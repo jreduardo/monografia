@@ -5,6 +5,10 @@
 *.toc
 *.snm
 *.synctex.gz
+*.bbl
+*.blg
+*.brf
+*.idx
 *.html
 *~
 .#*
