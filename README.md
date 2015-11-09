@@ -15,17 +15,17 @@ de efeitos aleatórios e acomodação de inflação de zeros).
 
 ### Lista de afazeres ###
 
-    - [x] Criar o repositório GIT para gerenciamento de arquivos do TCC;
-    - [x] Análise crítica de artigo científico;
-    - [ ] Programar método de estimação do modelo de regressão com
-      efeito fixo e aleatório;
-    - [ ] Elaboração do projeto de pesquisa;
-        * Entrega do pré-projeto, **19/11**
-        * Apresentação do projeto **26/11**
-    - [ ] Análise dos dados de desfolha em capulhos de agodão
-      (`defoliation`);
-    - [ ] Análise do conjunto de dados `aviurba`, do pacote `ade4`
-      (**D**ata **A**nalysis functions to analyse **E**cological and
-      **E**nvironmental data in the framework of **E**uclidean
-      **E**xploratory methods);
-    - [ ] Descrever a organização do repositório no README;
+- [x] Criar o repositório GIT para gerenciamento de arquivos do TCC;
+- [x] Análise crítica de artigo científico;
+- [ ] Programar método de estimação do modelo de regressão com
+  efeito fixo e aleatório;
+- [ ] Elaboração do projeto de pesquisa;
+    * Entrega do pré-projeto, **19/11**
+    * Apresentação do projeto **26/11**
+- [ ] Análise dos dados de desfolha em capulhos de agodão
+  (`defoliation`);
+- [ ] Análise do conjunto de dados `aviurba`, do pacote `ade4`
+  (**D**ata **A**nalysis functions to analyse **E**cological and
+  **E**nvironmental data in the framework of **E**uclidean
+  **E**xploratory methods);
+- [ ] Descrever a organização do repositório no README;
