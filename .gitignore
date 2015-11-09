@@ -1,0 +1,15 @@
+*.aux
+*.log
+*.out
+*.nav
+*.toc
+*.snm
+*.synctex.gz
+*.html
+*~
+.#*
+#*
+.Rhistory
+.Rproj.user
+**/cache/*
+**/images/*
