@@ -1,0 +1,1099 @@
+---
+output:
+  html_document:
+    css: ~/Dropbox/shiny/palatino.css
+    self_contained: yes
+    toc: yes
+    number_sections: no
+---
+
+```{r setup, include=FALSE}
+##----------------------------------------------------------------------
+## Knitr settings. Do not run.
+
+opts_chunk$set(
+    tidy=FALSE,
+    error=FALSE,
+    warning=FALSE,
+    cache=FALSE,
+    ## fig.path="figures/map",
+    fig.width=7,
+    fig.height=6,
+    dpi=100,
+    fig.align="center",
+    dev.args=list(family="Palatino")
+    )
+options(width=70)
+
+```
+
+<center>
+
+****
+
+*Análise de experimento*
+
+<h1>
+Componentes de produção de soja em consórcio com gramíneas
+</h1>
+
+[Luís Armando Zago Machado](http://lattes.cnpq.br/4912506729242379 "email: luis.zago@embrapa.br")    
+[Walmes Marques Zeviani](http://leg.ufpr.br/~walmes/ "email: walmes@ufpr.br")
+
+</center>
+
+```{r, include=FALSE}
+##=============================================================================
+##                                                       Walmes Marques Zeviani
+##                                                               walmes@ufpr.br
+##=============================================================================
+
+```
+
+<!-- ----------------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------------- -->
+
+****
+## Definições da sessão
+
+```{r, message=FALSE, error=FALSE, warning=FALSE, results="hide"}
+##----------------------------------------------------------------------
+## Pacotes necessários.
+
+pkg <- c("latticeExtra", "plyr", "doBy", "multcomp",
+         "agricolae", "wzRfun")
+sapply(pkg, require, character.only=TRUE)
+
+## Remove objetos da mémoria para começar vazia.
+rm(list=ls())
+
+##----------------------------------------------------------------------
+## Definições gráficas.
+
+## Tábua de cores.
+mycol <- brewer.pal(6, "Set1")
+
+## Definições de preenchimentos, linhas, etc.
+ps <- list(box.rectangle=list(col=1, fill=c("gray70")),
+           box.umbrella=list(col=1, lty=1),
+           dot.symbol=list(col=1, pch=19),
+           dot.line=list(col="gray50", lty=3),
+           plot.symbol=list(col=1, cex=1.2),
+           plot.line=list(col=1),
+           plot.polygon=list(col="gray95"),
+           superpose.line=list(col=mycol),
+           superpose.symbol=list(col=mycol, pch=c(1:5)),
+           superpose.polygon=list(col=mycol),
+           strip.background=list(col=c("gray80","gray50"))
+           )
+trellis.par.set(ps)
+## show.settings()
+
+```
+
+****
+## Carregar os dados
+
+Download dos dados: http://www.leg.ufpr.br/~walmes/data/    
+Download do script: [script.R](1-RG2012-2013-7.R)
+
+```{r}
+##----------------------------------------------------------------------
+## Ler.
+
+dados <- read.table("1-consRendGraosSoja12-13.csv",
+                    header=TRUE, sep=";", dec=",")
+
+dados$Ano <- factor(dados$Ano, labels=c(2012,2013))
+dados$Rep  <- factor(dados$Rep)
+dados$Trat <- factor(dados$Trat,
+                     levels=c("SS", "SA", "ST", "SPa",
+                         "SPi", "SX", "SD", "SR"))
+str(dados)
+
+xtabs(~Ano+Trat, data=dados)
+
+```
+
+****
+## Análise exploratória preliminar
+
+Legenda dos fatores e níveis:
+
+  * Ano: ano em que foi realizado o experimento (2012 ou 2013);
+  * Rep: representa o nível de bloco (7);
+  * Trat:
+     * SS: soja solteira (testemunha);
+     * SA: consórcio soja + capim-Aruana;
+     * ST: consórcio soja + capim-Tamani;
+     * SX: consórcio soja + capim-Xaraés;
+     * SPa: consórcio soja + capim-Paiaguás;
+     * SPi: consórcio soja + capim-Piatã;
+     * SD: consórcio soja + Brachiaria decumbens;
+     * SR: consórcio soja + B. ruziziensis.
+
+Legenda das variáveis resposta:
+
+  * RG: rendimento de grãos (kg/ha);
+  * Imp: teor de impurezas (%);
+  * TUmid: teor de umidade (%);
+  * AltSoja: Altura das plantas de soja (cm);
+  * NPD: número de plantas daninhas (plantas/m²);
+  * NVagem: número de vagens por planta;
+  * NGVagem: Número de grãos por vagem (Número de vagem/número de plantas
+    de soja);
+  * M100G: massa de 100 grãos (g);
+
+```{r}
+##----------------------------------------------------------------------
+
+xyplot(RG+Imp+TUmid+AltSoja+NPD+NVagem+NGVagem+M100G~Trat,
+       groups=Ano, data=dados, outer=TRUE, as.table=TRUE,
+       scales=list(y="free", x=list(rot=90)), jitter.x=TRUE,
+       xlab="Consócios", ylab="Valores observados")
+
+```
+
+****
+## Análise
+
+Experimento instalado no delineamento de blocos casualizados, com 7
+repetições, avaliado em dois anos agrícolas consecutivos.
+
+Foi considerado o modelo linear gaussiano com efeito fixo de ano, efeito
+aleatório de bloco dentro de ano, efeito fixo de consórcio e de ano
+interação com consórcio.
+
+$$
+y_{ijk} = \mu+\alpha_i+b_{i(j)}+\tau_k+\gamma_{ik}+e_{i(jk)},
+$$
+
+em que $y_{ijk}$ são os valores observados, $\mu$ é uma constante
+desconhecida e arbitrária e correspondente à todas as observações,
+$\alpha_i$ é o efeito do ano, $b_{i(j)}$ é o efeito do bloco dentro do
+ano, $\tau_k$ é o efeito do nível de consórcio, $\gamma_{ik}$ é o efeito
+da interação entre ano e consórcio e $e_{i(jk)}$ é o erro
+resídual. Letras gregas indicam os termos de efeito fixo e letras arábes
+os termos de efeito aleatório. Aos termos de efeito aleatório assume-se
+distribuição normal com média 0 e variância $\sigma^2_b$ e $\sigma^2_e$
+respectivamente.
+
+O modelo teve seus parâmetros estimados por mínimos quadrados. A
+avaliação dos pressupostos do modelo (normalidade dos erros e variância
+constante) se deu por inspeção gráfica baseada nos resíduos e valores
+ajustados. Ao se verificar afastamento dos pressupostos, buscou-se
+aplicar transformações da família Box-Cos aos dados sugeridas pelo valor
+de $\lambda$ que maximizam a log-verossimilhança perfilhada. Para
+inferência sobre diferença entre médias, considerou-se o teste de Tukey
+para comparações múltiplas. O estudo foi feito em separado por quando
+verificado que a interação ano e consórcio foi significativa.
+
+****
+### RG: rendimento de grãos (kg/ha);
+
+```{r, fig.height=4}
+##----------------------------------------------------------------------
+## Ver.
+
+lab <- expression("Rendimento de grãos"~(kg~ha^{-1}))
+
+xyplot(RG~Trat, groups=Ano, data=dados,
+       as.table=TRUE, type=c("p","a"), jitter.x=TRUE,
+       auto.key=list(columns=2),
+       xlab="Consórcios", ylab=lab)
+
+```
+
+```{r}
+##----------------------------------------------------------------------
+## Ajuste.
+
+m0 <- aov(RG~Ano+Error(Ano:Rep)+Ano*Trat, data=dados)
+summary(m0)
+
+## Para os termos Trat e Ano:Trat, são os mesmos F.
+m0 <- lm(RG~Ano+Ano:Rep+Ano*Trat, data=dados)
+## anova(m0)
+
+## Diagnóstico dos pressupostos.
+par(mfrow=c(2,2)); plot(m0); layout(1)
+
+## Sem afastamentos dos pressupostos que sejam sistemáticos
+## (corrigíveis) ou prejudiciais à inferência.
+
+##----------------------------------------------------------------------
+## Médias ajustadas.
+
+glr <- df.residual(m0)
+qmr <- deviance(m0)/glr
+
+## Teste de Tukey.
+tk <- with(dados,
+           HSD.test(y=RG, trt=Trat, DFerror=glr, MSerror=qmr))
+tk$statistics["HSD"] ## DMS.
+tk$groups
+
+## Remove os espaços extras adicionados pela função.
+tk$groups[,-2] <- sapply(tk$groups[,-2],
+                         FUN=gsub, pattern="\\s*$", replacement="")
+
+## Para obter os IC para a média (ajustada).
+## LSmeans(m0, effect="Trat")
+L <- LSmatrix(m0, effect="Trat")
+rownames(L) <- levels(dados$Trat)
+
+## grid <- apmc(X=L, model=m0, focus="Trat", test="fdr", level=0.05)
+grid <- apmc(X=L, model=m0, focus="Trat",
+             test="single-step", level=0.05)
+## grid
+
+grid <- merge(grid, tk$groups, by.x="Trat", by.y="trt")
+grid$Trat <- reorder(grid$Trat, grid$estimate)
+grid
+
+## cld veio da glht() e M veio da HSD.test().
+## estimate é uma média ajustada de mínimos quadrados, means é média
+## amostral.
+
+```
+
+Apesar do teste F ter sido não significativo, a aplicação do teste de
+Tukey indicou diferenças entre as médias extremas.
+
+```{r, fig.height=4}
+##----------------------------------------------------------------------
+
+l <- levels(grid$Trat)
+ylim <- c(0.5, length(l)+1)
+sc <- list(y=list(at=seq_along(l), labels=l))
+
+segplot(Trat~lwr+upr, data=grid, centers=estimate, draw=FALSE,
+        ## ann=grid$cld,
+        ann=grid$M, ## Teste de Tukey.
+        ylim=ylim, scales=sc,
+        xlab=lab, ylab="Consórcios",
+        panel=function(z, centers, ann, subscripts, ...){
+            panel.segplot(z=z, centers=centers,
+                          subscripts=subscripts,
+                          ...)
+            ann <- sprintf("%0.1f %s", centers, ann)
+            panel.text(x=centers, y=z, labels=ann, pos=3, cex=0.8)
+        })
+
+```
+
+****
+### Imp: teor de impurezas (%);
+
+```{r, fig.height=4}
+##----------------------------------------------------------------------
+## Ver.
+
+lab <- expression("Teor de impurezas"~("%"))
+
+xyplot(Imp~Trat, groups=Ano, data=dados,
+       as.table=TRUE, type=c("p","a"), jitter.x=TRUE,
+       auto.key=list(columns=2),
+       xlab="Consórcios", ylab=lab)
+
+```
+
+Efeito de ano bem expressivo, inclusive com diferença de variabilidade.
+
+```{r}
+##----------------------------------------------------------------------
+## Ajuste.
+
+## Para os termos Trat e Ano:Trat, são os mesmos F.
+m0 <- lm(Imp~Ano+Ano:Rep+Ano*Trat, data=dados)
+## anova(m0)
+
+## Diagnóstico dos pressupostos.
+par(mfrow=c(2,2)); plot(m0, which=1:3)
+MASS::boxcox(m0)
+abline(v=1/3, col=2)
+layout(1)
+
+## Aplicando transformação.
+m0 <- update(m0, formula=.^(1/3)~.)
+## anova(m0)
+
+## Diagnóstico dos pressupostos.
+par(mfrow=c(2,2)); plot(m0); layout(1)
+
+## Sem afastamentos dos pressupostos que sejam sistemáticos
+## (corrigíveis) ou prejudiciais à inferência.
+
+## ANOVA com valores de F corretos.
+summary(aov(Imp^(1/3)~Ano+Error(Ano:Rep)+Ano*Trat, data=dados))
+
+##----------------------------------------------------------------------
+## Médias ajustadas.
+
+glr <- df.residual(m0)
+qmr <- deviance(m0)/glr
+
+## Teste de Tukey.
+tk <- HSD.test(y=m0$model[,1], trt=m0$model["Trat"],
+               DFerror=glr, MSerror=qmr)
+tk$statistics["HSD"] ## DMS.
+tk$groups
+
+## Remove os espaços extras adicionados pela função.
+tk$groups[,-2] <- sapply(tk$groups[,-2],
+                         FUN=gsub, pattern="\\s*$", replacement="")
+
+## Para obter os IC para a média (ajustada).
+## LSmeans(m0, effect="Trat")
+L <- LSmatrix(m0, effect="Trat")
+rownames(L) <- levels(dados$Trat)
+
+## grid <- apmc(X=L, model=m0, focus="Trat", test="fdr", level=0.05)
+grid <- apmc(X=L, model=m0, focus="Trat",
+             test="single-step", level=0.05)
+## grid
+
+grid <- merge(grid, tk$groups, by.x="Trat", by.y="trt")
+grid$Trat <- reorder(grid$Trat, grid$estimate)
+grid
+
+## Representar na escala dos dados.
+grid[,c("estimate","lwr","upr")] <- grid[,c("estimate","lwr","upr")]^3
+
+## cld veio da glht() e M veio da HSD.test().
+## estimate é uma média ajustada de mínimos quadrados, means é média
+## amostral.
+
+```
+
+Apesar do teste F ter sido não significativo, a aplicação do teste de
+Tukey indicou diferenças entre as médias extremas. No gráfico estão
+sendo representados os valores médios na escala original. Eles foram
+obtidos pela transformação das médias ajustadas considerando a função
+inversa usada na resposta dados para adequação dos pressupostos. Em
+função disso, os intervalos na escala transformada não apresentam a
+mesma amplitude e nem simetria.
+
+```{r, fig.height=4}
+##----------------------------------------------------------------------
+
+l <- levels(grid$Trat)
+ylim <- c(0.5, length(l)+1)
+sc <- list(y=list(at=seq_along(l), labels=l))
+
+segplot(Trat~lwr+upr, data=grid, centers=estimate, draw=FALSE,
+        ## ann=grid$cld,
+        ann=grid$M, ## Teste de Tukey.
+        ylim=ylim, scales=sc,
+        xlab=lab, ylab="Consórcios",
+        panel=function(z, centers, ann, subscripts, ...){
+            panel.segplot(z=z, centers=centers,
+                          subscripts=subscripts,
+                          ...)
+            ann <- sprintf("%0.2f %s", centers, ann)
+            panel.text(x=centers, y=z, labels=ann, pos=3, cex=0.8)
+        })
+
+```
+
+****
+### TUmid: teor de umidade (%);
+
+```{r, fig.height=4}
+##----------------------------------------------------------------------
+## Ver.
+
+lab <- expression("Teor de umidade"~("%"))
+
+xyplot(TUmid~Trat, groups=Ano, data=dados,
+       as.table=TRUE, type=c("p","a"), jitter.x=TRUE,
+       auto.key=list(columns=2),
+       xlab="Consórcios", ylab=lab)
+
+```
+
+Efeito de ano bem expressivo, inclusive com diferença de variabilidade.
+
+```{r}
+##----------------------------------------------------------------------
+## Ajuste.
+
+## Para os termos Trat e Ano:Trat, são os mesmos F.
+m0 <- lm(TUmid~Ano+Ano:Rep+Ano*Trat, data=dados)
+## anova(m0)
+
+## Diagnóstico dos pressupostos.
+par(mfrow=c(2,2)); plot(m0, which=1:3)
+MASS::boxcox(m0, lambda=seq(-3, 1, by=0.1))
+abline(v=-2, col=2)
+layout(1)
+
+## Aplicando transformação.
+m0 <- update(m0, formula=.^(-2)~.)
+## anova(m0)
+
+## Diagnóstico dos pressupostos.
+par(mfrow=c(2,2)); plot(m0); layout(1)
+
+## Sem afastamentos dos pressupostos que sejam sistemáticos
+## (corrigíveis) ou prejudiciais à inferência.
+
+## ANOVA com valores de F corretos.
+summary(aov(TUmid^(-2)~Ano+Error(Ano:Rep)+Ano*Trat, data=dados))
+
+##----------------------------------------------------------------------
+## Médias ajustadas.
+
+glr <- df.residual(m0)
+qmr <- deviance(m0)/glr
+
+## Teste de Tukey.
+tk <- HSD.test(y=m0$model[,1], trt=m0$model["Trat"],
+               DFerror=glr, MSerror=qmr)
+tk$statistics["HSD"] ## DMS.
+tk$groups
+
+## Remove os espaços extras adicionados pela função.
+tk$groups[,-2] <- sapply(tk$groups[,-2],
+                         FUN=gsub, pattern="\\s*$", replacement="")
+
+## Para obter os IC para a média (ajustada).
+## LSmeans(m0, effect="Trat")
+L <- LSmatrix(m0, effect="Trat")
+rownames(L) <- levels(dados$Trat)
+
+## grid <- apmc(X=L, model=m0, focus="Trat", test="fdr", level=0.05)
+grid <- apmc(X=L, model=m0, focus="Trat",
+             test="single-step", level=0.05)
+## grid
+
+grid <- merge(grid, tk$groups, by.x="Trat", by.y="trt")
+grid$Trat <- reorder(grid$Trat, -grid$estimate)
+grid
+
+## Representar na escala dos dados.
+grid[,c("estimate","lwr","upr")] <-
+    grid[,c("estimate","lwr","upr")]^(-1/2)
+
+## cld veio da glht() e M veio da HSD.test().
+## estimate é uma média ajustada de mínimos quadrados, means é média
+## amostral.
+
+```
+
+No gráfico estão sendo representados os valores médios na escala
+original. Eles foram obtidos pela transformação das médias ajustadas
+considerando a função inversa usada na resposta dados para adequação dos
+pressupostos. Em função disso, os intervalos na escala transformada não
+apresentam a mesma amplitude e nem simetria.
+
+```{r, fig.height=4}
+##----------------------------------------------------------------------
+
+l <- levels(grid$Trat)
+ylim <- c(0.5, length(l)+1)
+sc <- list(y=list(at=seq_along(l), labels=l))
+
+segplot(Trat~lwr+upr, data=grid, centers=estimate, draw=FALSE,
+        ## ann=grid$cld,
+        ann=grid$M, ## Teste de Tukey.
+        ylim=ylim, scales=sc,
+        xlab=lab, ylab="Consórcios",
+        panel=function(z, centers, ann, subscripts, ...){
+            panel.segplot(z=z, centers=centers,
+                          subscripts=subscripts,
+                          ...)
+            ann <- sprintf("%0.2f %s", centers, ann)
+            panel.text(x=centers, y=z, labels=ann, pos=3, cex=0.8)
+        })
+
+```
+
+****
+### AltSoja: Altura das plantas de soja (cm);
+
+```{r, fig.height=4}
+##----------------------------------------------------------------------
+## Ver.
+
+lab <- expression("Altura das plantas de soja"~("cm"))
+
+xyplot(AltSoja~Trat, groups=Ano, data=dados,
+       as.table=TRUE, type=c("p","a"), jitter.x=TRUE,
+       auto.key=list(columns=2),
+       xlab="Consórcios", ylab=lab)
+
+```
+
+```{r}
+##----------------------------------------------------------------------
+## Ajuste.
+
+## Para os termos Trat e Ano:Trat, são os mesmos F.
+m0 <- lm(AltSoja~Ano+Ano:Rep+Ano*Trat, data=dados)
+## anova(m0)
+
+## Diagnóstico dos pressupostos.
+par(mfrow=c(2,2)); plot(m0); layout(1)
+
+## Sem afastamentos dos pressupostos que sejam sistemáticos
+## (corrigíveis) ou prejudiciais à inferência.
+
+## ANOVA com valores de F corretos.
+summary(aov(AltSoja~Ano+Error(Ano:Rep)+Ano*Trat, data=dados))
+
+##----------------------------------------------------------------------
+## Médias ajustadas.
+
+glr <- df.residual(m0)
+qmr <- deviance(m0)/glr
+
+## Teste de Tukey.
+tk <- HSD.test(y=m0$model[,1], trt=m0$model["Trat"],
+               DFerror=glr, MSerror=qmr)
+tk$statistics["HSD"] ## DMS.
+tk$groups
+
+## Remove os espaços extras adicionados pela função.
+tk$groups[,-2] <- sapply(tk$groups[,-2],
+                         FUN=gsub, pattern="\\s*$", replacement="")
+
+## Para obter os IC para a média (ajustada).
+## LSmeans(m0, effect="Trat")
+L <- LSmatrix(m0, effect="Trat")
+rownames(L) <- levels(dados$Trat)
+
+## grid <- apmc(X=L, model=m0, focus="Trat", test="fdr", level=0.05)
+grid <- apmc(X=L, model=m0, focus="Trat",
+             test="single-step", level=0.05)
+## grid
+
+grid <- merge(grid, tk$groups, by.x="Trat", by.y="trt")
+grid$Trat <- reorder(grid$Trat, grid$estimate)
+grid
+
+## cld veio da glht() e M veio da HSD.test().
+## estimate é uma média ajustada de mínimos quadrados, means é média
+## amostral.
+
+```
+
+```{r, fig.height=4}
+##----------------------------------------------------------------------
+
+l <- levels(grid$Trat)
+ylim <- c(0.5, length(l)+1)
+sc <- list(y=list(at=seq_along(l), labels=l))
+
+segplot(Trat~lwr+upr, data=grid, centers=estimate, draw=FALSE,
+        ## ann=grid$cld,
+        ann=grid$M, ## Teste de Tukey.
+        ylim=ylim, scales=sc,
+        xlab=lab, ylab="Consórcios",
+        panel=function(z, centers, ann, subscripts, ...){
+            panel.segplot(z=z, centers=centers,
+                          subscripts=subscripts,
+                          ...)
+            ann <- sprintf("%0.2f %s", centers, ann)
+            panel.text(x=centers, y=z, labels=ann, pos=3, cex=0.8)
+        })
+
+```
+
+****
+### NPD: número de plantas daninhas (plantas/m²);
+
+```{r, fig.height=4}
+##----------------------------------------------------------------------
+## Ver.
+
+lab <- expression("Número de plantas daninhas"~(plantas~m^{-2}))
+
+xyplot(NPD~Trat, groups=Ano, data=dados,
+       as.table=TRUE, type=c("p","a"), jitter.x=TRUE,
+       auto.key=list(columns=2),
+       xlab="Consórcios", ylab=lab)
+
+## xyplot(log(NPD+0.5)~Trat, groups=Ano, data=dados,
+##        as.table=TRUE, type=c("p","a"), jitter.x=TRUE,
+##        auto.key=list(columns=2),
+##        xlab="Consórcios", ylab=lab)
+
+```
+
+Efeito de ano bem expressivo, inclusive com diferença de
+variabilidade. Ainda é importante mencionar que essa é uma variável
+proveniente de uma contagem, como média de contagens, portanto não se
+pode aplicar à media de contagens a distribuição Poisson, a menos que o
+número de unidades (plantas) avaliadas para obter tal média, seja
+informado. Apresenta valores baixos incluindo zeros, portanto não
+contínua como se supõe para uso da análise de variância. Por outro lado,
+certas transformações, se adequadamente aplicadas, podem permitir que os
+pressupostos sejam atendidos, não comprometendo a validade das
+inferências.
+
+```{r}
+##----------------------------------------------------------------------
+## Ajuste.
+
+summary(dados$NPD)
+
+## Presença de zeros. Somar um para poder se fazer log, caso necessário.
+
+## Para os termos Trat e Ano:Trat, são os mesmos F.
+m0 <- lm((NPD+0.5)~Ano+Ano:Rep+Ano*Trat, data=dados)
+## anova(m0)
+
+## Diagnóstico dos pressupostos.
+par(mfrow=c(2,2)); plot(m0, which=1:3)
+MASS::boxcox(m0, lambda=seq(-2, 2, by=0.1))
+abline(v=0, col=2)
+layout(1)
+
+## Aplicando transformação.
+m0 <- update(m0, formula=log(.)~.)
+## anova(m0)
+
+## Diagnóstico dos pressupostos.
+par(mfrow=c(2,2)); plot(m0); layout(1)
+
+## Sem afastamentos dos pressupostos que sejam sistemáticos
+## (corrigíveis) ou prejudiciais à inferência.
+
+## ANOVA com valores de F corretos.
+summary(aov(log(NPD+0.5)~Ano+Error(Ano:Rep)+Ano*Trat, data=dados))
+
+##----------------------------------------------------------------------
+## Médias ajustadas.
+
+glr <- df.residual(m0)
+qmr <- deviance(m0)/glr
+
+## Teste de Tukey.
+tk <- HSD.test(y=m0$model[,1], trt=m0$model["Trat"],
+               DFerror=glr, MSerror=qmr)
+tk$statistics["HSD"] ## DMS.
+tk$groups
+
+## Remove os espaços extras adicionados pela função.
+tk$groups[,-2] <- sapply(tk$groups[,-2],
+                         FUN=gsub, pattern="\\s*$", replacement="")
+
+## Para obter os IC para a média (ajustada).
+## LSmeans(m0, effect="Trat")
+L <- LSmatrix(m0, effect="Trat")
+rownames(L) <- levels(dados$Trat)
+
+## grid <- apmc(X=L, model=m0, focus="Trat", test="fdr", level=0.05)
+grid <- apmc(X=L, model=m0, focus="Trat",
+             test="single-step", level=0.05)
+## grid
+
+grid <- merge(grid, tk$groups, by.x="Trat", by.y="trt")
+grid$Trat <- reorder(grid$Trat, grid$estimate)
+grid
+
+## Representar na escala dos dados.
+grid[,c("estimate","lwr","upr")] <-
+    exp(grid[,c("estimate","lwr","upr")])-0.5
+
+## cld veio da glht() e M veio da HSD.test().
+## estimate é uma média ajustada de mínimos quadrados, means é média
+## amostral.
+
+```
+
+No gráfico estão sendo representados os valores médios na escala
+original. Eles foram obtidos pela transformação das médias ajustadas
+considerando a função inversa usada na resposta dados para adequação dos
+pressupostos. Em função disso, os intervalos na escala transformada não
+apresentam a mesma amplitude e nem simetria.
+
+```{r, fig.height=4}
+##----------------------------------------------------------------------
+
+l <- levels(grid$Trat)
+ylim <- c(0.5, length(l)+1)
+sc <- list(y=list(at=seq_along(l), labels=l))
+
+segplot(Trat~lwr+upr, data=grid, centers=estimate, draw=FALSE,
+        ## ann=grid$cld,
+        ann=grid$M, ## Teste de Tukey.
+        ylim=ylim, scales=sc,
+        xlab=lab, ylab="Consórcios",
+        panel=function(z, centers, ann, subscripts, ...){
+            panel.segplot(z=z, centers=centers,
+                          subscripts=subscripts,
+                          ...)
+            ann <- sprintf("%0.2f %s", centers, ann)
+            panel.text(x=centers, y=z, labels=ann, pos=3, cex=0.8)
+        })
+
+```
+
+****
+### NVagem: número de vagens por planta;
+
+```{r, fig.height=4}
+##----------------------------------------------------------------------
+## Ver.
+
+lab <- expression("Número de vagens por planta")
+
+xyplot(NVagem~Trat, groups=Ano, data=dados,
+       as.table=TRUE, type=c("p","a"), jitter.x=TRUE,
+       auto.key=list(columns=2),
+       xlab="Consórcios", ylab=lab)
+
+```
+
+Efeito de ano bem expressivo, inclusive com diferença de
+variabilidade. Ainda é importante mencionar que essa é uma variável do
+tipo contagem então se fazem justos os mesmos comentários feitos para
+NPD. Os valores são altos (distantes do zero), portanto não contínua
+como se supõe para uso da análise de variância. Por outro lado, certas
+transformações, se adequadamente aplicadas, podem permitir que os
+pressupostos sejam atendidos, não comprometendo a validade das
+inferências. Em especial, pelo fato de ser uma contagem alta, espera-se
+menor afastamento dos pressupostos do que aquele para contagens baixas.
+
+```{r}
+##----------------------------------------------------------------------
+## Ajuste.
+
+summary(dados$NVagem)
+
+## Sem presença de zeros.
+
+## Para os termos Trat e Ano:Trat, são os mesmos F.
+m0 <- lm(NVagem~Ano+Ano:Rep+Ano*Trat, data=dados)
+## anova(m0)
+
+## Diagnóstico dos pressupostos.
+par(mfrow=c(2,2)); plot(m0, which=1:3)
+MASS::boxcox(m0, lambda=seq(-2, 2, by=0.1))
+abline(v=0, col=2)
+layout(1)
+
+## Aplicando transformação.
+m0 <- update(m0, formula=log(.)~.)
+## anova(m0)
+
+## Diagnóstico dos pressupostos.
+par(mfrow=c(2,2)); plot(m0); layout(1)
+
+## Sem afastamentos dos pressupostos que sejam sistemáticos
+## (corrigíveis) ou prejudiciais à inferência.
+
+## ANOVA com valores de F corretos.
+summary(aov(log(NVagem)~Ano+Error(Ano:Rep)+Ano*Trat, data=dados))
+
+##----------------------------------------------------------------------
+## Médias ajustadas.
+
+glr <- df.residual(m0)
+qmr <- deviance(m0)/glr
+
+## Teste de Tukey.
+tk <- HSD.test(y=m0$model[,1], trt=m0$model["Trat"],
+               DFerror=glr, MSerror=qmr)
+tk$statistics["HSD"] ## DMS.
+tk$groups
+
+## Remove os espaços extras adicionados pela função.
+tk$groups[,-2] <- sapply(tk$groups[,-2],
+                         FUN=gsub, pattern="\\s*$", replacement="")
+
+## Para obter os IC para a média (ajustada).
+## LSmeans(m0, effect="Trat")
+L <- LSmatrix(m0, effect="Trat")
+rownames(L) <- levels(dados$Trat)
+
+## grid <- apmc(X=L, model=m0, focus="Trat", test="fdr", level=0.05)
+grid <- apmc(X=L, model=m0, focus="Trat",
+             test="single-step", level=0.05)
+## grid
+
+grid <- merge(grid, tk$groups, by.x="Trat", by.y="trt")
+grid$Trat <- reorder(grid$Trat, grid$estimate)
+grid
+
+## Representar na escala dos dados.
+grid[,c("estimate","lwr","upr")] <-
+    exp(grid[,c("estimate","lwr","upr")])
+
+## cld veio da glht() e M veio da HSD.test().
+## estimate é uma média ajustada de mínimos quadrados, means é média
+## amostral.
+
+```
+
+No gráfico estão sendo representados os valores médios na escala
+original. Eles foram obtidos pela transformação das médias ajustadas
+considerando a função inversa usada na resposta dados para adequação dos
+pressupostos. Em função disso, os intervalos na escala transformada não
+apresentam a mesma amplitude e nem simetria.
+
+```{r, fig.height=4}
+##----------------------------------------------------------------------
+
+l <- levels(grid$Trat)
+ylim <- c(0.5, length(l)+1)
+sc <- list(y=list(at=seq_along(l), labels=l))
+
+segplot(Trat~lwr+upr, data=grid, centers=estimate, draw=FALSE,
+        ## ann=grid$cld,
+        ann=grid$M, ## Teste de Tukey.
+        ylim=ylim, scales=sc,
+        xlab=lab, ylab="Consórcios",
+        panel=function(z, centers, ann, subscripts, ...){
+            panel.segplot(z=z, centers=centers,
+                          subscripts=subscripts,
+                          ...)
+            ann <- sprintf("%0.2f %s", centers, ann)
+            panel.text(x=centers, y=z, labels=ann, pos=3, cex=0.8)
+        })
+
+```
+
+****
+### NGVagem: Número de grãos por vagem (Número de vagem/número de plantas de soja);
+
+```{r, fig.height=4}
+##----------------------------------------------------------------------
+## Ver.
+
+lab <- expression("Número de grãos por vagem")
+
+xyplot(NGVagem~Trat, groups=Ano, data=dados,
+       as.table=TRUE, type=c("p","a"), jitter.x=TRUE,
+       auto.key=list(columns=2),
+       xlab="Consórcios", ylab=lab)
+
+```
+
+Efeito de ano bem expressivo, inclusive com diferença de
+variabilidade. Ainda é importante mencionar que essa é uma variável do
+tipo contagem então se fazem justos os mesmos comentários feitos para
+NPD. Os valores são altos (distantes do zero), portanto não contínua
+como se supõe para uso da análise de variância. Por outro lado, certas
+transformações, se adequadamente aplicadas, podem permitir que os
+pressupostos sejam atendidos, não comprometendo a validade das
+inferências. Em especial, pelo fato de ser uma contagem alta, espera-se
+menor afastamento dos pressupostos do que aquele para contagens baixas.
+
+```{r}
+##----------------------------------------------------------------------
+## Ajuste.
+
+summary(dados$NGVagem)
+## MASS::fractions(dados$NGVagem)
+
+## Sem presença de zeros.
+
+## A observação 88 foi removida por ser considerada outlier por medidas
+## de influencia.
+
+## Para os termos Trat e Ano:Trat, são os mesmos F.
+m0 <- lm(NGVagem~Ano+Ano:Rep+Ano*Trat, data=dados[-88,])
+## anova(m0)
+
+## im <- influence.measures(m0)
+## summary(im)
+
+## Diagnóstico dos pressupostos.
+par(mfrow=c(2,2)); plot(m0, which=1:3)
+## MASS::boxcox(m0, lambda=seq(-2, 2, by=0.1))
+## abline(v=0.5, col=2)
+layout(1)
+
+## Sem afastamentos dos pressupostos que sejam sistemáticos
+## (corrigíveis) ou prejudiciais à inferência.
+
+## ANOVA com valores de F corretos.
+summary(aov(NGVagem~Ano+Error(Ano:Rep)+Ano*Trat, data=dados[-88,]))
+
+##----------------------------------------------------------------------
+## Médias ajustadas.
+
+## O desbalanceamento impede de usar Tukey.
+
+## glr <- df.residual(m0)
+## qmr <- deviance(m0)/glr
+## 
+## ## Teste de Tukey.
+## tk <- HSD.test(y=m0$model[,1], trt=m0$model["Trat"],
+##                DFerror=glr, MSerror=qmr)
+## tk$statistics["HSD"] ## DMS.
+## tk$groups
+## 
+## ## Remove os espaços extras adicionados pela função.
+## tk$groups[,-2] <- sapply(tk$groups[,-2],
+##                          FUN=gsub, pattern="\\s*$", replacement="")
+
+## Para obter os IC para a média (ajustada).
+## LSmeans(m0, effect="Trat")
+L <- LSmatrix(m0, effect=c("Ano","Trat"))
+rownames(L) <- apply(attr(L, "grid"), 1, paste, collapse="/")
+
+## grid <- apmc(X=L, model=m0, focus="Trat", test="fdr", level=0.05)
+## grid <- apmc(X=L, model=m0, focus="Trat",
+##              test="single-step", level=0.05)
+L <- by(data=L, INDICES=attr(L, "grid")$Ano, FUN=as.matrix)
+L <- lapply(L, apmc, model=m0, focus="Trat",
+            test="single-step", level=0.05)
+grid <- ldply(L, .id="Ano")
+grid$Trat <- factor(gsub(pattern="^.*/", x=grid$Trat, replacement=""),
+                    levels(dados$Trat))
+## grid
+
+## grid <- merge(grid, tk$groups, by.x="Trat", by.y="trt")
+grid$Trat <- reorder(grid$Trat, grid$estimate)
+## grid
+
+## cld veio da glht() e M veio da HSD.test().
+## estimate é uma média ajustada de mínimos quadrados, means é média
+## amostral.
+
+```
+
+No gráfico estão sendo representados os valores médios na escala
+original. Eles foram obtidos pela transformação das médias ajustadas
+considerando a função inversa usada na resposta dados para adequação dos
+pressupostos. Em função disso, os intervalos na escala transformada não
+apresentam a mesma amplitude e nem simetria.
+
+```{r, fig.height=6}
+##----------------------------------------------------------------------
+
+l <- levels(grid$Trat)
+ylim <- c(0, length(l)+1)
+sc <- list(y=list(at=seq_along(l), labels=l))
+
+l <- levels(grid$Ano)
+pch <- c(1,19)
+key <- list(columns=length(l), type="o", divide=1,
+            text=list(l),
+            lines=list(pch=pch, lty=1))
+
+segplot(Trat~lwr+upr, groups=grid$Ano, data=grid,
+        centers=estimate, draw=FALSE,
+        pch=pch[as.integer(grid$Ano)],
+        ann=grid$cld, f=0.1,
+        ## ann=grid$M, ## Teste de Tukey.
+        ylim=ylim, scales=sc, key=key,
+        xlab=lab, ylab="Consórcios",
+        panel=function(z, centers, ann, subscripts, groups, f, ...){
+            d <- 2*((as.integer(groups)-1)/(nlevels(groups)-1))-1
+            z <- as.numeric(z)+f*d
+            panel.segplot(z, centers=centers,
+                          subscripts=subscripts, ...)
+            ann <- sprintf("%0.2f %s", centers, ann)
+            panel.text(x=centers, y=z, labels=ann,
+                       pos=sign(d)+2, cex=0.8)
+        })
+
+```
+
+No gráfico acima, as letras distinguem médias de consórcios para um
+mesmo nível de ano.
+
+****
+### M100G: massa de 100 grãos (g);
+
+```{r, fig.height=4}
+##----------------------------------------------------------------------
+## Ver.
+
+lab <- expression("Massa de 100 graõs"~("g"))
+
+xyplot(M100G~Trat, groups=Ano, data=dados,
+       as.table=TRUE, type=c("p","a"), jitter.x=TRUE,
+       auto.key=list(columns=2),
+       xlab="Consórcios", ylab=lab)
+
+```
+
+```{r}
+##----------------------------------------------------------------------
+## Ajuste.
+
+## Para os termos Trat e Ano:Trat, são os mesmos F.
+m0 <- lm(M100G~Ano+Ano:Rep+Ano*Trat, data=dados)
+## anova(m0)
+
+## Diagnóstico dos pressupostos.
+par(mfrow=c(2,2)); plot(m0); layout(1)
+
+## Sem afastamentos dos pressupostos que sejam sistemáticos
+## (corrigíveis) ou prejudiciais à inferência.
+
+## ANOVA com valores de F corretos.
+summary(aov(M100G~Ano+Error(Ano:Rep)+Ano*Trat, data=dados))
+
+##----------------------------------------------------------------------
+## Médias ajustadas.
+
+glr <- df.residual(m0)
+qmr <- deviance(m0)/glr
+
+## Teste de Tukey.
+tk <- HSD.test(y=m0$model[,1], trt=m0$model["Trat"],
+               DFerror=glr, MSerror=qmr)
+tk$statistics["HSD"] ## DMS.
+tk$groups
+
+## Remove os espaços extras adicionados pela função.
+tk$groups[,-2] <- sapply(tk$groups[,-2],
+                         FUN=gsub, pattern="\\s*$", replacement="")
+
+## Para obter os IC para a média (ajustada).
+## LSmeans(m0, effect="Trat")
+L <- LSmatrix(m0, effect="Trat")
+rownames(L) <- levels(dados$Trat)
+
+## grid <- apmc(X=L, model=m0, focus="Trat", test="fdr", level=0.05)
+grid <- apmc(X=L, model=m0, focus="Trat",
+             test="single-step", level=0.05)
+## grid
+
+grid <- merge(grid, tk$groups, by.x="Trat", by.y="trt")
+grid$Trat <- reorder(grid$Trat, grid$estimate)
+grid
+
+## cld veio da glht() e M veio da HSD.test().
+## estimate é uma média ajustada de mínimos quadrados, means é média
+## amostral.
+
+```
+
+```{r, fig.height=4}
+##----------------------------------------------------------------------
+
+l <- levels(grid$Trat)
+ylim <- c(0.5, length(l)+1)
+sc <- list(y=list(at=seq_along(l), labels=l))
+
+segplot(Trat~lwr+upr, data=grid, centers=estimate, draw=FALSE,
+        ## ann=grid$cld,
+        ann=grid$M, ## Teste de Tukey.
+        ylim=ylim, scales=sc,
+        xlab=lab, ylab="Consórcios",
+        panel=function(z, centers, ann, subscripts, ...){
+            panel.segplot(z=z, centers=centers,
+                          subscripts=subscripts,
+                          ...)
+            ann <- sprintf("%0.2f %s", centers, ann)
+            panel.text(x=centers, y=z, labels=ann, pos=3, cex=0.8)
+        })
+
+```
+
+```{r}
+##----------------------------------------------------------------------
+## Versões dos pacotes e data do documento.
+
+sessionInfo()
+Sys.time()
+
+```
