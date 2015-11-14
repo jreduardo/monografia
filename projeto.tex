@@ -106,8 +106,8 @@
 % ---
 % Informações de dados para CAPA e FOLHA DE ROSTO
 % ---
-\titulo{Modelo de Regressão Conway-Maxwell-Poisson para Modelagem de 
-Dados de Contagem; Extensões e Aplicações
+\titulo{Extensões e Aplicações Modelo de Regressão
+Conway-Maxwell-Poisson para Modelagem de Dados de Contagem}
 \vspace{2cm}}
 \autor{Eduardo Elias Ribeiro Junior}
 \local{Curitiba}
@@ -222,23 +222,45 @@ como requisito para elaboração do Trabalho de Conclusão de Curso}
 % ----------------------------------------------------------
 \chapter{Introdução}
 
-Discutir a relevância e aplicação de modelos estatísticos 
-de regressão no âmbito científico. Citar a introdução dos 
-modelos lineares generalizados.
+Discutir a relevância e aplicação de modelos estatísticos de regressão
+no âmbito científico: compreender e medir a relação entre uma varíavel
+dependente com variáveis independentes e fazer previsão.
 
-Abordar modelos de regressão para variáveis de contagem, 
-descrever as características, e com isso a imitação do 
-modelo de regressão Poisson. Apresentar o modelo COM-Poisson
-descrevendo sua flexibilidade.
+Descrever a estrutura genérica de um modelo de regressão: variável
+resposta, variáveis preditoras, distribuição de probabilidades,
+especificação do preditor, função de ligação.
 
-Abordar modelos lineares mistos com situações exemplos, e 
-discutir a aplicação de modelos mistos para acomodar 
-sobredispersão.
+Tipo de modelos de regressão. Modelos lineares quando a variável é
+normal. GLM é uma extensão para respostas não Gaussinas.  Citar a
+introdução dos modelos lineares generalizados.  Poisson é o membro da
+familia para dados de contagem.
 
-Ressaltar a relevância do estudo para a comunidade 
-estatística, principalmente como contribuição para a 
-literatura estatística brasileira.
+O processo de Poisson. As características de uma v.a. Poisson. A
+restrição da suposição de equidispersão. Mecanísmos geradores de
+contagens.
 
+Abordar modelos de regressão para variáveis de contagem, descrever as
+características, e com isso a imitação do modelo de regressão Poisson.
+
+Apresentar o modelo COM-Poisson. Enfatizar sua flexibilidade,
+principalmente para casos de subdispersão.
+
+Abordar modelos lineares mistos com situações exemplos, e discutir a
+aplicação de modelos mistos para acomodar sobredispersão. Comentar que,
+até onde temos conhecimento, não existem aplicações/implementações do
+COM-Poisson com efeito aleatório.
+
+Da mesma forma, modelos com inflação de zeros e contagem COM-Poisson não
+foram encontrados.
+
+Comentar dos problemas de cunho númerico relacionado a COM-Poisson que
+merecem cuidados na implementação ao são desafiadores. A constante de
+integração que exige uma soma infinita, o expoentes altos. Os métodos de
+integração para modelos de efeito aleatório.
+
+Ressaltar a relevância do estudo para a comunidade estatística,
+principalmente como contribuição para a literatura estatística
+brasileira.
 
 % ----------------------------------------------------------
 % Objetivos
@@ -256,24 +278,23 @@ e inflação de zeros).
 \section{Objetivos Específicos}
 
 \begin{itemize}
-	\item Apresentar e discutir aspectos da distribuição 
-	COM-Poisson para modelagem de dados discretos;
+\item Apresentar e discutir aspectos da distribuição COM-Poisson para
+  modelos de regressão para dados de contagem;
 	
-	\item Avaliar a acurácia os métodos de estimação para 
-	os modelos de regressão de efeito fixo;
+\item Avaliar as propriedades de soluções númericas para 1) cálculo da
+  densidade de probabilidade do modelo e 2) para estimação de modelos de
+  regressão de efeito fixo;
 	
-	\item Estender os modelos de regressão COM-Poisson para 
-	acomodar efeitos aleatórios e estimar seus parâmetros;
+\item Propor e implementar uma extensão do modelo de regressão
+  COM-Poisson para acomodar efeitos aleatórios;
 	
-	\item Acomodar excesso de zeros no modelo de regressão 
-	COM-Poisson
+\item Propor e implementar uma extensão do modelo de regressão
+  COM-Poisson para acomodar contagens com excesso de zeros.
 	
-	\item Aplicar e comparar os resultados dos modelos de 
-	interesse, COM-Poisson, com diferentes abordagens 
-	comumente utilizadas pela comunidade estatística 
-	(Modelos Poisson, Poisson de efeito aleatório, Binomial
-	Negativo, Quasi-Poisson, VIF) para dados reais e/ou 
-	simulados.
+\item Fazer a aplicação do modelo COM-Poisson e das extensões
+  desenvolvidas à dados reais ou simulados. Fazer comparações com os
+  modelos disponíveis para as situações estudadas: Poisson,
+  Quasi-Poisson, Binomial Negativo, Poisson de efeito aleatório.
 \end{itemize}
 
 % ----------------------------------------------------------
