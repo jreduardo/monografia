@@ -1,0 +1,1276 @@
+---
+title: "Gamma-Count na análise de dados de contagem"
+author: "Walmes Zeviani"
+output:
+  rmarkdown::html_vignette:
+    fig_width: 6
+    fig_height: 6
+    toc: true
+    toc_dep: 3
+vignette: >
+  %\VignetteIndexEntry{Análise dos dados em Pimentel-Gomes (2009)}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+<style type="text/css">
+body, td, caption {
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+    background-color: white;
+    font-size: 16px;
+}
+
+tt, code, pre {
+    font-family: "Inconsolata", "Andale Mono", monospace;
+}
+
+code {
+    font-size: 16px;
+}
+
+pre code {
+    font-size: 14px;
+}
+
+pre:not([class]) code {
+    background-color: #92BFB1;
+}
+pre, code {
+    background-color: #62BFB1;
+    border-radius: 3px;
+    color: #333;
+}
+
+/* R output */
+pre:not([class]) code {
+    background-color: #D4D4D4;
+}
+pre:not([class]), code {
+    background-color: #D4D4D4;
+}
+
+/* R input */
+pre, code {
+    border-radius: 3px;
+    background-color: #EDEDED;
+    color: #333;
+}
+
+img {
+    max-width: 100% !important;
+    display: block;
+    margin: auto;
+}
+
+.MathJax {
+    font-size: 80% !important;
+}
+
+</style>
+
+```{r setup, include=FALSE}
+library(knitr)
+
+opts_chunk$set(
+    dev.args=list(family="Palatino"))
+
+options(width=68)
+
+```
+
+****
+## Gamma-Count
+
+```{r, message=FALSE, error=FALSE, results="hide"}
+##----------------------------------------------------------------------
+## Carrega pacotes.
+
+library(lattice)
+library(latticeExtra)
+library(plyr)
+library(bbmle)
+library(corrplot)
+library(car)
+library(multcomp)
+library(doBy)
+
+```
+
+```{r, eval=FALSE}
+##----------------------------------------------------------------------
+## Função de probabilidade da Gamma-Count.
+
+dgcount <- function(y, alpha, beta, offset=1){
+    pgamma(offset, alpha*y, alpha*beta)-
+        pgamma(offset, alpha*y+alpha, alpha*beta)
+}
+
+y <- 0:30
+pP <- dpois(y, lambda=5)
+pGC <- dgcount(y, alpha=1, beta=5)
+
+plot(pP~y, type="h")
+points(pGC~c(y+0.2), type="h", col=2)
+
+```
+
+```{r, eval=FALSE}
+##----------------------------------------------------------------------
+## Explorando a distribuição de probabilidades.
+
+library(rpanel)
+
+draw <- function(input){
+    with(input,
+    {
+        ebeta <- exp(beta)
+        ealpha <- exp(alpha)
+        pP <- dpois(y, lambda=ebeta*off)
+        pGC <- dgcount(y, alpha=ealpha, beta=ebeta, offset=off)
+        plot(pP~y, type="h", ylim=c(0, max(c(pGC, pP))))
+        points(pGC~c(y+0.2), type="h", col=2)
+        m <- sum(y*pGC)
+        abline(v=ebeta*off, lty=2)
+        abline(v=m, col=2, lty=2)
+    })
+    return(input)
+}
+
+panel <- rp.control(y=0:100)
+rp.slider(panel, variable=alpha, from=-5, to=5, initval=0,
+          showvalue=TRUE, resolution=0.1, action=draw)
+rp.slider(panel, variable=beta, from=-5, to=8, initval=3,
+          showvalue=TRUE, resolution=0.1, action=draw)
+rp.doublebutton(panel, variable=off, range=c(0, 3), initval=1,
+                showvalue=TRUE, step=0.1, action=draw)
+
+```
+
+****
+## Reprodução de nematóides em cultivo de soja
+
+Nesse conjunto de dados, a contagem tem um *offset* que precisa ser
+considerado.
+
+### Análise exploratória
+
+```{r}
+##----------------------------------------------------------------------
+## Carrega os dados.
+
+nematodeSoybean1 <- read.table(
+    "nematodeSoybean1.csv",
+    header=TRUE, sep=";")
+nematodeSoybean1$count <- with(nematodeSoybean1, count1+count2)
+str(nematodeSoybean1)
+
+##----------------------------------------------------------------------
+
+xyplot(count1+count2~log2(inipop)|factor(das),
+       data=nematodeSoybean1,
+       type=c("p", "smooth"), jitter.x=TRUE,
+       ylab=expression(Nematodes~by~unit~volume),
+       xlab=expression(Initial~nematode~density))
+
+xyplot(count~log2(inipop)|factor(das), data=nematodeSoybean1,
+       type=c("p", "smooth"), jitter.x=TRUE,
+       ylab=expression(Nematodes~by~unit~volume),
+       xlab=expression(Initial~nematode~density))
+
+xyplot(count/(2*volume)~log2(inipop)|factor(das), data=nematodeSoybean1,
+       type=c("p", "smooth"), jitter.x=TRUE,
+       ylab=expression(Nematodes~by~unit~volume),
+       xlab=expression(Initial~nematode~density))
+
+##----------------------------------------------------------------------
+## Relação média-variância.
+
+da <- subset(nematodeSoybean1, inipop>0)
+
+mv <- ddply(.data=da,
+            .variables=.(inipop, das),
+            .fun=summarise,
+            m=mean(count, na.rm=TRUE),
+            v=var(count, na.rm=TRUE))
+
+xyplot(v~m, data=mv, scales="free", type=c("p", "r"))+
+    layer(panel.abline(a=0, b=1, lty=2))
+
+```
+
+### Inclusão de offset no modelo Gamma-Count
+
+```{r}
+##----------------------------------------------------------------------
+## Simulando um conjunto de dados para ver como acomodar o offset na
+## Gamma-Count.
+
+y <- rpois(100, lambda=5) ## Contagem.
+o <- rep(2, length(y))    ## Offset.
+
+n0 <- glm(y~1, family=poisson)
+## predict(n0, type="response"); exp(coef(n0))
+## logLik(n0)
+
+n1 <- glm(y~offset(log(o))+1, family=poisson)
+## predict(n1, type="response"); exp(coef(n1))*o
+## logLik(n1)
+
+ll <- function(theta, y, X, offset){
+    ## theta: parameter vector;
+    ##   theta[1]: dispersion parameter;
+    ##   theta[-1]: location parameters;
+    ## y: response vector (counts);
+    ## X: model matrix;
+    ## offset: upper limit of the intergral;
+    eXb <- exp(X%*%theta[-1])
+    alpha <- exp(theta[1])
+    alpha.eXb <- alpha*eXb
+    alpha.y <- alpha*y
+    ## returns the log-likelihood.
+    -sum(log(
+         pgamma(offset, alpha.y, alpha.eXb)-
+             pgamma(offset, alpha.y+alpha, alpha.eXb)
+     ))
+}
+
+start <- c(alpha=1, lambda=coef(n1))
+parnames(ll) <- names(start)
+L <- list(y=y, offset=o, X=cbind(rep(1, length(y))))
+
+n2 <- mle2(ll, start=start, fixed=list(alpha=0),
+           vecpar=TRUE, data=L)
+
+n3 <- mle2(ll, start=start,
+           vecpar=TRUE, data=L)
+
+## Log-verossimilhaça.
+cbind(logLik(n0), logLik(n1), logLik(n2), logLik(n3))
+
+## Estimativas dos parâmetros.
+cbind(coef(n0), coef(n1), coef(n2)[-1], coef(n3)[-1])
+
+```
+
+### Ajuste dos modelos
+
+```{r}
+##----------------------------------------------------------------------
+## Ajuste do Poisson e Quasi-Poisson.
+
+da <- transform(da, IP=factor(inipop), DAS=factor(das))
+
+## Modelo Poisson para ter referência.
+m0 <- glm(count~offset(log(volume))+IP*DAS, data=da, family=poisson)
+summary(m0)
+anova(m0, test="Chisq")
+
+## Modelo quasi Poisson para usar os valores iniciais.
+## m1 <- glm(count/volume~IP*DAS, data=da, family=quasipoisson)
+m1 <- glm(count~offset(log(volume))+IP*DAS,
+          data=da, family=quasipoisson)
+summary(m1)
+anova(m1, test="F")
+
+par(mfrow=c(2,2)); plot(m1); layout(1)
+cbind(coef(m0), coef(m1))
+
+##----------------------------------------------------------------------
+## Ajuste do Gamma-Count.
+
+start <- c("alpha"=log(1), coef(m0))
+parnames(ll) <- names(start)
+
+## y <- with(da, count/vol)
+y <- with(da, count/volume)
+X <- model.matrix(~IP*DAS, data=da)
+
+L <- with(da,
+          list(y=count, offset=volume,
+               X=model.matrix(~IP*DAS)))
+
+m2 <- mle2(ll, start=start, fixed=list(alpha=0),
+           data=L, vecpar=TRUE)
+
+m3 <- mle2(ll, start=start,
+           data=L, vecpar=TRUE)
+
+```
+
+### Comparação dos ajustes
+
+```{r}
+##----------------------------------------------------------------------
+
+## Log-verossimilhaça.
+cbind(logLik(m0), logLik(m1), logLik(m2), logLik(m3))
+
+## Estimativas dos parâmetros.
+cbind(coef(m0), coef(m1), coef(m2)[-1], coef(m3)[-1])
+
+## Estimativa do parâmetro de dispersão.
+exp(coef(m3)[1])
+
+## Perfil de log-verossmilhança.
+plot(profile(m3, which=1))
+
+## Teste para o parâmetro de dispersão.
+anova(m3, m2)
+
+## Teste para interação (Wald).
+a <- c(0, attr(model.matrix(m0), "assign"))
+ai <- a==3
+L <- t(replicate(sum(ai), rbind(coef(m3)*0), simplify="matrix"))
+L[,ai] <- diag(sum(ai))
+
+## Teste de Wald explicito.
+## t(L%*%coef(m3))%*%
+##     solve(L%*%vcov(m3)%*%t(L))%*%
+##     (L%*%coef(m3))
+crossprod(L%*%coef(m3), solve(L%*%vcov(m3)%*%t(L), L%*%coef(m3)))
+
+## Teste de Wald para interação (poderia ser LRT, claro).
+linearHypothesis(model=m0, ## É necessário um objeto glm.
+                 hypothesis.matrix=L,
+                 vcov.=vcov(m3),
+                 coef.=coef(m3))
+
+## Teste pelo modelo quasi Poisson.
+anova(m1, test="Chisq")
+anova(m1, test="F")
+
+##----------------------------------------------------------------------
+## Ortogonalidade entre dispersão e locação.
+
+V <- cov2cor(vcov(m3))
+corrplot.mixed(V, upper="ellipse", col="gray50")
+dev.off()
+
+V[1,-1]
+sum(abs(V[1,-1]))
+
+```
+
+### Predição
+
+```{r}
+##----------------------------------------------------------------------
+## Predição das médias com IC.
+
+pred <- expand.grid(IP=levels(da$IP),
+                    DAS=levels(da$DAS),
+                    volume=100,
+                    KEEP.OUT.ATTRS=FALSE)
+pred <- list(pois=pred, quasi=pred, cg=pred)
+
+## Quantil normal.
+qn <- qnorm(0.975)*c(lwr=-1, fit=0, upr=1)
+
+## Preditos pela Poisson.
+aux <- predict(m0, newdata=pred$pois, se.fit=TRUE)
+aux <- exp(aux$fit+outer(aux$se.fit, qn, FUN="*"))
+pred$pois <- cbind(pred$pois, aux)
+str(pred$pois)
+
+aux <- predict(m1, newdata=pred$quasi, se.fit=TRUE)
+aux <- exp(aux$fit+outer(aux$se.fit, qn, FUN="*"))
+pred$quasi <- cbind(pred$quasi, aux)
+
+alpha <- coef(m3)[1]  ## Locação.
+theta <- coef(m3)[-1] ## Dispersão.
+
+## Preditor linear.
+X <- model.matrix(~IP*DAS, data=pred$cg)
+pred$cg$eta <- c(X%*%theta)
+
+## Matrix de covariância completa.
+V <- vcov(m3)
+
+## Marginal em theta.
+Vm <- V[-1,-1]
+
+## Condicional.
+Vc <- V[-1,-1]-V[-1,1]%*%solve(V[1,1])%*%V[1,-1]
+
+max(abs(Vm-Vc))
+
+## Preditos pela Gamma-count.
+U <- chol(Vm)
+aux <- sqrt(apply(X%*%t(U), MARGIN=1,
+                  FUN=function(x){ sum(x^2) }))
+
+## Para calcular a média de uma Gamma-Count pelo preditor linear.
+eta2mean <- function(eta, offset, alpha, tol=1e-5){
+    stopifnot(length(eta)==1L)
+    stopifnot(length(offset)==1L)
+    stopifnot(length(alpha)==1L)
+    change <- 1
+    S <- 0; x <- 1; p <- 1
+    while (p>tol){
+        p <- pgamma(offset,
+                    shape=exp(alpha)*x,
+                    rate=exp(alpha)*exp(eta))
+        S <- S+p
+        x <- x+1
+    }
+    return(S)
+}
+
+aux <- pred$cg$eta+outer(aux, qn, FUN="*")
+aux <- apply(aux, MARGIN=2,
+             FUN=function(col){
+                 sapply(col, FUN=eta2mean,
+                        offset=pred$cg$volume[1], alpha=alpha)
+             })
+pred$cg <- cbind(pred$cg, aux)
+
+##----------------------------------------------------------------------
+
+pred <- ldply(pred, .id="modelo")
+pred <- arrange(pred, DAS, IP, modelo)
+str(pred)
+
+source("http://git.leg.ufpr.br/leg/legTools/raw/devel/R/panel.segplot.by.R")
+
+segplot(IP~lwr+upr|DAS, centers=fit, data=pred,
+        draw=FALSE, scales=list(x="free"),
+        panel=panel.segplot.by, groups=pred$modelo, f=0.1,
+        pch=pred$modelo, layout=c(1, NA), as.table=TRUE, 
+        key=list(type="o", divide=1,
+                 lines=list(pch=1:nlevels(pred$modelo), lty=1, col=1),
+                 text=list(c("Poisson", "Quasi-Poisson",
+                             "Gamma-Count"))))
+
+```
+
+****
+## Número de vagens viáveis em soja
+
+Nesse conjunto de dados, **o efeito de bloco pode ser aleatório**. Teria
+que implementar uma versão da Gamma-Count para acomodar termos de efeito
+aleatório.
+
+### Análise exploratória
+
+```{r}
+##----------------------------------------------------------------------
+## Carrega os dados.
+
+db <- read.table("http://www.leg.ufpr.br/~walmes/data/soja.txt",
+                 header=TRUE, sep="\t", dec=",")
+names(db)[1:2] <- c("k", "a")
+db <- db[-74,c(1:3, 8, 10)]
+str(db)
+
+xyplot(nv~k|a, data=db)
+xyplot(ts~k|a, data=db)
+
+##----------------------------------------------------------------------
+## Gráfico de média-variância não é possível pois não existem repetições
+## com o mesmo preditor.
+
+```
+
+### Ajuste dos modelos
+
+```{r}
+##----------------------------------------------------------------------
+## Ajuste do Poisson e Quasi-Poisson.
+
+db <- transform(db, A=factor(a), K=factor(k))
+
+## Modelo Poisson para ter referência.
+m0 <- glm(nv~bloco+A*K, data=db, family=poisson)
+summary(m0)
+anova(m0, test="Chisq")
+
+## Modelo quasi Poisson para usar os valores iniciais.
+## m1 <- glm(count/volume~IP*DAS, data=da, family=quasipoisson)
+m1 <- update(m0, family=quasipoisson)
+summary(m1)
+anova(m1, test="F")
+
+par(mfrow=c(2,2)); plot(m1); layout(1)
+cbind(coef(m0), coef(m1))
+
+##----------------------------------------------------------------------
+## Ajuste do Gamma-Count.
+
+start <- c("alpha"=log(1), coef(m0))
+parnames(ll) <- names(start)
+
+y <- with(db, nv)
+X <- model.matrix(~bloco+A*K, data=db)
+
+L <- with(db,
+          list(y=nv, offset=1,
+               X=model.matrix(~bloco+A*K)))
+
+m2 <- mle2(ll, start=start, fixed=list(alpha=0),
+           data=L, vecpar=TRUE)
+
+m3 <- mle2(ll, start=start,
+           data=L, vecpar=TRUE)
+
+```
+
+### Comparação dos ajustes
+
+```{r}
+##----------------------------------------------------------------------
+
+## Log-verossimilhaça.
+cbind(logLik(m0), logLik(m1), logLik(m2), logLik(m3))
+
+## Estimativas dos parâmetros.
+cbind(coef(m0), coef(m1), coef(m2)[-1], coef(m3)[-1])
+
+## Estimativa do parâmetro de dispersão.
+exp(coef(m3)[1])
+
+## Perfil de log-verossmilhança.
+plot(profile(m3, which=1))
+
+## Teste para o parâmetro de dispersão.
+anova(m3, m2)
+
+## Teste para interação (Wald).
+a <- c(0, attr(model.matrix(m0), "assign"))
+ai <- a==4
+L <- t(replicate(sum(ai), rbind(coef(m3)*0), simplify="matrix"))
+L[,ai] <- diag(sum(ai))
+
+## Teste de Wald explicito.
+## t(L%*%coef(m3))%*%
+##     solve(L%*%vcov(m3)%*%t(L))%*%
+##     (L%*%coef(m3))
+crossprod(L%*%coef(m3), solve(L%*%vcov(m3)%*%t(L), L%*%coef(m3)))
+
+## Teste de Wald para interação (poderia ser LRT, claro).
+linearHypothesis(model=m0, ## É necessário um objeto glm.
+                 hypothesis.matrix=L,
+                 vcov.=vcov(m3),
+                 coef.=coef(m3))
+
+## Teste pelo modelo quasi Poisson.
+anova(m1, test="Chisq")
+anova(m1, test="F")
+
+##----------------------------------------------------------------------
+## Ortogonalidade entre dispersão e locação.
+
+V <- vcov(m3)
+corrplot.mixed(V, upper="ellipse", col="gray50")
+dev.off()
+
+V[1,-1]
+sum(abs(V[1,-1]))
+
+```
+
+### Predição
+
+```{r}
+##----------------------------------------------------------------------
+## Predição das médias com IC.
+
+pred <- expand.grid(A=levels(db$A),
+                    K=levels(db$K),
+                    bloco=factor("I", levels=levels(db$bloco)),
+                    KEEP.OUT.ATTRS=FALSE)
+pred <- list(pois=pred, quasi=pred, cg=pred)
+
+## Quantil normal.
+qn <- qnorm(0.975)*c(lwr=-1, fit=0, upr=1)
+
+## Preditor linear que considera o efeito médio dos blocos.
+X <- LSmatrix(m0, effect=c("A", "K"))
+
+## Preditos pela Poisson.
+## aux <- predict(m0, newdata=pred$pois, se.fit=TRUE)
+## aux <- exp(aux$fit+outer(aux$se.fit, qn, FUN="*"))
+## pred$pois <- cbind(pred$pois, aux)
+aux <- confint(glht(m0, linfct=X), calpha=univariate_calpha())$confint
+colnames(aux)[1] <- "fit"
+pred$pois <- cbind(pred$pois, exp(aux))
+
+## aux <- predict(m1, newdata=pred$quasi, se.fit=TRUE)
+## aux <- exp(aux$fit+outer(aux$se.fit, qn, FUN="*"))
+## pred$quasi <- cbind(pred$quasi, aux)
+aux <- confint(glht(m1, linfct=X), calpha=univariate_calpha())$confint
+colnames(aux)[1] <- "fit"
+pred$quasi <- cbind(pred$quasi, exp(aux))
+
+alpha <- coef(m3)[1]  ## Locação.
+theta <- coef(m3)[-1] ## Dispersão.
+
+## Preditor linear.
+pred$cg$eta <- c(X%*%theta)
+
+## Matrix de covariância completa.
+V <- vcov(m3)
+
+## Marginal em theta.
+Vm <- V[-1,-1]
+
+## Condicional.
+Vc <- V[-1,-1]-V[-1,1]%*%solve(V[1,1])%*%V[1,-1]
+
+max(abs(Vm-Vc))
+
+## Preditos pela Gamma-count.
+U <- chol(Vm)
+aux <- sqrt(apply(X%*%t(U), MARGIN=1,
+                  FUN=function(x){ sum(x^2) }))
+
+aux <- pred$cg$eta+outer(aux, qn, FUN="*")
+aux <- apply(aux, MARGIN=2,
+             FUN=function(col){
+                 sapply(col, FUN=eta2mean,
+                        offset=1, alpha=alpha)
+             })
+pred$cg <- cbind(pred$cg, aux)
+
+##----------------------------------------------------------------------
+
+pred <- ldply(pred, .id="modelo")
+pred <- arrange(pred, A, K, modelo)
+str(pred)
+
+xyplot(nv~K|A, data=db, layout=c(NA, 1), as.table=TRUE,
+       col=1, cex=0.7, pch=19)+
+    as.layer(
+        segplot(K~lwr+upr|A, centers=fit, data=pred,
+                draw=FALSE, horizontal=FALSE, ## scales=list(x="free"),
+                panel=panel.segplot.by, groups=pred$modelo, f=0.15,
+                pch=pred$modelo, layout=c(NA, 1), as.table=TRUE, 
+                key=list(type="o", divide=1,
+                         lines=list(pch=1:nlevels(pred$modelo),
+                                    lty=1, col=1),
+                         text=list(c("Poisson", "Quasi-Poisson",
+                                     "Gamma-Count"))))
+    )
+
+```
+
+## Ocorrência de mosca branca
+
+<http://www.leg.ufpr.br/~walmes/data/ninfas.txt>
+
+### Análise exploratória
+
+```{r}
+##----------------------------------------------------------------------
+## Análise exploratória.
+
+dc <- read.table("moscaBranca.txt", header=TRUE, sep="\t")
+dc <- transform(dc,
+                data=as.Date(dc$data),
+                bloc=factor(bloc),
+                tot=inf+med+sup,
+                off=100)
+dc$aval <- with(dc, c(data-min(data)))
+dc$Aval <- factor(dc$aval)
+names(dc)[2:3] <- c("Vari","Bloc")
+dc <- droplevels(subset(dc, grepl("BRS", x=Vari)))
+str(dc)
+
+## xyplot(sup+med+inf~data, groups=Vari, outer=TRUE, data=dc)
+xyplot(tot~data|Vari, data=dc)
+
+```
+
+### Ajuste dos modelos
+
+```{r}
+##----------------------------------------------------------------------
+## Ajuste do Poisson e Quasi-Poisson.
+
+## IMPORTANT: Foi usado um offset de 100 por problemas de
+## over/underflow. O problema não é com a Poisson mas com a
+## Gamma-Count. Todas as análises consideram um offset de 100, portanto,
+## permanecem comparáveis e igualmente interpretáveis.
+
+## Modelo Poisson para ter referência.
+m0 <- glm(tot~offset(log(off))+Bloc+Vari*Aval,
+          data=dc, family=poisson)
+summary(m0)
+anova(m0, test="Chisq")
+
+## Modelo quasi Poisson para usar os valores iniciais.
+## m1 <- glm(count/volume~IP*DAS, data=da, family=quasipoisson)
+m1 <- update(m0, family=quasipoisson)
+summary(m1)
+anova(m1, test="F")
+
+par(mfrow=c(2,2)); plot(m1); layout(1)
+anova(m1, test="F")
+
+##----------------------------------------------------------------------
+## Ajuste do Gamma-Count.
+
+start <- c("alpha"=log(0.05), coef(m0))
+parnames(ll) <- names(start)
+
+y <- with(dc, tot)
+X <- model.matrix(~Bloc+Vari*Aval, data=dc)
+
+L <- with(dc, list(y=tot, offset=100, X=X))
+
+m3 <- mle2(ll, start=start,
+           data=L, vecpar=TRUE)
+## summary(m3)
+
+```
+
+### Comparação dos ajustes
+
+```{r}
+##----------------------------------------------------------------------
+
+## Log-verossimilhaça.
+cbind(logLik(m0), logLik(m1), logLik(m3))
+
+## Estimativas dos parâmetros.
+cbind(coef(m0), coef(m1), coef(m3)[-1])
+
+## Estimativa do parâmetro de dispersão.
+exp(coef(m3)[1])
+
+## Perfil de log-verossmilhança.
+plot(profile(m3, which=1))
+
+a <- c(0, attr(model.matrix(m0), "assign"))
+ai <- a==4
+L <- t(replicate(sum(ai), rbind(coef(m3)*0), simplify="matrix"))
+L[,ai] <- diag(sum(ai))
+
+## Teste de Wald explicito.
+## t(L%*%coef(m3))%*%
+##     solve(L%*%vcov(m3)%*%t(L))%*%
+##     (L%*%coef(m3))
+crossprod(L%*%coef(m3), solve(L%*%vcov(m3)%*%t(L), L%*%coef(m3)))
+
+## Teste de Wald para interação (poderia ser LRT, claro).
+linearHypothesis(model=m0, ## É necessário um objeto glm.
+                 hypothesis.matrix=L,
+                 vcov.=vcov(m3),
+                 coef.=coef(m3))
+
+## Teste pelo modelo quasi Poisson.
+anova(m1, test="Chisq")
+anova(m1, test="F")
+
+##----------------------------------------------------------------------
+## Ortogonalidade entre dispersão e locação.
+
+V <- cov2cor(vcov(m3))
+corrplot.mixed(V, upper="ellipse", col="gray50")
+dev.off()
+
+```
+
+### Predição
+
+```{r}
+##----------------------------------------------------------------------
+## Predição das médias com IC.
+
+pred <- expand.grid(Vari=levels(dc$Vari),
+                    Aval=unique(dc$Aval),
+                    Bloc=factor("1", levels=levels(dc$Bloc)),
+                    off=100,
+                    KEEP.OUT.ATTRS=FALSE)
+pred <- list(pois=pred, quasi=pred, cg=pred)
+
+## Quantil normal.
+qn <- qnorm(0.975)*c(lwr=-1, fit=0, upr=1)
+
+X <- LSmatrix(lm(tot~Bloc+Vari*Aval, dc), effect=c("Vari", "Aval"))
+
+## Preditos pela Poisson.
+## aux <- predict(m0, newdata=pred$pois, se.fit=TRUE)
+## aux <- exp(aux$fit+outer(aux$se.fit, qn, FUN="*"))
+## pred$pois <- cbind(pred$pois, aux)
+aux <- confint(glht(m0, linfct=X), calpha=univariate_calpha())$confint
+colnames(aux)[1] <- "fit"
+pred$pois <- cbind(pred$pois, 100*exp(aux))
+
+## aux <- predict(m1, newdata=pred$quasi, se.fit=TRUE)
+## aux <- exp(aux$fit+outer(aux$se.fit, qn, FUN="*"))
+## pred$quasi <- cbind(pred$quasi, aux)
+aux <- confint(glht(m1, linfct=X), calpha=univariate_calpha())$confint
+colnames(aux)[1] <- "fit"
+pred$quasi <- cbind(pred$quasi, 100*exp(aux))
+
+alpha <- coef(m3)[1]  ## Locação.
+theta <- coef(m3)[-1] ## Dispersão.
+
+## Preditor linear.
+pred$cg$eta <- c(X%*%theta)
+
+## Matrix de covariância completa.
+V <- vcov(m3)
+
+## Marginal em theta.
+Vm <- V[-1,-1]
+
+## Condicional.
+Vc <- V[-1,-1]-V[-1,1]%*%solve(V[1,1])%*%V[1,-1]
+
+max(abs(Vm-Vc))
+
+## Preditos pela Gamma-count.
+U <- chol(Vm)
+aux <- sqrt(apply(X%*%t(U), MARGIN=1,
+                  FUN=function(x){ sum(x^2) }))
+
+aux <- pred$cg$eta+outer(aux, qn, FUN="*")
+aux <- apply(aux, MARGIN=2,
+             FUN=function(col){
+                 sapply(col, FUN=eta2mean,
+                        offset=100, alpha=alpha)
+             })
+pred$cg <- cbind(pred$cg, aux)
+
+##----------------------------------------------------------------------
+
+pred <- ldply(pred, .id="modelo")
+pred <- arrange(pred, Aval, Vari, modelo)
+str(pred)
+
+## source("http://git.leg.ufpr.br/leg/legTools/raw/devel/R/panel.segplot.by.R")
+
+xyplot(tot~Aval|Vari, data=dc, layout=c(NA, 1), as.table=TRUE,
+       col=1, cex=0.7, pch=19)+
+    as.layer(
+        segplot(Aval~lwr+upr|Vari, centers=fit, data=pred,
+                horizontal=FALSE,
+                draw=FALSE,
+                panel=panel.segplot.by, groups=pred$modelo, f=0.15,
+                pch=pred$modelo, layout=c(NA, 1), as.table=TRUE, 
+                key=list(type="o", divide=1,
+                         lines=list(pch=1:nlevels(pred$modelo),
+                                    lty=1, col=1),
+                         text=list(c("Poisson", "Quasi-Poisson",
+                                     "Gamma-Count"))))
+    )
+
+```
+
+****
+## Produção de ovos
+
+### Análise exploratória
+
+```{r}
+##----------------------------------------------------------------------
+
+dd <- read.table("ovos.txt", header=TRUE, sep="\t")
+str(dd)
+
+ftable(xtabs(~periodo+luz+box, data=dd))
+
+## Cada box tem 6 gaiolas. Cada gaiola tem 10 aves.
+## Modelar a produção por ave dia usando o total de por gaiola em duas
+## semanas. O offset é 10*14=140.
+
+useOuterStrips(
+    xyplot(ovos~dia|luz+periodo, data=dd, jitter.x=TRUE,
+           groups=gaiola,
+           type=c("p", "smooth")))
+
+useOuterStrips(
+    xyplot(massa~dia|luz+periodo, data=dd, jitter.x=TRUE,
+           groups=gaiola,
+           type=c("p", "smooth")))
+
+## Agregar para o total quinzenal.
+dd <- aggregate(ovos~periodo+box+luz+gaiola, data=dd, FUN=sum)
+str(dd)
+
+xyplot(ovos~periodo, groups=luz, data=dd, jitter.x=TRUE,
+       ## groups=gaiola,
+       type=c("p", "smooth"))
+
+```
+
+### Ajuste dos modelos
+
+```{r}
+##----------------------------------------------------------------------
+## Ajuste do Poisson e Quasi-Poisson.
+
+## IMPORTANT: Foi usado um offset de 10*14=140.
+
+dd <- transform(dd,
+                off=10*14, ## 10 aves por gaiola, soma de 14 dias.
+                Per=factor(periodo),
+                Box=factor(box))
+names(dd)[3] <- "Luz"
+
+## WARNING: Esta sendo negligenciada a variância de gaiolas. Isso requer
+## um modelo de efeitos aleatórios que ainda não dispomos.
+
+## Modelo Poisson para ter referência.
+m0 <- glm(ovos~offset(log(off))+Per+Box+Luz,
+          data=dd, family=poisson)
+summary(m0)
+anova(m0, test="Chisq")
+
+## Modelo quasi Poisson para usar os valores iniciais.
+## m1 <- glm(count/volume~IP*DAS, data=da, family=quasipoisson)
+m1 <- update(m0, family=quasipoisson)
+summary(m1)
+anova(m1, test="F")
+
+par(mfrow=c(2,2)); plot(m1); layout(1)
+
+##----------------------------------------------------------------------
+## Ajuste do Gamma-Count.
+
+start <- c("alpha"=log(1), coef(m0))
+parnames(ll) <- names(start)
+
+y <- with(dd, ovos)
+X <- model.matrix(~Per+Box+Luz, data=dd)
+
+L <- list(y=y, offset=140, X=X)
+
+m3 <- mle2(ll, start=start,
+           data=L, vecpar=TRUE)
+## summary(m3)
+
+```
+
+### Comparação dos ajustes
+
+```{r}
+##----------------------------------------------------------------------
+
+## Log-verossimilhaça.
+cbind(logLik(m0), logLik(m1), logLik(m3))
+
+## Estimativas dos parâmetros.
+cbind(coef(m0), coef(m1), coef(m3)[-1])
+
+## Estimativa do parâmetro de dispersão.
+exp(coef(m3)[1])
+
+## Perfil de log-verossmilhança.
+plot(profile(m3, which=1))
+
+a <- c(0, attr(model.matrix(m0), "assign"))
+ai <- a==3
+L <- t(replicate(sum(ai), rbind(coef(m3)*0), simplify="matrix"))
+L[,ai] <- diag(sum(ai))
+
+## Teste de Wald explicito.
+## t(L%*%coef(m3))%*%
+##     solve(L%*%vcov(m3)%*%t(L))%*%
+##     (L%*%coef(m3))
+crossprod(L%*%coef(m3), solve(L%*%vcov(m3)%*%t(L), L%*%coef(m3)))
+
+## Teste de Wald para interação (poderia ser LRT, claro).
+linearHypothesis(model=m0, ## É necessário um objeto glm.
+                 hypothesis.matrix=L,
+                 vcov.=vcov(m3),
+                 coef.=coef(m3))
+
+## Teste pelo modelo quasi Poisson.
+anova(m1, test="Chisq")
+anova(m1, test="F")
+
+##----------------------------------------------------------------------
+## Ortogonalidade entre dispersão e locação.
+
+V <- cov2cor(vcov(m3))
+corrplot.mixed(V, upper="ellipse", col="gray50")
+dev.off()
+
+```
+
+### Predição
+
+```{r}
+##----------------------------------------------------------------------
+## Predição das médias com IC.
+
+pred <- expand.grid(Per=factor(levels(dd$Per)[1],
+                               levels=levels(dd$Per)),
+                    Box=factor(levels(dd$Box)[1],
+                               levels=levels(dd$Box)),
+                    Luz=levels(dd$Luz),
+                    off=10*14,
+                    KEEP.OUT.ATTRS=FALSE)
+pred <- list(pois=pred, quasi=pred, cg=pred)
+
+## Quantil normal.
+qn <- qnorm(0.975)*c(lwr=-1, fit=0, upr=1)
+
+X <- LSmatrix(lm(ovos~Per+Box+Luz, dd), effect=c("Luz"))
+
+## Preditos pela Poisson.
+## aux <- predict(m0, newdata=pred$pois, se.fit=TRUE)
+## aux <- exp(aux$fit+outer(aux$se.fit, qn, FUN="*"))
+## pred$pois <- cbind(pred$pois, aux)
+aux <- confint(glht(m0, linfct=X), calpha=univariate_calpha())$confint
+colnames(aux)[1] <- "fit"
+pred$pois <- cbind(pred$pois, 140*exp(aux))
+
+## aux <- predict(m1, newdata=pred$quasi, se.fit=TRUE)
+## aux <- exp(aux$fit+outer(aux$se.fit, qn, FUN="*"))
+## pred$quasi <- cbind(pred$quasi, aux)
+aux <- confint(glht(m1, linfct=X), calpha=univariate_calpha())$confint
+colnames(aux)[1] <- "fit"
+pred$quasi <- cbind(pred$quasi, 140*exp(aux))
+
+alpha <- coef(m3)[1]  ## Locação.
+theta <- coef(m3)[-1] ## Dispersão.
+
+## Preditor linear.
+pred$cg$eta <- c(X%*%theta)
+
+## Matrix de covariância completa.
+V <- vcov(m3)
+
+## Marginal em theta.
+Vm <- V[-1,-1]
+
+## Condicional.
+Vc <- V[-1,-1]-V[-1,1]%*%solve(V[1,1])%*%V[1,-1]
+
+max(abs(Vm-Vc))
+
+## Preditos pela Gamma-count.
+U <- chol(Vm)
+aux <- sqrt(apply(X%*%t(U), MARGIN=1,
+                  FUN=function(x){ sum(x^2) }))
+
+aux <- pred$cg$eta+outer(aux, qn, FUN="*")
+aux <- apply(aux, MARGIN=2,
+             FUN=function(col){
+                 sapply(col, FUN=eta2mean,
+                        offset=140, alpha=alpha)
+             })
+pred$cg <- cbind(pred$cg, aux)
+
+##----------------------------------------------------------------------
+
+pred <- ldply(pred, .id="modelo")
+pred <- arrange(pred, Luz, modelo)
+str(pred)
+
+## source("http://git.leg.ufpr.br/leg/legTools/raw/devel/R/panel.segplot.by.R")
+
+segplot(Luz~lwr+upr, centers=fit, data=pred,
+        horizontal=FALSE,
+        draw=FALSE,
+        panel=panel.segplot.by, groups=pred$modelo, f=0.15,
+        pch=pred$modelo, layout=c(NA, 1), as.table=TRUE, 
+        key=list(type="o", divide=1,
+                 lines=list(pch=1:nlevels(pred$modelo),
+                            lty=1, col=1),
+                 text=list(c("Poisson", "Quasi-Poisson",
+                             "Gamma-Count"))))
+
+```
+
+****
+## Capulhos no algodão em função da pressão da mosca branca
+
+<http://www.leg.ufpr.br/~walmes/data/mosca_algodao_prod.txt>
+
+### Análise exploratória
+
+```{r}
+##----------------------------------------------------------------------
+
+da <- read.table(
+    "http://www.leg.ufpr.br/~walmes/data/mosca_algodao_prod.txt",
+    header=TRUE, sep="\t")
+## da <- aggregate(ncapu~vaso+dexp, data=da, FUN=sum)
+str(da)
+
+xyplot(ncapu~dexp, data=da, jitter.x=TRUE,
+       type=c("p", "smooth"))
+
+```
+
+### Ajuste dos modelos
+
+```{r}
+##----------------------------------------------------------------------
+## Ajuste do Poisson e Quasi-Poisson.
+
+## da <- transform(da, Dexp=factor(dexp))
+da <- transform(da, dexp=dexp-mean(range(dexp)))
+
+## WARNING: Esta sendo negligenciada a variância entre vasos. Isso
+## requer um modelo de efeitos aleatórios que ainda não dispomos.
+
+## Modelo Poisson para ter referência.
+m0 <- glm(ncapu~dexp+I(dexp^2), data=da, family=poisson)
+summary(m0)
+anova(m0, test="Chisq")
+
+## Modelo quasi Poisson para usar os valores iniciais.
+m1 <- update(m0, family=quasipoisson)
+summary(m1)
+anova(m1, test="F")
+
+par(mfrow=c(2,2)); plot(m1); layout(1)
+
+##----------------------------------------------------------------------
+## Ajuste do Gamma-Count.
+
+start <- c("alpha"=log(2), coef(m0))
+parnames(ll) <- names(start)
+
+y <- with(da, ncapu)
+X <- model.matrix(m0)
+
+L <- list(y=y, offset=1, X=X)
+
+m3 <- mle2(ll, start=start,
+           data=L, vecpar=TRUE)
+summary(m3)
+
+```
+
+### Comparação dos ajustes
+
+```{r}
+##----------------------------------------------------------------------
+
+## Log-verossimilhaça.
+cbind(logLik(m0), logLik(m1), logLik(m3))
+
+## Estimativas dos parâmetros.
+cbind(coef(m0), coef(m1), coef(m3)[-1])
+
+## Estimativa do parâmetro de dispersão.
+exp(coef(m3)[1])
+
+## Perfil de log-verossmilhança.
+plot(profile(m3, which=1))
+
+a <- c(0, attr(model.matrix(m0), "assign"))
+ai <- a!=0
+L <- t(replicate(sum(ai), rbind(coef(m3)*0), simplify="matrix"))
+L[,ai] <- diag(sum(ai))
+
+## Teste de Wald explicito.
+## t(L%*%coef(m3))%*%
+##     solve(L%*%vcov(m3)%*%t(L))%*%
+##     (L%*%coef(m3))
+crossprod(L%*%coef(m3), solve(L%*%vcov(m3)%*%t(L), L%*%coef(m3)))
+
+## Teste de Wald para interação (poderia ser LRT, claro).
+linearHypothesis(model=m0, ## É necessário um objeto glm.
+                 hypothesis.matrix=L,
+                 vcov.=vcov(m3),
+                 coef.=coef(m3))
+
+## Teste pelo modelo quasi Poisson.
+anova(m1, test="Chisq")
+anova(m1, test="F")
+
+##----------------------------------------------------------------------
+## Ortogonalidade entre dispersão e locação.
+
+V <- cov2cor(vcov(m3))
+corrplot.mixed(V, upper="ellipse", col="gray50")
+dev.off()
+
+```
+
+### Predição
+
+```{r}
+##----------------------------------------------------------------------
+## Predição das médias com IC.
+
+pred <- data.frame(dexp=with(da, seq(min(dexp), max(dexp), l=30)))
+pred <- list(pois=pred, quasi=pred, cg=pred)
+
+## Quantil normal.
+qn <- qnorm(0.975)*c(lwr=-1, fit=0, upr=1)
+
+X <- model.matrix(formula(m0)[-2], data=pred$cg)
+
+## Preditos pela Poisson.
+## aux <- predict(m0, newdata=pred$pois, se.fit=TRUE)
+## aux <- exp(aux$fit+outer(aux$se.fit, qn, FUN="*"))
+## pred$pois <- cbind(pred$pois, aux)
+aux <- confint(glht(m0, linfct=X), calpha=univariate_calpha())$confint
+colnames(aux)[1] <- "fit"
+pred$pois <- cbind(pred$pois, exp(aux))
+
+## aux <- predict(m1, newdata=pred$quasi, se.fit=TRUE)
+## aux <- exp(aux$fit+outer(aux$se.fit, qn, FUN="*"))
+## pred$quasi <- cbind(pred$quasi, aux)
+aux <- confint(glht(m1, linfct=X), calpha=univariate_calpha())$confint
+colnames(aux)[1] <- "fit"
+pred$quasi <- cbind(pred$quasi, exp(aux))
+
+alpha <- coef(m3)[1]  ## Locação.
+theta <- coef(m3)[-1] ## Dispersão.
+
+## Preditor linear.
+pred$cg$eta <- c(X%*%theta)
+
+## Matrix de covariância completa.
+V <- vcov(m3)
+
+## Marginal em theta.
+Vm <- V[-1,-1]
+
+## Condicional.
+Vc <- V[-1,-1]-V[-1,1]%*%solve(V[1,1])%*%V[1,-1]
+
+max(abs(Vm-Vc))
+
+## Preditos pela Gamma-count.
+U <- chol(Vm)
+aux <- sqrt(apply(X%*%t(U), MARGIN=1,
+                  FUN=function(x){ sum(x^2) }))
+
+aux <- pred$cg$eta+outer(aux, qn, FUN="*")
+aux <- apply(aux, MARGIN=2,
+             FUN=function(col){
+                 sapply(col, FUN=eta2mean,
+                        offset=1, alpha=alpha)
+             })
+pred$cg <- cbind(pred$cg, aux)
+
+##----------------------------------------------------------------------
+
+pred <- ldply(pred, .id="modelo")
+pred <- arrange(pred, dexp)
+str(pred)
+
+source("https://raw.githubusercontent.com/walmes/wzRfun/master/R/prepanel.cbH.R")
+source("https://raw.githubusercontent.com/walmes/wzRfun/master/R/panel.cbH.R")
+
+xyplot(ncapu~dexp, data=da, jitter.x=TRUE, pch=19, col=1)+
+    as.layer(
+        under=TRUE,
+        xyplot(fit~dexp, data=pred, groups=modelo, type="l",
+               ly=pred$lwr, uy=pred$upr, cty="bands",
+               ## fill="gray90",
+               alpha=0.5,
+               prepanel=prepanel.cbH,
+               panel.groups=panel.cbH,
+               panel=panel.superpose)
+    )
+
+```
+
+
+****
+## Mais dados para se considerar
+
+* http://www.leg.ufpr.br/~walmes/data/banana_culttecido.txt
+* http://www.leg.ufpr.br/~walmes/data/frango_comportamento.txt
+* http://www.leg.ufpr.br/~walmes/data/mosca_algodao_aval.txt
