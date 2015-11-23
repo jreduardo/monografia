@@ -1,0 +1,188 @@
+%% ======================================================================
+%% Eduardo Junior
+%% eduardo.jr@ufpr.br
+%% 22-11-2015
+%% ======================================================================
+%% Template latex beamer para ser usado na opção `include: in_header:`
+%% de arquivos Rmd com ouput beamer_template
+
+%% ======================================================================
+%% README
+
+% O YAML do documento Rmd usado é, modificações podem alterar os
+% resutados obtidos.
+% ---
+% date: "`r format(Sys.time(), '%d de %B de %Y')`"
+% fontsize: "10pt"
+% output: 
+%   beamer_presentation: 
+%     fig_caption: yes
+%     highlight: zenburn
+%     includes:
+%       in_header: preambulo-beamer.tex
+%     keep_tex: yes
+%     slide_level: 3
+% ---
+
+%% ======================================================================
+%% Lista de pacotes para tarefas gerais no documento
+
+\usepackage{xcolor}
+
+\usepackage{setspace}
+\usepackage{tikz}
+\usepackage{pgfgantt}
+\usetikzlibrary{backgrounds}
+\definecolor{done}{RGB}{120, 180, 120}
+\definecolor{do}{RGB}{180, 120, 120}
+
+%% ======================================================================
+%% Tema e cores do documento
+
+\usetheme{CambridgeUS}
+\setbeamertemplate{itemize items}[triangle]
+\setbeamertemplate{navigation symbols}{}
+
+\setbeamertemplate{frametitle}{
+  \nointerlineskip
+  \begin{beamercolorbox}[sep=0.3cm, ht=1.8em, 
+    wd=\paperwidth]{frametitle}
+    \vbox{}\vskip-2ex%
+    \strut\hspace*{3ex}\large\bfseries\insertframetitle\strut
+    \vskip-0.8ex%
+  \end{beamercolorbox}
+}
+
+\setbeamercolor{frametitle}{fg=teal}
+\setbeamercolor{structure}{fg=teal}
+\setbeamercolor{palette primary}{bg=gray!30, fg=teal}
+\setbeamercolor{palette tertiary}{bg=teal, fg=white}
+\setbeamercolor{footlinecolor}{fg=white,bg=teal}
+\setbeamercolor{caption name}{fg=teal}
+
+%% ======================================================================
+%% Página Inicial
+
+\setbeamertemplate{title page}[default]
+\setbeamercolor{title}{fg=teal}
+\setbeamercolor{author}{fg=black!70}
+\setbeamercolor{institute}{fg=black!70}
+\setbeamercolor{date}{fg=black!70}
+\setbeamerfont{title}{series=\bfseries}
+
+%% ======================================================================
+%% Definição do cabeçalho e rodapé
+
+\setbeamertemplate{headline}{\bfseries
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=.5\paperwidth, ht=2.2ex, dp=1ex, right, 
+      rightskip=1em]{section in head/foot}
+      \hspace*{2ex}\insertsectionhead
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.5\paperwidth, ht=2.2ex, dp=1ex, left,
+      leftskip=1em]{subsection in head/foot}
+      \insertsubsectionhead\hspace*{2ex}
+    \end{beamercolorbox}}
+  \vskip0pt
+}
+
+\makeatletter
+\setbeamertemplate{footline}{\ttfamily\bfseries
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=.3\paperwidth, ht=2.2ex, dp=1ex, right, 
+      rightskip=1em]{footlinecolor}
+      \insertshortauthor%
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.6\paperwidth, ht=2.2ex, dp=1ex, left,
+      leftskip=1em]{footlinecolor}
+      \hfill\insertshorttitle%
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.1\paperwidth, ht=2.2ex, dp=1ex, left,
+      leftskip=1em]{footlinecolor}
+      Slide \insertframenumber
+    \end{beamercolorbox}}
+  \vskip0pt
+}
+\makeatother
+
+%% ======================================================================
+%% Fontes
+
+\usepackage{palatino}
+\usepackage{eulervm}
+\usepackage[none]{ubuntu}
+\usepackage{verbatim}
+
+\usefonttheme{professionalfonts}
+\usefonttheme{serif}
+\renewcommand{\ttdefault}{ubuntumono}
+\renewcommand{\ttfamily}{\fontUbuntuMono}
+\makeatletter
+\def\verbatim@font{\small\fontUbuntuMono}
+\makeatother
+
+%% ======================================================================
+%% Colorindo ambiente verbatim
+
+\usepackage{etoolbox}
+\makeatletter
+\preto{\@verbatim}{\topsep=0pt \partopsep=0pt }
+\makeatother
+
+\let\oldv\verbatim
+\let\oldendv\endverbatim
+
+\def\verbatim{\setbox0\vbox\bgroup\oldv}
+\def\endverbatim{\oldendv\egroup \hspace*{-0.6ex}\colorbox[gray]{0.93}{\usebox0}}
+% \def\endverbatim{\oldendv\egroup \usebox0}
+
+
+%% ======================================================================
+%% Layout do tableofcontents
+
+\setbeamertemplate{section in toc}{
+  {\color{teal} \bfseries\inserttocsectionnumber.}~
+  {\color{black}\inserttocsection}
+}
+
+%% ======================================================================
+%% Formatando slides para seções e subseções
+
+\AtBeginSection{
+  \let\insertsectionnumber\relax
+  \let\sectionname\relax
+  \frame{\frametitle{Sumário}
+    \tableofcontents[currentsection, subsectionstyle=hide]
+  }
+}
+
+\AtBeginSubsection{
+  \let\insertsubsectionnumber\relax
+  \let\subsectionname\relax
+}
+
+%% ======================================================================
+%% Metadados do documento
+
+\title[Extensões e Aplicações do Modelo COM-Poisson]{Extensões e
+  Aplicações do Modelo de Regressão Conway-Maxwell-Poisson para
+  Modelagem de Dados de Contagem} 
+\author[Eduardo E. R. Junior \& Walmes M. Zeviani]{
+  Eduardo Elias Ribeiro Junior \\
+  Orientação: Prof. Dr. Walmes Marques Zeviani}
+\institute[]{
+  Projeto de Pesquisa - Laboratório A\\
+  Departamento de Estatística (DEST)\\
+  Universidade Federal do Paraná (UFPR)
+}
+
+%% ======================================================================
+%% TODO
+
+% * Realizar as definidos em um documento template, para ser usado no YAML
+% como `template: template.tex`. Assim não são sobrepostas as definição
+% padrão do knitr com as modificações feitas. Utilizar como base o arquivo
+% em ~/.../rmarkdown/rmd/latex/default.tex
+
