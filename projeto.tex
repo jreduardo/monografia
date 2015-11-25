@@ -231,134 +231,163 @@ brazil,				% o último idioma é o principal do documento
 \chapter{Introdução}
 \label{cha:introducao}
 
-Modelos estatísticos de regressão são fundamentalmente os principais
+Modelos de regressão são fundamentalmente os principais
 métodos suporte para a prática de Estatística aplicada. Diversas áreas
-do conhecimento são familiares a estes modelos, pois eles objetivam
-descrever a relação entre uma variável dependente, de interesse, com
-variáveis independentes, a fim de compreender este relacionamento e
-realizar predições através do modelo estabelecido, principal interesse
-de pesquisas aplicadas. Um modelo estatístico, na sua forma univariada
-consiste no estabelecimento de um equação matemática que relaciona uma
-variável de interesse $Y$ com variáveis preditoras $X_i$, considerando
-uma distribuição de probabilidades para $Y$ condicionalmente à $X$ e 
-de média associada a um preditor linear dos efeitos das variáveis
-independentes.
+do conhecimento empregam estes modelos, pois eles objetivam
+i) descrever a relação entre uma variável dependente, de interesse, com
+variáveis independentes a fim de compreender este relacionamento e ii)
+realizar predições por meio do modelo estabelecido, principal interesse
+de pesquisas aplicadas.
 
-Podemos destacar o modelo linear normal, com distribuição Normal
-associada à $[Y \mid X]$ e preditor linear da forma $X\beta$, como o
-modelo predominante dentre as análises estatísticas aplicadas. Até a
+Os modelos de regressão, na sua forma univariada e usual,
+consistem no estabelecimento de uma equação matemática que relaciona a
+média de uma
+variável de interesse $Y$ aos valores de variáveis preditoras $X_i$.
+Eles consideram uma distribuição de probabilidades para $Y$ condicional
+à $X$ cuja média está associada a um preditor linear que serve para
+acomodar o efeitos das variáveis independentes.
+
+Podemos destacar o modelo linear normal como o
+modelo predominante dentre as análises estatísticas aplicadas.
+Esse modelo estabelece que $[Y \mid X]$ têm distribuição Normal
+e a média condicional de $Y$ está associada ao preditor linear da forma
+$X\beta$.
+
+Até a
 década de 70, para situações em que a variável resposta $Y$ não se
-apresentava de forma contínua com domínio nos reais ou ainda não se
-verificava os pressupostos do modelo, a alternativa mais utilizada era
+apresentava de forma contínua com domínio nos reais ou ainda quando os
+pressupostos do modelo linear normal não eram atendidos, a alternativa
+mais utilizada era
 encontrar alguma forma de transformação da variável resposta para
-atingir a normalidade \cite{Paula2013}. Porém, com a introdução dos
-da teoria do modelos lineares generalizados (MLG) por
+atender aos pressupostos \cite{Paula2013}. Porém, com a introdução dos
+modelos lineares generalizados (MLG) por
 \citeauthoronline{Nelder1972} (\citeyear{Nelder1972}) e com o avanço
-computacional, a análise de dados não normais passou a ser
-corriqueiramente via MLG's. Esta nova classe de modelos flexibiliza a 
-distribuição condicional associada, permitindo outras distribuições
-pertencentes à família exponencial de distribuições o que contempla as
-distribuições Normal, Poisson, Binomial, Gama entre outras bem
-conhecidas na literatura. 
+computacional, a análise de dados não normais passou a ter
+como alternativa os MLG's. Esta nova classe de modelos flexibilizou a 
+distribuição condicional associada permitindo outras distribuições
+pertencentes à família exponencial de distribuições. Tal família
+contempla as distribuições Poisson, Binomial, Gama entre outras bem
+conhecidas na literatura, além da própria distribuição Normal. 
 
-Com isso a modelagem de dados passou a ser mais
-fiel a natureza dos dados em observação. Neste contexto, a análise de
-variáveis aleatórias de contagem, que representam o número de
-ocorrências de um evento de interesse em um intervalo de tempo ou espaço
-específico, foi enriquecida expressivamente. Pois via o modelo
-linear normal as estimativas contêm erros padrão inconsistentes e podem
-produzir predições negativas para o número de eventos
-\cite{King1989}. 
+Com os MLG's a modelagem de dados passou a ser mais
+fiel a natureza dos dados em observação, principalmente no que diz
+respeito ao suporte da variável. Neste contexto, a análise de
+variáveis aleatórias de contagem, que têm suporte nos conjunto dos
+números naturais, foi enriquecida expressivamente. Contagens representam
+o número de ocorrências de um evento em um intervalo de tempo ou espaço
+específico. A análise desses dados pelo modelo
+linear normal gera estimativas que contêm erros padrões inconsistentes e
+podem produzir predições negativas para o número de eventos
+\cite{King1989}.
 
-Para análise estatística destas variáveis temos o modelo probabilístico
-de Poisson, já consolidado na literatura, sendo amplamente
+Para análise estatística destas variáveis, temos o modelo probabilístico
+de Poisson, já consolidado na literatura e amplamente
 utilizado. Este modelo possui apenas um parâmetro, denotado por
-$\lambda$ que atua na média e na variância a partir de uma relação
-identidade ($\lambda = E[Y] = V[Y]$). Essa propriedade, chamada de
+$\lambda$, que representa a média e também a variância, o que implica em
+uma relação identidade 1:1 ($\lambda = E[Y] = V[Y]$). Essa propriedade,
+chamada de 
 equidispersão, é uma particularidade do modelo Poisson que pode não ser
-adequada a diversas situações. Quando aplicado sem verificação desta
-suposição, o modelo Poisson acarreta em erros padrões inconsistentes.
+adequada à diversas situações. Quando aplicado sob negligência desta
+suposição, o modelo Poisson apresenta erros padrões inconsistentes para
+as estimativas dos parâmentros e por consequência, para toda função
+desses parâmetros.
 
 Algumas abordagens para modelagem de dados de contagens com fuga de
 equidispersão foram propostas na literatura. O caso de superdispersão,
-quando a variância é maior que a média é o mais comum e tem uma gama de
+quando a variância é maior que a média, é o mais comum e tem uma gama de
 métodos para análise mais extensa. A superdispersão pode ocorrer pela
 ausência de covariáveis importantes, excesso de zeros, diferentes
 amplitudes de domínio (\textit{offset}) não considerado, heterogeneidade
-de unidades amostrais, excesso de zeros, entre
+de unidades amostrais, entre
 outros \cite{RibeiroJr2012}. Para estes casos a abordagem mais comum é a
 adoção de modelos com efeitos aleatórios que capturam a variabilidade
 extra. Um caso particular dos modelos Poisson de efeitos aleatórios,
 muito adotado no campo aplicado da Estatística, ocorre quando
 consideramos distribuição Gama para os efeitos aleatórios, nesta
 situação temos expressão fechada para a função de probabilidade marginal
-que assume a forma Binomial Negativa. Contudo outra manifestação de
+que assume a forma Binomial Negativa.
+
+Outra manifestação de
 fuga da suposição de equidispersão é a subdispersão, situação menos
-comum na literatura. O processo
-que reduz a variabilidade das contagens Poisson não é tão claro quanto o
-que produz variabilidade extra e é muito particular do experimento em
-estudo. São poucas as abordagens descritas na literatura  que
-compreendem o tratamento de
-subdispersão, uma vez que efeitos aleatórios só capturam avariabilidade
-extra. Podemos citar os modelos de quase-verossimilhança como a 
+comum na literatura. Os processos
+que reduzem a variabilidade das contagens, abaixo do estabalecido pela
+Poisson, não são tão conhecidos quanto os
+que produzem variabilidade extra. Pela mesma razão, são poucas as
+abordagens descritas na literatura que 
+capazes de tratar a
+subdispersão, uma vez que efeitos aleatórios só capturam a variabilidade
+extra. Podemos citar os modelos de quasi-verossimilhança como a 
 abordagem mais utilizada, todavia não é possível recuperar a verdadeira
 distribuição da variável resposta nesta abordagem pois aqui a
 modelagem é baseada apenas nos dois primeiros momentos \cite{Paula2013}. 
 
-Anteriormente à formalização dos MLG's, em um contexto de filas
+Anteriormente à formalização dos MLG's, em um contexto de filas,
 \citeauthoronline{Conway1962} (\citeyear{Conway1962}) propuseram uma
 distribuição de probabilidades que 
 generaliza a distribuição Poisson com a adição de mais uma parâmetro,
-denotado por $\nu$, contemplando agora os casos de sub e
+denotado por $\nu$, contemplando assim os casos de sub e
 superdispersão. Posteriormente esta distribuição foi nomeada como 
 COM-Poisson (Conway-Maxwell-Poisson em homenagem à Richard W. Conway,
-William L. Maxwell seus autores). A função distribuição de probabilidade
-COM-Poisson assume a forma
+William L. Maxwell, seus autores). A função distribuição de
+probabilidade COM-Poisson assume a forma
 
 \begin{equation} \label{eq:dcmp}
-  P(Y = y) = \frac{\lambda^y}{(y!)^\nu} \frac{1}{Z(\lambda, \nu)}, \qquad
-  y \in \mathbb{Z}_+
+  \Pr(Y = y) = \frac{\lambda^y}{(y!)^\nu} \frac{1}{Z(\lambda, \nu)},
+  \qquad y \in \mathbb{Z}_+
 \end{equation}
 
 \noindent
 onde $Z(\lambda, \nu) = \sum_{j=0}^\infty \frac{\lambda^s}{(s!)^\nu}$,
 $\lambda > 0$ e $\nu \geq 0$. A flexibilidade da COM-Poisson é
-verificada pela razão de probabilidades consecutivas, que se caracteriza
-não necessariamente linear em $y$ ($P(Y = y - 1) / P(Y = y) = y^\nu /
-\lambda$) sendo governada pelo parâmetro extra $\nu$
-\cite{Shmueli2005}. Uma característica bastante relevante é que esta
-distribuição 
+verificada na razão de probabilidades consecutivas,
+\begin{equation}
+\frac{\Pr(Y = y - 1)}{\Pr(Y = y)} = \frac{y^\nu}{\lambda}
+\end{equation}
+que se caracteriza por
+não ser linear em $y$ para $nu \neq 1$, portanto, governada pelo
+parâmetro extra $\nu$ 
+\cite{Shmueli2005}.
+
+Uma característica bastante relevante é que a COM-Poisson
 pertence à família exponencial e possui como casos particulares as
 distribuições Poisson, Geométrica e Binomial. Portanto, empregando a
-distribuição COM-Poisson na estrutura de um MLG obtemos um modelo de
-regressão sem a imposição de equidispersão. 
+distribuição COM-Poisson na estrutura de um MLG, obtemos um modelo de
+regressão sem a imposição de equidispersão. Tal flexibilidade,
+considerando o amplo uso do modelo Poisson, significa que a COM-Poisson
+pode ser aplicada nestas situações e será principalmente relevante
+naquelas onde há fuga da equidispersão.
 
 A aplicação do modelo de regressão COM-Poisson não apresenta forma
-analítica para estimação, portanto métodos numéricos são empregados
-nesta tarefa. Ainda a constante normalizadora $Z(\lambda, \nu)$ em
+analítica para estimação, portanto métodos numéricos são empregados.
+Ainda, a constante normalizadora $Z(\lambda, \nu)$ em
 \ref{eq:dcmp} se apresenta como uma série infinita que
-computacionalmente deve ser truncada. Algumas aplicações do modelo
-de regressão COM-Poisson são apresentadas em \citeonline{Shmueli2005} e
-\citeonline{Sellers2010}.
+computacionalmente precisa ser truncada. Algumas aplicações do modelo
+de regressão COM-Poisson foram apresentadas em \citeonline{Shmueli2005}
+e \citeonline{Sellers2010}.
 
 Pela similaridade da função de distribuição COM-Poisson em \ref{eq:dcmp}
-com a Poisson vários aspectos podem ser estendidos. Por exemplo, citamos
+com a Poisson, vários aspectos podem ser estendidos. Por exemplo,
+citamos 
 a inclusão de efeitos aleatórios para acomodar superdispersão, porém há
-situações em que o delineamento do experimento sugere a correlação entre
-observações de parcelas da amostra e independência entre parcela. São
-efeitos não observáveis que agem no nível de observação e isso pode ser
-incorporado no modelo de regressão COM-Poisson. Da mesma forma excesso
-de zeros podem ser introduzidos a esta distribuição da mesma forma com o
+situações em que o delineamento do experimento sugere uma estrutura de
+covariância entre observações induzidas por um processo hierárquico de
+casualizado ou amostragem. São casos assim os experimentos em parcelas
+subdivididas e experimentos com medidas repetidas ou longitudinais. Tais
+estruturas estabelecem modelos com efeitos não observáveis que agem no
+nível de observação e isso pode ser incorporado no modelo de regressão
+COM-Poisson. Da mesma forma, excesso
+de zeros pode ser introduzido a esta distribuição da mesma maneira
 que ocorre para o modelo Poisson, através de truncamento (modelos
-Hurdle) ou inflação (modelos de mistura). Estas extensões citadas para o
-modelo COM-Poisson não são bem consolidadas na literatura e são raras
+Hurdle) ou inflação (modelos de mistura). Estas extensões para o
+modelo COM-Poisson ainda não são bem consolidadas na literatura e são
+raras 
 suas aplicações. Uma constatação do fato é que não há implementações
 destas extensões nos principais softwares estatísticos.
 
-Na literatura brasileira a aplicação dos modelos COM-Poisson são
-escassos. Foram encontrados apenas aplicações na área de Análise de
-Sobrevivência mais especificamente em modelos com fração de
-cura. Portanto a presente pesquisa visa colaborar com a literatura
+Na literatura brasileira, aplicações do modelo COM-Poisson são
+escassas. Foram encontradas apenas aplicações na área de Análise de
+Sobrevivência, mais especificamente em modelos com fração de
+cura. Portanto, a presente pesquisa visa colaborar com a literatura
 estatística brasileira apresentando e explorando alternativas para
 modelagem de dados de contagem e suas extensões para situações comuns em
 estudos experimentais e observacionais.
@@ -372,12 +401,11 @@ estudos experimentais e observacionais.
 \section{Objetivos Gerais}
 \label{sec:objetivosgerais}
 
-Apresentar o modelo de regressão COM-Poisson, alternativa 
-paramétrica não comumente utilizada pela comunidade de 
-Estatística aplicada, trazendo discussões sobre aspectos 
-inferenciais deste modelo. Estender as aplicações do modelo
-COM-Poisson para situações específicas (efeitos aleatórios 
-e excesso de zeros).
+Apresentar o modelo de regressão COM-Poisson, alternativa paramétrica
+não comumente utilizada pela comunidade de Estatística aplicada,
+trazendo discussões sobre aspectos inferenciais deste modelo. Estender
+as aplicações do modelo COM-Poisson para situações específicas como
+efeitos aleatórios e excesso de zeros.
 
 \section{Objetivos Específicos}
 \label{sec:objetivosespecificos}
@@ -414,8 +442,9 @@ e excesso de zeros).
 \subsection{Dados para análise}
 \label{sec:dados}
 
-Este projeto de pesquisa via o estudo e avaliação do modelo de regressão
-COM-Poisson para modelagem de dados de contagem. Portanto pretende-se
+Este projeto de pesquisa objetiva o estudo e avaliação do modelo de
+regressão 
+COM-Poisson para modelagem de dados de contagem. Portanto, pretende-se
 analisar vários conjuntos de dados, preferencialmente os já analisados
 na literatura via outras técnicas, para efeitos de comparação.
 
@@ -424,15 +453,17 @@ Inicialmente temos o conjunto \texttt{defoliation}, disponível no
   desenvolvimento pelo Laboratório de Estatística e Geoinformação da
   UFPR \url{http://git.leg.ufpr.br/leg/legTools}}. Este conjunto de
 dados contém 125 observações provenientes de um experimento em casa de
-vegetação inteiramente casualizado com 5 repetições, cujo plantas de
+vegetação em delineamento inteiramente casualizado com 5 repetições,
+cujas plantas de 
 algodão (\textit{Gossypium hirsutum}) foram submetidas à níveis de
 desfolha artificial (5 níveis) combinados com o estágio fenológico da
-planta na aplicação da desfolha (5 níveis), observou-se como variável
+planta na aplicação da desfolha (5 níveis). Observou-se como variável
 resposta o número de capulhos produzidos ao final do ciclo cultura. Este
 conjunto de dados foi analisado considerando o modelo de contagem Gamma
 por \citeonline{Zeviani2014}.
 
-Ainda serão utilizados dados simulados para avaliação da acurácia dos
+Ainda serão utilizados dados simulados para avaliação das propriedades
+numéricas, computacionais e estatísticas dos
 métodos de estimação e comparação de abordagens distintas em diferentes
 cenários.
 
@@ -442,16 +473,19 @@ cenários.
 Para análise e elaboração do trabalho será utilizado o
 \textit{software R}, na versão 3.2 \cite{Rcore2015}. 
 Atualmente há três bibliotecas desenvolvidas em R dedicadas
-à distribuição COM-Poisson. São eles \texttt{COMPoissonReg}
-\cite{COMPoissonReg}, este conjunto de funções foi 
-desenvolvido com base nas análises apresentadas no artigo
-\textit{A flexible regression model for count data} 
-\cite{Sellers2010}; \texttt{compoisson} as funções desta 
-biblioteca se dedicam apenas ao modelo probabilístico; e
-\texttt{CompGLM} esta é mais recente biblioteca de funções 
-com ênfase no modelo COM-Poisson, escrita em \texttt{C++}
-permite a estimação de modelos de regressão além de funções 
-probabilísticas.
+à distribuição COM-Poisson:
+\begin{itemize}
+\item \texttt{COMPoissonReg} \cite{COMPoissonReg}: contém o conjunto de
+  funções desenvolvidas para as análises apresentadas no artigo
+  \textit{A flexible regression model for count data}
+  \cite{Sellers2010};
+\item \texttt{compoisson}: biblioteca com funções se dedicam apenas
+  a obter a distribuição de probabilidades do modelo e geração de
+  números aleatórios;
+\item \texttt{CompGLM}: é mais recente biblioteca de funções com
+  ênfase no modelo COM-Poisson, escrita em \texttt{C++}. Permite a
+  estimação de modelos de regressão além de funções probabilísticas.
+\end{itemize}
 
 Outros recursos e bibliotecas, principalmente para 
 otimização de funções e elaboração de gráficos, serão 
@@ -464,22 +498,17 @@ Neste trabalho se fará uso da teoria de Modelos Lineares Generalizados
 descritas inicialmente por \citeonline{Nelder1972}, cujo referência
 nacional é dada por \citeonline{Paula2013} que também aborda modelos
 para dados de contagem com excesso de zeros. Para estimação dos modelos
-COM-Poisson de efeitos aleatórios pretende-se utilizar os métodos de
+COM-Poisson de efeitos aleatórios, pretende-se utilizar os métodos de
 integração apresentados no material de \citeonline{RibeiroJr2012} com
 discussão sobre aspectos computacionais e implementação em R.
 
-Para comparação de modelos será considerado a avaliação da
-log-verossimilhança no ponto $\hat{\underline{\theta}}$ e os critérios
-de informação AIC, proposto inicialmente para modelos de séries
-temporais por Akaike em 1974 e estendido para qualquer modelo
-estimado por máxima verossimilhança e o critério BIC, modificação do AIC
-proposto por Schwarz em 1978 que tende a ser mais rigoroso na indicação
-de modelos mais complexos.
+Para comparação de modelos, será considerado o teste de razão de
+verossimilhanças e as medidas de AIC e BIC.
 
-Ainda aspectos inferenciais computacionalmente intensivos serão
-avaliados como intervalos de confiança para estimativas dos parâmetros
-via perfis da verossimilhança e intervalos de confiança para os valores
-preditos baseados em \textit{bootstrap}, necessários quando o número de
+Aspectos inferenciais computacionalmente intensivos serão avaliados,
+como intervalos de confiança para estimativas dos parâmetros via perfis
+da verossimilhança e intervalos de confiança para os valores preditos
+baseados em \textit{bootstrap}, necessários quando o número de
 observações é pequeno.
 
 % ----------------------------------------------------------
