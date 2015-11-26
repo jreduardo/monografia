@@ -37,6 +37,7 @@ opts_chunk$set(
 library(compoisson)
 library(latticeExtra)
 library(grid)
+library(CompGLM)
 
 ```
 
@@ -54,7 +55,7 @@ library(grid)
 ###  ###
 
 * Disciplinas: 
-    + Modelos de Regressão (CE071 - 2014/1S)
+    + Análise de Regressão Linear (CE071 - 2014/1S)
     + Modelos Lineares Generalizados (CE225 - 2014/2S)
     + Estatística Computacional II (CE089 - 2014/2S)
 
@@ -72,7 +73,7 @@ library(grid)
       + Apresentação da distribuição *Count-gama* (concorrente à
         *Conway-Maxwell-Poisson*)
       + Análise de dados utilizando um modelo de regressão
-      + Discussão de aspectos inferênciais
+      + Discussão de aspectos inferenciais
 
 <!-- ------------------------------------------- -->
 # Introdução #
@@ -91,7 +92,7 @@ Exemplos:
 
 * Número de filhos por casal;
 * Número de indivíduos infectados por uma doença;
-* Número de insetos mortos após $k$ dias da aplicação de inseticidade;
+* Número de insetos mortos após $k$ dias da aplicação de inseticida;
 * ...
 
 ### Modelos de regressão ###
@@ -119,14 +120,14 @@ Permitem a inclusão de variáveis independentes (covariáveis) para:
 \begin{itemize}
     \itemsep7.5pt\parskip0pt\parsep0pt
     \item $\frac{P(Y = y - 1)}{P(Y = y)} = \frac{y}{\lambda}$
-    \item $E[Y] = \lambda $
-    \item $V[Y] = \lambda$
+    \item $E(Y) = \lambda $
+    \item $V(Y) = \lambda$
 \end{itemize}
 \end{block}
 
 ### Equidispersão ###
 
-```{r, fig.height = 4.2, fig.width = 8}
+```{r, fig.height = 4.2, fig.width = 8, fig.cap = "Densidade de probabilidade da distribuição Poisson"}
 cols <- c("black", "forestgreen")
 
 ## Definindo parametros e calculando as probabilidas
@@ -149,10 +150,6 @@ xyplot(px ~ xx | caso, type = c("h", "g"),
        strip = strip.custom(bg = "gray90",
                           factor.levels = fl))
 ```
-
-\begin{center}
-\textcolor{red}{Muitas vezes a suposição de equidispersão não é atendida}
-\end{center}
 
 ### Abordagens para fuga da suposição ###
 
@@ -180,11 +177,11 @@ xyplot(px ~ xx | caso, type = c("h", "g"),
 \begin{block}{Densidade de probabilidade}
 \begin{center}
 \begin{equation} 
-  \Pr(Y = y) = \frac{\lambda^y}{(y!)^\nu Z(\lambda, \nu)} \quad y \in
+  \Pr(Y = y \mid \lambda, \nu) = \frac{\lambda^y}{(y!)^\nu Z(\lambda, \nu)} \quad y \in
   \mathbb{Z}_+
 \end{equation}
 
-onde $Z(\lambda, \nu) = \sum_{j=0}^\infty \frac{\lambda^s}{(s!)^\nu}$; e
+onde $Z(\lambda, \nu) = \sum_{j=0}^\infty \frac{\lambda^j}{(j!)^\nu}$; e
 \hspace{0.5cm} $\lambda > 0$ e $\nu \geq 0$
 \end{center}
 \end{block}
@@ -195,9 +192,9 @@ onde $Z(\lambda, \nu) = \sum_{j=0}^\infty \frac{\lambda^s}{(s!)^\nu}$; e
 \begin{itemize}
     \itemsep7.5pt\parskip0pt\parsep0pt
     \item $\frac{P(Y = y - 1)}{P(Y = y)} = \frac{y^\nu}{\lambda}$
-    \item $E[Y] \approx \lambda ^ \frac{1}{\nu} - \frac{\nu - 1}{2\nu}$
-    \item $V[Y] \approx \frac{1}{\nu}E[Y]$
-    \item $E[Y^\nu] = \lambda$
+    \item $E(Y) \approx \lambda ^ \frac{1}{\nu} - \frac{\nu - 1}{2\nu}$
+    \item $V(Y) \approx \frac{1}{\nu}E(Y)$
+    \item $E(Y^\nu) = \lambda$
 \end{itemize}
 \end{block}
 
@@ -213,18 +210,9 @@ onde $Z(\lambda, \nu) = \sum_{j=0}^\infty \frac{\lambda^s}{(s!)^\nu}$; e
 
 \end{columns}
 
-<!-- \begin{block}{Modelo de regressão} -->
-<!-- \begin{equation*} -->
-<!--     \begin{split} -->
-<!--         Y \mid &X \sim \text{COM-Poisson}(\lambda_i, \nu) \\ -->
-<!--         &g(\lambda_i) = X \underline{\beta} -->
-<!--     \end{split} -->
-<!-- \end{equation*} -->
-<!-- \end{block} -->
-
 ###  ###
 
-```{r, fig.height = 5.5, fig.width = 8}
+```{r, fig.height = 5, fig.width = 8, fig.cap = "Densidade de probabilidade da distribuição COM-Poisson comparada com a Poisson"}
 
 ## Parametros da distribuição
 lambdas <- c(1.36, 8, 915); nus <- c(0.4, 1, 2.5)
@@ -243,7 +231,7 @@ fl <- expression(lambda == 1.36~","~nu == 0.4,
                  lambda == 8~","~nu == 1,
                  lambda == 915~","~nu == 2.5)
 
-xyplot(py.com ~ c(yy - 0.12) | caso, type = c("h", "g"),
+xyplot(py.com ~ c(yy - 0.14) | caso, type = c("h", "g"),
        lwd = 2.5, xlab = "y", ylab = expression(P(Y==y)),
        col = cols[2], ylim = c(-0.040, 0.25), xlim = extendrange(y),
        key = list(columns = 2,
@@ -251,10 +239,10 @@ xyplot(py.com ~ c(yy - 0.12) | caso, type = c("h", "g"),
                       lty=1, col = c(cols[1], cols[2]), lwd = 3),
                   text = list(c("Poisson", "COM-Poisson"))),
        layout = c(NA, 1),
-       between = list(x=0.2,y=0.3),
+       between = list(x = 0.2,y = 0.3),
        strip = strip.custom(bg = "gray90",
                             factor.levels = fl)) + 
-  as.layer(xyplot(py.pois ~ c(yy + 0.12) | caso, 
+  as.layer(xyplot(py.pois ~ c(yy + 0.14) | caso, 
                   lwd = 2.5, col = cols[1],
                   type = "h"))
 for(i in 1:3){
@@ -277,10 +265,79 @@ trellis.unfocus()
 
 ### Extensões do modelo de regressão COM-Poisson ###
 
-* **Excesso de zeros**
-    + Em muitas
+* **Excesso de zeros**  
+  O mecanismo gerador das variáveis aleatórias de contagem é proveniente
+  de duas distribuições.
 
-* **Efeitos aleatórios**
+```{r, fig.height = 4, fig.width = 8, fig.cap = "Contagens que apresentam excesso de zeros"}
+
+set.seed(100)
+## y <- rcomp(500, 10, 1.5)
+## y <- c(y, rep(0, 15))
+
+n <- 500
+rb <- rbinom(n, 1, 0.98)
+for (i in 1:n) {
+    rb[i] <- ifelse(rb[i] == 0, 0, rcomp(1, 10, 1.5))
+}
+
+y <- rb
+py_real <- prop.table(table(y))
+
+m0 <- glm(y ~ 1, family = poisson)
+py_pois<- dpois(sort(unique(y)), exp(m0$coef))
+
+m1 <- glm.comp(y ~ 1)
+coefs <- sapply(coef(m1), exp)
+py_cmp <- dcom(sort(unique(y)), coefs[1], coefs[2])
+
+yu <- sort(unique(y))
+xyplot(py_real ~ yu, type = "h",
+       lwd = 3, grid = T, col = 1,
+       xlab = "y",
+       ylab = expression(P(Y==y)),
+       key = list(space = "right",
+                  lines = list(
+                      lty=1, col = c(1, 4, cols[2]), lwd = 3),
+                  text = list(c("Real", "Poisson", "COM-Poisson"))),
+       panel = function(x, y, ...) {
+           panel.xyplot(x, y, ...)
+           panel.lines(x = x - 0.1, y = py_pois, type = "h",
+                    col = 4, lwd = 3)
+           panel.lines(x = x + 0.1, y = py_cmp, type = "h",
+                       col = cols[2], lwd = 3)
+       })
+
+```
+
+### Extensões do modelo de regressão COM-Poisson ###
+
+* **Efeitos aleatórios**  
+  Correlação entre grupos de indivíduos induzida pelo delineamento
+  experimental ou estrutura do problema.
+
+```{r, fig.height = 4, fig.width = 8, fig.cap = "Contagens que apresentam um efeito aleatório da unidade experimental (u.e.)"}
+
+simula.pois <- function(n, r, mu, sig, seed = NULL) {
+    if (!is.null(seed)) set.seed(seed)
+    b <- rnorm(n, 0, sig)
+    lambda <- exp(mu + b)
+    y <- rpois(n * r, lambda)
+    da <- data.frame(y = y, id = 1:n)
+    return(da = da[order(da$id), ])
+}
+
+da <- simula.pois(10, 6, 3, 1, seed = 100)
+
+xyplot(y ~ id, groups = id, data = da, type = c("g", "p"),
+       ylab = "Contagens", xlab = "",
+       par.settings = list(superpose.symbol = list(pch = 19)),
+       auto.key = list(space = "right", text = paste("u.e.", 1:10)),
+       pch = 19, cex = 1.1,
+       jitter.x = TRUE, jitter.y = TRUE)
+
+```
+
 
 <!-- ------------------------------------------- -->
 # Objetivos #
@@ -290,9 +347,16 @@ trellis.unfocus()
 * Apresentar o modelo de regressão COM-Poisson com discussão sobre
   aspectos inferenciais;
 
+\vspace{0.2cm}
 
 * Estender as aplicações para situações específicas como efeitos
-  aleatórios e excesso de zeros.
+  aleatórios e excesso de zeros; e
+
+\vspace{0.2cm}
+
+* Contribuir para a comunidade Estatística, principalmente aplicada, com
+ aplicações e discussões de uma abordagem paramétrica flexível para
+ dados de contagem.
 
 ### Objetivos específicos ###
 
@@ -310,7 +374,7 @@ trellis.unfocus()
   para acomodar contagens com excesso de zeros;
   
 * Fazer aplicação do modelo COM-Poisson e suas extensões desenvolvidas à
-  dados reais e/ou simulados; e
+  dados reais e simulados; e
   
 * Fazer comparações com as abordagens já utilizadas para as situações
   estudadas: Poisson, Quase-Poisson, Binomial Negativo, Poisson de
@@ -329,7 +393,7 @@ trellis.unfocus()
 
 ### Dados de desfolha ###
 
-```{r defol, fig.height = 5, fig.width = 8}
+```{r defol, fig.height = 5, fig.width = 8, out.width = "0.9\\textwidth", fig.cap = "Número de capulhos produzidos pelo nível de desfolha estratificado por estágio da planta"}
 library(legTools)
 defol <- defoliation
 names(defol) <- substr(names(defoliation), 1, 3)
@@ -417,9 +481,6 @@ Pacotes:
 
 ### Modelos de efeitos aleatórios ###
 
-Quando há uma estrutura de covariância entre as obervações induzida pelo delineamento
-experimental ou por um processo hierárquico.
-
 \begin{equation*}
     \begin{split}
         Y \mid b \sim f_*(&\mu, \phi) \\
@@ -431,6 +492,11 @@ experimental ou por um processo hierárquico.
 \begin{equation}
     Pr(Y = y) = \int_{-\infty}^{\infty} [Y \mid X,b_i][b_i]db_i
 \end{equation}
+
+* Métodos de integração numérica, discutidos em @RibeiroJr2012
+    + Aproximação de Laplace  
+    + Quadratura Gaussiana  
+    + Monte Carlo (e.g. MCMC)
 
 ### Métodos de estimação ###
 
@@ -564,7 +630,6 @@ progress=0, progress label text=]{Revisão Final}{21}{24} \\
 
 <!-- Listando as referencias não citadas no texto. Há maneiras mais -->
 <!-- elegantes de se fazer \nocite em Rmd. -->
-[@RibeiroJr2012]
 [@Paula2013]
 [@Sellers2010]
 [@Shmueli2005]
