@@ -86,7 +86,7 @@ domínio específico.
 Se $Y$ é uma v.a de contagem, $y \in \mathbb{Z}_+$, ou seja, $y = 0, 1,
 2, ...$
 
-\vspace{0.5cm}
+\vspace{0.5cm} \pause
 
 Exemplos:
 
@@ -98,12 +98,19 @@ Exemplos:
 ### Modelos de regressão ###
 
 Permitem a inclusão de variáveis independentes (covariáveis) para:
+\vspace{-0.1cm}
 
 * Descrever a relação entre a variável resposta e as variáveis
   preditoras; e
 
 * Realizar predições por meio do modelo estabelecido.
 
+\pause
+\vspace{-0.5cm}
+\begin{figure}[!ht]
+	\includegraphics[scale=0.9]{./images/regressao.pdf}
+    \caption{Representação esquemática de um modelo de regressão}
+\end{figure}
 
 ## Modelos para dados de contagem ##
 
@@ -115,7 +122,7 @@ Permitem a inclusão de variáveis independentes (covariáveis) para:
   \mathbb{Z}_+
 \end{equation}
 \end{block}
-
+\pause
 \begin{block}{Propriedades}
 \begin{itemize}
     \itemsep7.5pt\parskip0pt\parsep0pt
@@ -161,7 +168,7 @@ xyplot(px ~ xx | caso, type = c("h", "g"),
     + Corrige os erros-padrão das estimativas;
     + Não é possível recuperar a verdadeira distribuição de $Y$;
 
-\vspace{0.2cm}
+\vspace{0.2cm}\pause
 
 * **Modelo de efeitos aleatórios**  
     \vspace{0.2cm}
@@ -184,7 +191,7 @@ xyplot(px ~ xx | caso, type = c("h", "g"),
 onde $Z(\lambda, \nu) = \sum_{j=0}^\infty \frac{\lambda^j}{(j!)^\nu}$; e
 \hspace{0.5cm} $\lambda > 0$ e $\nu \geq 0$
 \end{center}
-\end{block}
+\end{block}\pause
 
 \begin{columns}[t,onlytextwidth]
 \column{.48\textwidth}
@@ -196,7 +203,7 @@ onde $Z(\lambda, \nu) = \sum_{j=0}^\infty \frac{\lambda^j}{(j!)^\nu}$; e
     \item $V(Y) \approx \frac{1}{\nu}E(Y)$
     \item $E(Y^\nu) = \lambda$
 \end{itemize}
-\end{block}
+\end{block}\pause
 
 \column{.48\textwidth}
 
@@ -267,7 +274,7 @@ trellis.unfocus()
 
 * **Excesso de zeros**  
   O mecanismo gerador das variáveis aleatórias de contagem é proveniente
-  de duas distribuições.
+  de duas distribuições.\pause
 
 ```{r, fig.height = 4, fig.width = 8, fig.cap = "Contagens que apresentam excesso de zeros"}
 
@@ -314,7 +321,7 @@ xyplot(py_real ~ yu, type = "h",
 
 * **Efeitos aleatórios**  
   Correlação entre grupos de indivíduos induzida pelo delineamento
-  experimental ou estrutura do problema.
+  experimental ou estrutura do problema.\pause
 
 ```{r, fig.height = 4, fig.width = 8, fig.cap = "Contagens que apresentam um efeito aleatório da unidade experimental (u.e.)"}
 
@@ -345,12 +352,12 @@ xyplot(y ~ id, groups = id, data = da, type = c("g", "p"),
 ### Objetivos gerais ###
 
 * Apresentar o modelo de regressão COM-Poisson com discussão sobre
-  aspectos inferenciais;
+  aspectos inferenciais; \pause
 
 \vspace{0.2cm}
 
 * Estender as aplicações para situações específicas como efeitos
-  aleatórios e excesso de zeros; e
+  aleatórios e excesso de zeros; e \pause
 
 \vspace{0.2cm}
 
@@ -361,20 +368,20 @@ xyplot(y ~ id, groups = id, data = da, type = c("g", "p"),
 ### Objetivos específicos ###
 
 * Apresentar e discutir aspectos da distribuição COM-Poisson para
-  modelagem de dados de contagem;
+  modelagem de dados de contagem; \pause
   
 * Avaliar as propriedades de soluções numéricas para i) cálculo da
   densidade de probabilidade e ii) estimação dos modelos de regressão de
-  efeito fixo;
+  efeito fixo; \pause
   
 * Propor e implementar a extensão do modelo de regressão COM-Poisson
-  para acomodar efeitos aleatórios;
+  para acomodar efeitos aleatórios; \pause
   
 * Propor e implementar a extensão do modelo de regressão COM-Poisson
-  para acomodar contagens com excesso de zeros;
+  para acomodar contagens com excesso de zeros; \pause
   
 * Fazer aplicação do modelo COM-Poisson e suas extensões desenvolvidas à
-  dados reais e simulados; e
+  dados reais e simulados; e \pause
   
 * Fazer comparações com as abordagens já utilizadas para as situações
   estudadas: Poisson, Quase-Poisson, Binomial Negativo, Poisson de
@@ -456,7 +463,7 @@ Pacotes:
 
 ### Modelos para excesso de zeros ###
 
-* **Modelo de Barreira (condicionais)**  
+* **Modelos de Barreira (condicionais ou truncados)**  
   *Hurdle models*
 
 \begin{equation}
@@ -465,10 +472,10 @@ Pacotes:
         \pi& \text{se } y = 0,\\
         (1 - \pi) \frac{f_*(y)}{1 - f_*(0)} & \text{se } y = 1, 2, \dots
     \end{dcases*}
-\end{equation}
+\end{equation} \pause
 
 
-* **Modelo Poisson Inflacionado de Zeros (mistura)**  
+* **Modelos Inflacionados de Zeros (mistura)**  
   *e.g. Zero Inflated Poisson Regression (ZIP)*
 
 \begin{equation}
@@ -477,7 +484,7 @@ Pacotes:
         \pi + (1 - \pi) f_*(0) & \text{se } y = 0,\\
         (1 - \pi) f_*(y)       & \text{se } y = 1, 2, \dots
     \end{dcases*}
-\end{equation}
+\end{equation} \pause
 
 ### Modelos de efeitos aleatórios ###
 
@@ -491,7 +498,7 @@ Pacotes:
 
 \begin{equation}
     Pr(Y = y) = \int_{-\infty}^{\infty} [Y \mid X,b_i][b_i]db_i
-\end{equation}
+\end{equation} \pause
 
 * Métodos de integração numérica, discutidos em @RibeiroJr2012
     + Aproximação de Laplace  
@@ -505,17 +512,18 @@ Pacotes:
 $$ L(\underline{\theta} \mid \underline{Y}) = \prod_{i=1}^n f_*(y_i \mid
 \underline{\theta}) $$
 
-$$ \hat{\underline{\theta}} \implies \max({\log(L(\underline{\theta} \mid \underline{Y}))}) $$
+$$ \hat{\underline{\theta}} \implies \max({\log(L(\underline{\theta}
+\mid \underline{Y}))}) $$ \pause
 
 * **Mínimos Quadrados Ponderados Iterativamente**  
   *Iterative Reweighted Least Squares (IRLS)*
 
 \begin{equation*}
 	\begin{split}
-		&\partial ll/ \partial \beta_j = (y_i - E[Y_i]x_{ij})\\
-		&\partial ll/ \partial \nu = \log(y_i!) + E[\log(Y_i!)]
+		&\partial ll/ \partial \beta_j \approx (y_i - E[Y_i]x_{ij})\\
+		&\partial ll/ \partial \nu \approx \log(y_i!) + E[\log(Y_i!)]
 	\end{split}
-\end{equation*}
+\end{equation*} \pause
 
 
 ### Critérios para Comparação ###
@@ -523,12 +531,13 @@ $$ \hat{\underline{\theta}} \implies \max({\log(L(\underline{\theta} \mid \under
 * **Critério de Informação de Akaike**  
   *Akaike Information Criterion (AIC)*
 
-$$ AIC = 2 k - 2 \log(L(\underline{\hat{\theta}} \mid \underline{Y})) $$
+$$ AIC = 2 k - 2 \log(L(\underline{\hat{\theta}} \mid \underline{Y})) $$ \pause
 
 * **Critério de Informação Bayesiano**  
   *Bayesian Information Criterion (BIC)*
 
-$$ BIC = \log(n) k - 2 \log(L(\underline{\hat{\theta}} \mid \underline{Y})) $$
+$$ BIC = \log(n) k - 2 \log(L(\underline{\hat{\theta}} \mid
+\underline{Y})) $$ \pause
 
 * **Teste de razão de verossimilhanças (TRV)**
 
