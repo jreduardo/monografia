@@ -9,7 +9,7 @@ output:
     highlight: zenburn
     includes:
       in_header: preambulo-beamer.tex
-    keep_tex: yes
+    keep_tex: no
     slide_level: 3
 ---
 
@@ -579,14 +579,14 @@ link type=dr
 \gantttitle{Abril}{4} 
 \gantttitle{Maio}{4} 
 \gantttitle{Junho}{4} 
-\gantttitle{Julho}{4} \\
-%\gantttitlelist{1,...,24}{1} \\
+\gantttitle{Julho}{3} \\
+%\gantttitlelist{1,...,23}{1} \\
 \ganttgroup[group label node/.append style={align=right}, 
-progress=75]{Projeto \ganttalignnewline de Pesquisa}{1}{3} \\
-\ganttbar[progress=80]{Redação da \ganttalignnewline versão 
+progress=80]{Projeto \ganttalignnewline de Pesquisa}{1}{6} \\
+\ganttbar[progress=85]{Redação da \ganttalignnewline versão 
 final}{1}{2} \\
 \ganttbar[progress=0, progress label text=]{Entrega à
-\ganttalignnewline banca}{3}{3} \\
+\ganttalignnewline banca}{6}{6} \\
 \ganttgroup[group label node/.append style={align=right},
 progress=15]{Elaboração \ganttalignnewline da Pesquisa}{2}{20} \\
 \ganttbar[progress=40]{Revisão de \ganttalignnewline
@@ -603,13 +603,13 @@ literatura}{2}{8} \\
 progress=0, progress label text=]{Defesa \ganttalignnewline do
 Trabalho}{20}{21} \\  
 \ganttbar[progress=0, progress label text= ]{Elaboração da
-\ganttalignnewline apresentação}{20}{20} \\
+\ganttalignnewline apresentação}{20}{21} \\
 \ganttgroup[group label node/.append style={align=right},
-progress=0, progress label text=]{Revisão Final}{21}{24} \\ 
+progress=0, progress label text=]{Revisão Final}{21}{23} \\ 
 \ganttbar[progress=0, progress label text= ]{Incorporação
 \ganttalignnewline das sugestões}{21}{22} \\
 \ganttbar[progress=0, progress label text= ]{Redação da 
-\ganttalignnewline versão final}{22}{23}
+\ganttalignnewline versão final}{21}{22}
  \ganttlink{elem1}{elem2}
  \ganttlink{elem1}{elem3}
  \ganttlink{elem4}{elem5}
@@ -620,7 +620,6 @@ progress=0, progress label text=]{Revisão Final}{21}{24} \\
  \ganttlink{elem8}{elem10}
  \ganttlink{elem10}{elem12}
  \ganttlink{elem10}{elem13}
- \ganttlink{elem12}{elem13}
 \end{ganttchart}
 \end{tikzpicture}
 \caption{Cronograma de atividades para 2016}
