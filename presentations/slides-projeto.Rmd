@@ -27,7 +27,7 @@ opts_chunk$set(
     cache = FALSE,
     echo = FALSE,
     out.width = "1\\textwidth",
-    fig.path = "figures/",
+    fig.path = "images/",
     fig.align = "center",
     dev.args = list(family = "Palatino")
     )
@@ -108,7 +108,7 @@ Permitem a inclusão de variáveis independentes (covariáveis) para:
 \pause
 \vspace{-0.5cm}
 \begin{figure}[!ht]
-	\includegraphics[scale=0.9]{./images/regressao.pdf}
+	\includegraphics[scale=0.9]{./figures/regressao.pdf}
     \caption{Representação esquemática de um modelo de regressão}
 \end{figure}
 
@@ -441,7 +441,7 @@ xyplot(bol ~ def | phe, data = defol, pch = 19,
 
 \begin{minipage}[c]{0.4\linewidth}
     \begin{flushright}	
-      \includegraphics[scale=0.1]{images/logoR}\\
+      \includegraphics[scale=0.1]{./figures/logoR}\\
       \vspace{0.3cm}
     \end{flushright}
 \end{minipage}
