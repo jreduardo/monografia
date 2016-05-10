@@ -1,3 +1,8 @@
+*.tex
+*.ilg
+*.ind
+*.lof
+*.lot
 *.aux
 *.log
 *.out
@@ -11,7 +16,6 @@
 *.brf
 *.idx
 *.html
-*.pdf
 *~
 .#*
 #*
@@ -21,3 +25,7 @@
 .Rproj.user
 **/cache/*
 **/figures/*
+
+*.pdf
+!00-projeto.pdf
+!01-tcc.pdf
