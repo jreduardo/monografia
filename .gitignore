@@ -3,6 +3,7 @@
 *.out
 *.nav
 *.toc
+*.tex.bak
 *.snm
 *.synctex.gz
 *.bbl
@@ -10,9 +11,12 @@
 *.brf
 *.idx
 *.html
+*.pdf
 *~
 .#*
 #*
+*.dvi
+*ps
 .Rhistory
 .Rproj.user
 **/cache/*

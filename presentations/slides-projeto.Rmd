@@ -1,0 +1,649 @@
+---
+date: "`r format(Sys.time(), '%d de %B de %Y')`"
+fontsize: "10pt"
+bibliography: ../compois.bib
+csl: abntcite.csl
+output: 
+  beamer_presentation:
+    fig_caption: yes
+    highlight: zenburn
+    includes:
+      in_header: preambulo-beamer.tex
+    keep_tex: no
+    slide_level: 3
+---
+
+<!-- Arquivos de estilo de bibliográfica e citação "Citation Style -->
+<!-- Language (CSL)" disponíveis em -->
+<!-- <https://github.com/citation-style-language/styles> -->
+
+```{r, include = FALSE}
+
+##-------------------------------------------
+## Definições knitr
+library(knitr)
+opts_chunk$set(
+    tidy = FALSE,
+    cache = FALSE,
+    echo = FALSE,
+    out.width = "1\\textwidth",
+    fig.path = "images/",
+    fig.align = "center",
+    dev.args = list(family = "Palatino")
+    )
+
+##-------------------------------------------
+## Pacotes
+library(compoisson)
+library(latticeExtra)
+library(grid)
+library(CompGLM)
+
+```
+
+<!-- ###  ### -->
+
+\titlepage
+
+### Sumário ###
+
+\tableofcontents[hideallsubsections]
+
+<!-- ------------------------------------------- -->
+# Contextualização #
+
+###  ###
+
+* Disciplinas: 
+    + Análise de Regressão Linear (CE071 - 2014/1S)
+    + Modelos Lineares Generalizados (CE225 - 2014/2S)
+    + Estatística Computacional II (CE089 - 2014/2S)
+
+\pause
+
+* Trabalho proposto na disciplina CE089:
+    + Distribuição Conway-Maxwell-Poisson
+    + Simulação, métodos de estimação, função de verossimilhança,
+      inferência estatística
+
+\pause
+
+* Sugestão de leitura do artigo *The Gamma-count distribution in the analysis of
+  experimental underdispersed data* por @Zeviani2014:
+      + Apresentação da distribuição *Count-gama* (concorrente à
+        *Conway-Maxwell-Poisson*)
+      + Análise de dados utilizando um modelo de regressão
+      + Discussão de aspectos inferenciais
+
+<!-- ------------------------------------------- -->
+# Introdução #
+
+### Dados de contagem ###
+
+Representam o número de ocorrências de um evento de interesse em um
+domínio específico.
+
+Se $Y$ é uma v.a de contagem, $y \in \mathbb{Z}_+$, ou seja, $y = 0, 1,
+2, ...$
+
+\vspace{0.5cm} \pause
+
+Exemplos:
+
+* Número de filhos por casal;
+* Número de indivíduos infectados por uma doença;
+* Número de insetos mortos após $k$ dias da aplicação de inseticida;
+* ...
+
+### Modelos de regressão ###
+
+Permitem a inclusão de variáveis independentes (covariáveis) para:
+\vspace{-0.1cm}
+
+* Descrever a relação entre a variável resposta e as variáveis
+  preditoras; e
+
+* Realizar predições por meio do modelo estabelecido.
+
+\pause
+\vspace{-0.5cm}
+\begin{figure}[!ht]
+	\includegraphics[scale=0.9]{./figures/regressao.pdf}
+    \caption{Representação esquemática de um modelo de regressão}
+\end{figure}
+
+## Modelos para dados de contagem ##
+
+### Modelo Poisson ###
+
+\begin{block}{Densidade de probabilidade}
+\begin{equation} 
+  \Pr(Y = y) = \frac{\lambda^y}{y! e^\lambda} \quad y \in
+  \mathbb{Z}_+
+\end{equation}
+\end{block}
+\pause
+\begin{block}{Propriedades}
+\begin{itemize}
+    \itemsep7.5pt\parskip0pt\parsep0pt
+    \item $\frac{P(Y = y - 1)}{P(Y = y)} = \frac{y}{\lambda}$
+    \item $E(Y) = \lambda $
+    \item $V(Y) = \lambda$
+\end{itemize}
+\end{block}
+
+### Equidispersão ###
+
+```{r, fig.height = 4.2, fig.width = 8, fig.cap = "Densidade de probabilidade da distribuição Poisson"}
+cols <- c("black", "forestgreen")
+
+## Definindo parametros e calculando as probabilidas
+lambdas <- c(3, 8, 15)
+x <- 0:30; xx <- rep(x, 3)
+px <- NULL
+for(i in 1:3) px <- c(px, dpois(x, lambdas[i]))
+
+## Criando categorias para split da lattice
+caso <- rep(c("1", "2", "3"), each = length(x))
+
+## Definindo nome para os splits da lattice
+fl <- as.expression(lapply(lambdas,
+    function(x){ bquote(lambda==.(x)) }))
+    
+xyplot(px ~ xx | caso, type = c("h", "g"),
+       lwd = 3, xlab = "y", ylab = expression(P(Y==y)),
+       layout = c(NA, 1), col = cols[1],
+       between = list(x=0.2, y=0.3),
+       strip = strip.custom(bg = "gray90",
+                          factor.levels = fl))
+```
+
+### Abordagens para fuga da suposição ###
+
+* **Modelo quase-Poisson**  
+    \vspace{0.2cm}
+    $V(Y) = \phi V(\mu)$  
+    Nesta abordagem estima-se $\phi$ separadamente:
+    + Produz as mesmas estimativas pontuais do que o modelo Poisson;
+    + Corrige os erros-padrão das estimativas;
+    + Não é possível recuperar a verdadeira distribuição de $Y$;
+
+\vspace{0.2cm}\pause
+
+* **Modelo de efeitos aleatórios**  
+    \vspace{0.2cm}
+    $g(\mu) = X\underline{\beta} + Z\underline{b}$  
+    Onde $b$ são efeitos aleatórios, variáveis não observadas
+    (latentes) provenientes de uma distribuição de probabilidades.
+    + Contemplam a estrutura de delineamento experimentada;
+    + Capturam (somente) a variabilidade extra especificada pelo modelo;
+    + São computacionalmente intensivos;
+
+### Modelo COM-Poisson ###
+
+\begin{block}{Densidade de probabilidade}
+\begin{center}
+\begin{equation} 
+  \Pr(Y = y \mid \lambda, \nu) = \frac{\lambda^y}{(y!)^\nu Z(\lambda, \nu)} \quad y \in
+  \mathbb{Z}_+
+\end{equation}
+
+onde $Z(\lambda, \nu) = \sum_{j=0}^\infty \frac{\lambda^j}{(j!)^\nu}$; e
+\hspace{0.5cm} $\lambda > 0$ e $\nu \geq 0$
+\end{center}
+\end{block}\pause
+
+\begin{columns}[t,onlytextwidth]
+\column{.48\textwidth}
+\begin{block}{Propriedades}
+\begin{itemize}
+    \itemsep7.5pt\parskip0pt\parsep0pt
+    \item $\frac{P(Y = y - 1)}{P(Y = y)} = \frac{y^\nu}{\lambda}$
+    \item $E(Y) \approx \lambda ^ \frac{1}{\nu} - \frac{\nu - 1}{2\nu}$
+    \item $V(Y) \approx \frac{1}{\nu}E(Y)$
+    \item $E(Y^\nu) = \lambda$
+\end{itemize}
+\end{block}\pause
+
+\column{.48\textwidth}
+
+\begin{block}{Casos particulares}
+\begin{itemize}
+	\item Distribuição Poisson, \\ quando $\nu = 1$
+	\item Distribuição Bernoulli, \\ quando $\nu \rightarrow \infty$
+	\item Distribuição Geométrica, \\ quando $\nu = 0,\ \lambda < 1$
+\end{itemize}
+\end{block}
+
+\end{columns}
+
+###  ###
+
+```{r, fig.height = 5, fig.width = 8, fig.cap = "Densidade de probabilidade da distribuição COM-Poisson comparada com a Poisson"}
+
+## Parametros da distribuição
+lambdas <- c(1.36, 8, 915); nus <- c(0.4, 1, 2.5)
+medias <- mapply(com.mean, lambda = lambdas, nu = nus)
+variancias <- mapply(com.var, lambda = lambdas, nu = nus)
+
+## Calculando as probabilidades
+y <- 0:30; yy <- rep(x, 3)
+py.com <- py.pois <- NULL
+for(i in 1:3) py.com <- c(py.com, dcom(x, lambdas[i], nus[i]))
+for(i in 1:3) py.pois <- c(py.pois, dpois(x, medias[i]))
+
+## Criando categorias para split da lattice
+caso <- rep(c("1", "2", "3"), each = length(x))
+fl <- expression(lambda == 1.36~","~nu == 0.4,
+                 lambda == 8~","~nu == 1,
+                 lambda == 915~","~nu == 2.5)
+
+xyplot(py.com ~ c(yy - 0.14) | caso, type = c("h", "g"),
+       lwd = 2.5, xlab = "y", ylab = expression(P(Y==y)),
+       col = cols[2], ylim = c(-0.040, 0.25), xlim = extendrange(y),
+       key = list(columns = 2,
+                  lines = list(
+                      lty=1, col = c(cols[1], cols[2]), lwd = 3),
+                  text = list(c("Poisson", "COM-Poisson"))),
+       layout = c(NA, 1),
+       between = list(x = 0.2,y = 0.3),
+       strip = strip.custom(bg = "gray90",
+                            factor.levels = fl)) + 
+  as.layer(xyplot(py.pois ~ c(yy + 0.14) | caso, 
+                  lwd = 2.5, col = cols[1],
+                  type = "h"))
+for(i in 1:3){
+  trellis.focus("panel", i, 1, highlight=FALSE)
+  grid.text(label = sprintf("E[Y]:  %.2f\nV[Y]:  %.2f",
+                            medias[i], variancias[i]),
+            x = .62, y = 0.02, 
+            default.units = "npc",
+            gp = gpar(col = cols[2]),
+            just = c("left", "bottom"))
+  grid.text(label = sprintf("E[Y]:  %.2f\nV[Y]:  %.2f",
+                            medias[i], medias[i]),
+            x = .08, y = 0.02, 
+            default.units = "npc",
+            gp = gpar(col = cols[1]),
+            just = c("left", "bottom"))
+}
+trellis.unfocus()
+```
+
+### Extensões do modelo de regressão COM-Poisson ###
+
+* **Excesso de zeros**  
+  O mecanismo gerador das variáveis aleatórias de contagem é proveniente
+  de duas distribuições.\pause
+
+```{r, fig.height = 4, fig.width = 8, fig.cap = "Contagens que apresentam excesso de zeros"}
+
+set.seed(100)
+## y <- rcomp(500, 10, 1.5)
+## y <- c(y, rep(0, 15))
+
+n <- 500
+rb <- rbinom(n, 1, 0.98)
+for (i in 1:n) {
+    rb[i] <- ifelse(rb[i] == 0, 0, rcomp(1, 10, 1.5))
+}
+
+y <- rb
+py_real <- prop.table(table(y))
+
+m0 <- glm(y ~ 1, family = poisson)
+py_pois<- dpois(sort(unique(y)), exp(m0$coef))
+
+m1 <- glm.comp(y ~ 1)
+coefs <- sapply(coef(m1), exp)
+py_cmp <- dcom(sort(unique(y)), coefs[1], coefs[2])
+
+yu <- sort(unique(y))
+xyplot(py_real ~ yu, type = "h",
+       lwd = 3, grid = T, col = 1,
+       xlab = "y",
+       ylab = expression(P(Y==y)),
+       key = list(space = "right",
+                  lines = list(
+                      lty=1, col = c(1, 4, cols[2]), lwd = 3),
+                  text = list(c("Real", "Poisson", "COM-Poisson"))),
+       panel = function(x, y, ...) {
+           panel.xyplot(x, y, ...)
+           panel.lines(x = x - 0.1, y = py_pois, type = "h",
+                    col = 4, lwd = 3)
+           panel.lines(x = x + 0.1, y = py_cmp, type = "h",
+                       col = cols[2], lwd = 3)
+       })
+
+```
+
+### Extensões do modelo de regressão COM-Poisson ###
+
+* **Efeitos aleatórios**  
+  Correlação entre grupos de indivíduos induzida pelo delineamento
+  experimental ou estrutura do problema.\pause
+
+```{r, fig.height = 4, fig.width = 8, fig.cap = "Contagens que apresentam um efeito aleatório da unidade experimental (u.e.)"}
+
+simula.pois <- function(n, r, mu, sig, seed = NULL) {
+    if (!is.null(seed)) set.seed(seed)
+    b <- rnorm(n, 0, sig)
+    lambda <- exp(mu + b)
+    y <- rpois(n * r, lambda)
+    da <- data.frame(y = y, id = 1:n)
+    return(da = da[order(da$id), ])
+}
+
+da <- simula.pois(10, 6, 3, 1, seed = 100)
+
+xyplot(y ~ id, groups = id, data = da, type = c("g", "p"),
+       ylab = "Contagens", xlab = "",
+       par.settings = list(superpose.symbol = list(pch = 19)),
+       auto.key = list(space = "right", text = paste("u.e.", 1:10)),
+       pch = 19, cex = 1.1,
+       jitter.x = TRUE, jitter.y = TRUE)
+
+```
+
+
+<!-- ------------------------------------------- -->
+# Objetivos #
+
+### Objetivos gerais ###
+
+* Apresentar o modelo de regressão COM-Poisson com discussão sobre
+  aspectos inferenciais; \pause
+
+\vspace{0.2cm}
+
+* Estender as aplicações para situações específicas como efeitos
+  aleatórios e excesso de zeros; e \pause
+
+\vspace{0.2cm}
+
+* Contribuir para a comunidade Estatística, principalmente aplicada, com
+ aplicações e discussões de uma abordagem paramétrica flexível para
+ dados de contagem.
+
+### Objetivos específicos ###
+
+* Apresentar e discutir aspectos da distribuição COM-Poisson para
+  modelagem de dados de contagem; \pause
+  
+* Avaliar as propriedades de soluções numéricas para i) cálculo da
+  densidade de probabilidade e ii) estimação dos modelos de regressão de
+  efeito fixo; \pause
+  
+* Propor e implementar a extensão do modelo de regressão COM-Poisson
+  para acomodar efeitos aleatórios; \pause
+  
+* Propor e implementar a extensão do modelo de regressão COM-Poisson
+  para acomodar contagens com excesso de zeros; \pause
+  
+* Fazer aplicação do modelo COM-Poisson e suas extensões desenvolvidas à
+  dados reais e simulados; e \pause
+  
+* Fazer comparações com as abordagens já utilizadas para as situações
+  estudadas: Poisson, Quase-Poisson, Binomial Negativo, Poisson de
+  efeito aleatório.
+
+<!-- ------------------------------------------- -->
+# Materiais e Métodos #
+
+## Materiais ##
+
+
+### Conjunto de dados ###
+
+ A pesquisa tem como um dos objetivos a avaliação do método, portanto
+ pretende-se utilizar vários conjuntos de dados. 
+
+### Dados de desfolha ###
+
+```{r defol, fig.height = 5, fig.width = 8, out.width = "0.9\\textwidth", fig.cap = "Número de capulhos produzidos pelo nível de desfolha estratificado por estágio da planta"}
+library(legTools)
+defol <- defoliation
+names(defol) <- substr(names(defoliation), 1, 3)
+
+panel.beeswarm <- function(x, y, subscripts, r, ...){
+    xx <- x; yy <- y
+    aux <- by(cbind(yy, xx, subscripts), xx,
+              function(i){
+                  or <- order(i[,1])
+                  ys <- i[or,1]
+                  yt <- table(ys)
+                  dv <- sapply(unlist(yt),
+                               function(j){
+                                   seq(1,j,l=j)-(j+1)/2
+                               })
+                  if(!is.list(dv)){ dv <- as.list(dv) }
+                  xs <- i[or,2]+r*do.call(c, dv)
+                  cbind(x=xs, y=ys, subscripts[or])
+              })
+    aux <- do.call(rbind, aux)
+    panel.xyplot(aux[,1], aux[,2], subscripts=aux[,3], ...)
+}
+
+xyplot(bol ~ def | phe, data = defol, pch = 19,
+       layout = c(3, 2), as.table = 1, col = cols[1],
+       xlim = extendrange(c(0:1),f = 0.15),
+       xlab = "Nível de desfolha artificial",
+       ylab = "Número de capulhos produzidos",
+       type = c("p","smooth"), grid = TRUE,
+       col.line = cols[2], jitter.x = TRUE, 
+       strip = strip.custom(bg = "gray90",
+                            factor.levels = levels(defol$phe)),
+       panel = panel.beeswarm, r = 0.05)
+
+```
+
+### Resursos Computacionais ###
+
+\begin{minipage}[c]{0.4\linewidth}
+    \begin{flushright}	
+      \includegraphics[scale=0.1]{./figures/logoR}\\
+      \vspace{0.3cm}
+    \end{flushright}
+\end{minipage}
+\begin{minipage}[c]{0.6\linewidth}
+    \hspace{0.2cm}
+    Software \texttt{R}, versão 3.2 \\
+\end{minipage}
+
+\vspace{0.5cm}
+
+Pacotes:
+
+ * `COMPoissonReg` (SELLERS; LOTZE, 2011);
+ * `compoisson` (DUNN, 2012);
+ * `CompGLM` (POLLOCK, 2014);
+ * Bibliotecas para elaboração de gráficos e otimização de funções;
+
+## Métodos ##
+
+### Modelos para excesso de zeros ###
+
+* **Modelos de Barreira (condicionais ou truncados)**  
+  *Hurdle models*
+
+\begin{equation}
+    Pr(Y = y) =
+    \begin{dcases*}
+        \pi& \text{se } y = 0,\\
+        (1 - \pi) \frac{f_*(y)}{1 - f_*(0)} & \text{se } y = 1, 2, \dots
+    \end{dcases*}
+\end{equation} \pause
+
+
+* **Modelos Inflacionados de Zeros (mistura)**  
+  *e.g. Zero Inflated Poisson Regression (ZIP)*
+
+\begin{equation}
+    Pr(Y = y) =
+    \begin{dcases*}
+        \pi + (1 - \pi) f_*(0) & \text{se } y = 0,\\
+        (1 - \pi) f_*(y)       & \text{se } y = 1, 2, \dots
+    \end{dcases*}
+\end{equation} \pause
+
+### Modelos de efeitos aleatórios ###
+
+\begin{equation*}
+    \begin{split}
+        Y \mid b \sim f_*(&\mu, \phi) \\
+        g(\mu) = &\beta_0 + b_i \\
+        b_i \sim &N(0, \sigma^2)
+    \end{split}
+\end{equation*}
+
+\begin{equation}
+    Pr(Y = y) = \int_{-\infty}^{\infty} [Y \mid X,b_i][b_i]db_i
+\end{equation} \pause
+
+* Métodos de integração numérica, discutidos em @RibeiroJr2012
+    + Aproximação de Laplace  
+    + Quadratura Gaussiana  
+    + Monte Carlo (e.g. MCMC)
+
+### Métodos de estimação ###
+
+* **Máxima Verossimilhança**  
+
+$$ L(\underline{\theta} \mid \underline{Y}) = \prod_{i=1}^n f_*(y_i \mid
+\underline{\theta}) $$
+
+$$ \hat{\underline{\theta}} \implies \max({\log(L(\underline{\theta}
+\mid \underline{Y}))}) $$ \pause
+
+* **Mínimos Quadrados Ponderados Iterativamente**  
+  *Iterative Reweighted Least Squares (IRLS)*
+
+\begin{equation*}
+	\begin{split}
+		&\partial ll/ \partial \beta_j \approx (y_i - E[Y_i]x_{ij})\\
+		&\partial ll/ \partial \nu \approx \log(y_i!) + E[\log(Y_i!)]
+	\end{split}
+\end{equation*} \pause
+
+
+### Critérios para Comparação ###
+
+* **Critério de Informação de Akaike**  
+  *Akaike Information Criterion (AIC)*
+
+$$ AIC = 2 k - 2 \log(L(\underline{\hat{\theta}} \mid \underline{Y})) $$ \pause
+
+* **Critério de Informação Bayesiano**  
+  *Bayesian Information Criterion (BIC)*
+
+$$ BIC = \log(n) k - 2 \log(L(\underline{\hat{\theta}} \mid
+\underline{Y})) $$ \pause
+
+* **Teste de razão de verossimilhanças (TRV)**
+
+\begin{equation*}
+    \begin{split}
+        &TRV = 2 {\log(L(\underline{\hat{\theta}}_p, \underline{y})) -
+        \log(L(\underline{\hat{\theta}}_q), \underline{y})}\\
+        & TRV \sim \chi^2_{p-q}
+    \end{split}
+\end{equation*}
+
+<!-- ------------------------------------------- -->
+# Cronograma #
+
+###  ###
+
+\begin{figure}
+\centering
+\hspace{-0.5cm}
+\begin{tikzpicture}[thick, scale=0.75, every node/.style={scale=0.75}]
+\begin{ganttchart}[
+canvas/.append style={fill=none},
+y unit title=0.5cm, % Size da indicação do tempo
+y unit chart=0.7cm, % Size do altura das colunas
+x unit= 5.8mm, % largura das celulas
+vgrid={*1{black!50, dotted}}, % grid cinza vertical
+hgrid={*1{black!50, dotted}}, % grid cinza horizontal
+title height=1, % Size dos dias
+bar/.style={fill=done, draw=teal},
+bar incomplete/.append style={fill=gray!10, draw=teal}, 
+bar label node/.append style={align=right},
+bar label font=\scriptsize\color{black!65},
+group label font=\bfseries\scriptsize\color{black},
+group left peak width=0.2,
+group right peak width=0.2,
+group left peak height=0.15,
+group right peak height=0.15,
+group left shift=.1, group right shift=-.1,
+bar height=0.6, % size das barras de tarefas
+bar left shift=.2, bar right shift=-.2,
+bar top shift=.1, bar height=.8,
+link/.style={-to, line width=0.7pt, black!50},
+link type=dr
+]{1}{24} % 
+%\gantttitle{\color{teal}\bf Cronograma de atividades para 2016}{24}\\
+\gantttitle{Fevereiro}{4}
+\gantttitle{Março}{4} 
+\gantttitle{Abril}{4} 
+\gantttitle{Maio}{4} 
+\gantttitle{Junho}{4} 
+\gantttitle{Julho}{3} \\
+%\gantttitlelist{1,...,23}{1} \\
+\ganttgroup[group label node/.append style={align=right}, 
+progress=80]{Projeto \ganttalignnewline de Pesquisa}{1}{6} \\
+\ganttbar[progress=85]{Redação da \ganttalignnewline versão 
+final}{1}{2} \\
+\ganttbar[progress=0, progress label text=]{Entrega à
+\ganttalignnewline banca}{6}{6} \\
+\ganttgroup[group label node/.append style={align=right},
+progress=15]{Elaboração \ganttalignnewline da Pesquisa}{2}{20} \\
+\ganttbar[progress=40]{Revisão de \ganttalignnewline
+literatura}{2}{8} \\
+\ganttbar[progress=10]{Implementação
+\ganttalignnewline Computacional}{7}{14} \\
+\ganttbar[progress=0, progress label text= ]{Análise
+\ganttalignnewline dos dados}{11}{14} \\
+\ganttbar[progress=0, progress label text= ]{Discussão
+\ganttalignnewline dos resultados}{13}{16} \\
+\ganttbar[progress=0, progress label text= ]{Redação
+\ganttalignnewline da pesquisa}{15}{20} \\
+\ganttgroup[group label node/.append style={align=right},
+progress=0, progress label text=]{Defesa \ganttalignnewline do
+Trabalho}{20}{21} \\  
+\ganttbar[progress=0, progress label text= ]{Elaboração da
+\ganttalignnewline apresentação}{20}{21} \\
+\ganttgroup[group label node/.append style={align=right},
+progress=0, progress label text=]{Revisão Final}{21}{23} \\ 
+\ganttbar[progress=0, progress label text= ]{Incorporação
+\ganttalignnewline das sugestões}{21}{22} \\
+\ganttbar[progress=0, progress label text= ]{Redação da 
+\ganttalignnewline versão final}{21}{22}
+ \ganttlink{elem1}{elem2}
+ \ganttlink{elem1}{elem3}
+ \ganttlink{elem4}{elem5}
+ \ganttlink{elem4}{elem7}
+ \ganttlink{elem4}{elem8}
+ \ganttlink{elem5}{elem6}
+ \ganttlink{elem5}{elem7}
+ \ganttlink{elem8}{elem10}
+ \ganttlink{elem10}{elem12}
+ \ganttlink{elem10}{elem13}
+\end{ganttchart}
+\end{tikzpicture}
+\caption{Cronograma de atividades para 2016}
+\end{figure}
+
+# Bibliografia #
+
+<!-- Listando as referencias não citadas no texto. Há maneiras mais -->
+<!-- elegantes de se fazer \nocite em Rmd. -->
+[@Paula2013]
+[@Sellers2010]
+[@Shmueli2005]
+[@Nelder1972]
+[@King1989]
+
+### Referências ###
+\footnotesize
+
