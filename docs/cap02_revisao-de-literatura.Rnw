@@ -2,11 +2,38 @@
 % CAPÍTULO 2 - REVISÃO DE LITERATURA
 % ------------------------------------------------------------------------
 
-\section{Seção}
-\lipsum[1-5]
+Neste capítulo apresentamos algumas abordagens para análise de dados de
+contagem. Inicialmente são apresentados os métodos mais tradicionais
+para
 
-\section{Seção}
-\lipsum[1-5]
+baseados na
+distribuição Poisson
 
-\section{Seção}
-\lipsum[1-8]
+
+frequentemente utilizadas na aplicação da modelagem Estatística para
+dados de contagem.
+
+Na seção \ref{rev-zeros} os modelos já
+frequentemente aplicados
+na literatura são apresentados
+
+Estudos aplicados e teóricos são citados
+
+\section{Modelo Poisson}
+\label{rev-poisson}
+\lipsum[1]
+
+\section{Modelo Binomial Negativo}
+\label{rev-binomneg}
+\lipsum[1]
+
+\section{Modelos para excesso de zeros}
+\label{rev-zeros}
+\lipsum[1]
+
+\section{Modelos de efeitos aleatórios}
+\label{rev-aleatorio}
+
+\section{Modelo COM-Poisson}
+\label{rev-compoisson}
+\lipsum[1]
