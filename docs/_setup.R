@@ -1,18 +1,17 @@
 library(knitr)
 opts_chunk$set(
-    warning = FALSE, 
+    warning = FALSE,
     message = FALSE,
     echo = FALSE,
-    tidy = FALSE,
+    tidy = TRUE,
     fig.width = 7,
     fig.height = 5,
     fig.align = "center",
-    dpi = 100,
     dev.args = list(family = "Palatino"))
 
 ## Configura opções de gráficos do knitr
 library(latticeExtra)
-mycol <- c("#E41A1C", "#377EB8", "#4DAF4A",
+mycol <- c("#377EB8", "#E41A1C", "#4DAF4A",
            "#ff00ff", "#FF7F00", "#984EA3", "#FFFF33")
 
 ## Trellis graphical style.
@@ -28,7 +27,7 @@ ps <- list(
     superpose.line = list(col = mycol, lty = 1),
     superpose.symbol = list(col = mycol, pch = 1),
     superpose.polygon = list(col = mycol),
-    strip.background = list(col = c("gray80", "gray50")))
+    strip.background = list(col = c("gray90", "gray70")))
 trellis.par.set(ps)
 
 ## Configura opções de output no documento
@@ -36,4 +35,3 @@ options(digits = 3, OutDec = ",",
         xtable.caption.placement = "top",
         xtable.include.rownames = FALSE,
         xtable.booktabs = TRUE)
-
