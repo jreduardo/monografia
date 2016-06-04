@@ -317,8 +317,8 @@ source("_setup.R")
 <<cap01, child = "cap01_introducao.Rnw">>=
 @
 
-\chapter{Revisão de Literatura}
-\label{cap:revisao-de-literatura}
+\chapter{Modelos para dados de contagem}
+\label{cap:modelos-para-dados-de-contagem}
 <<cap02, child = "cap02_revisao-de-literatura.Rnw">>=
 @
 
