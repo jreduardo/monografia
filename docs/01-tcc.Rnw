@@ -62,6 +62,7 @@
 \usepackage{microtype} 			% para melhorias de justificação
 \usepackage{amsmath,amssymb,amstext}
 \usepackage{setspace}
+\usepackage{wrapfig}
 
 % ---
 % Para tabelas
