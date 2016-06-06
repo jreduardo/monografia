@@ -359,13 +359,7 @@ acomodar somente superdispersão, pois $E(Y)$ é menor que $V(Y)$ para
 qualquer $\phi$. Percebemos também quanto maior o parâmetro $\phi$ mais
 $E(Y)$ se aproxima de $V(Y)$, e no limite $\phi \rightarrow \infty$,
 $E(Y) = V(Y)$ fazendo com que a distribuição Binomial Negativa se reduza
-a Poisson. A relação funcional entre média e variância é ilustrada na
-figura \ref{fig:mv-binombeg} onde apesentamos as médias e variâncias
-para $\mu$ entre 0 e 10 e $\phi$ entre 0 e 50. O comportamento dessa
-relação proporciona um mairo flexibilidade à distribuição em acomodar
-superdispersão, uma característica importante exibida nesta figura é que
-para a Binomial Negativa se aproximar a Poisson em contagens altas o
-$\phi$ deve ser extremamente grande.
+a Poisson.
 
 <<mv-binomneg, fig.cap="Relação Média e Variância na distribuição Binomial Negativa", fig.height=4, fig.width=4, fig.show="hide", results="asis">>=
 
@@ -406,6 +400,14 @@ mtext(text = expression(phi), side = 3, cex = 1.5,
 
 wrapfigure()
 @
+
+A relação funcional entre média e variância é ilustrada na
+figura \ref{fig:mv-binomneg} onde apesentamos as médias e variâncias
+para $\mu$ entre 0 e 10 e $\phi$ entre 0 e 50. O comportamento dessa
+relação proporciona um mairo flexibilidade à distribuição em acomodar
+superdispersão, uma característica importante exibida nesta figura é que
+para a Binomial Negativa se aproximar a Poisson em contagens altas o
+$\phi$ deve ser extremamente grande.
 
 O emprego do modelo Binomial Negativo em problemas se regressão ocorre
 de maneira similar aos MLG's, com excessão de que a distribuição só
