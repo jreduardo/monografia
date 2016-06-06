@@ -2,38 +2,243 @@
 % CAPÍTULO 2 - REVISÃO DE LITERATURA
 % ------------------------------------------------------------------------
 
-Neste capítulo apresentamos algumas abordagens para análise de dados de
-contagem. Inicialmente são apresentados os métodos mais tradicionais
-para
+Métodos para inferência em dados de contagem estão bem aquém da
+quantidade disponível para dados contínuos. Destacamos o modelo
+log-linear Poisson como o modelo mais utilizado quando se trata de dados
+de contagem. Porém não raramente os dados de contagens apresentam
+variância superior ou inferior à sua média. Esses são os casos de super
+ou subdispersão já enunciados no capítulo \ref{cap:introducao}, que
+quando ocorrem inviabilizam o uso da distribuição Poisson.
 
-baseados na
-distribuição Poisson
+Nos casos de fuga da equidispersão algumas abordagens não paramétricas
+são empregadas. Nesse contexto, podemos citar os métodos de estimação
+via quase-verossimilhança, estimação robusta dos erros padrões
+(estimador ``sanduíche'') e estimação dos erros padrões via reamostragem
+(``\textit{bootstrap}'') \cite{Hilbe2014}. Desses métodos detalhamos
+brevemente somente o método de estimação via função de
+quase-verossimilhança na seção
+\ref{cap02:estimacao-via-quase-verossimilhanca}.
 
+No contexto paramétrico, pesquisas recentes trazem modelos bastante
+flexíveis à fuga de equidispersão no campo da Estatística aplicada, veja
+\cite{Sellers2010, Zeviani2014, Lord2010}. Na tabela
+\ref{tab:distribuicoes} listamos as distribuições de
+probabilidades consideradas por \citeonline{Winkelmann2008} e
+\citeonline{Kokonendji2014} e as características de dados de contagem
+que são contempladas. Notamos que a Poisson na verdade é um caso
+particular, pois é a única das distribuições listada que contempla
+somente a característica de equidipersão, ainda observa-se que temos um
+conjunto maior de distribuições para os casos de superdispersão com
+relação os casos de subdispersão. Embora este grande número de
+distribuições exista para lidar com os casos de fuga de equidispersão
+destacamos que são poucos os pacotes estatísticos que empregam essas
+distribuições a modelos de regressão para dados de contagem.
 
-frequentemente utilizadas na aplicação da modelagem Estatística para
-dados de contagem.
+%%----------------------------------------------------------------------
+%% Tabela das distribuições para dados de contagem
+\begin{table}
+\centering
+\caption{Distribuições de probabilidades para dados de contagem com
+  indicação das características contempladas}
+\label{tab:distribuicoes}
+\begin{tabular}{lccc}
+  \toprule
+\multirow{2}{*}{Distribuição}       & \multicolumn{3}{c}{Contempla a característica de} \\
+  \cline{2-4} \\[-0.3cm]
+                                    & Equidispersão     & Superdispersão & Subdispersão \\[0.1cm]
+  \hline
+Poisson                             & \checkmark        &                &              \\
+Binomial Negativa                   & \checkmark        & \checkmark     &              \\
+\textit{Inverse Gaussian Poisson}   & \checkmark        & \checkmark     &              \\
+\textit{Compound Poisson}           & \checkmark        & \checkmark     &              \\
+Poisson Generalizada                & \checkmark        & \checkmark     & \checkmark   \\
+\textit{Gamma-Count}                & \checkmark        & \checkmark     & \checkmark   \\
+COM-Poisson                         & \checkmark        & \checkmark     & \checkmark   \\
+Katz                                & \checkmark        & \checkmark     & \checkmark   \\
+\textit{Poisson Polynomial}         & \checkmark        & \checkmark     & \checkmark   \\
+\textit{Double-Poisson}             & \checkmark        & \checkmark     & \checkmark   \\
+\textit{Lagrangian Poisson}         & \checkmark        & \checkmark     & \checkmark   \\
+  \bottomrule
+\end{tabular}
+\end{table}
+%%----------------------------------------------------------------------
 
-Na seção \ref{rev-zeros} os modelos já
-frequentemente aplicados
-na literatura são apresentados
+Dos modelos paramétricos o Binomial Negativo aparece em destaque com
+implementações já consolidadas nos principais \textit{softwares}
+estatísticos e frequentes aplicações nos casos de superdispersão. Na
+seção \ref{cap02:binomneg} detalhes da construção desses modelos são
+apresentados. Dos demais modelos derivados das distribuições listadas na
+tabela \ref{tab:ditribuicoes} este trabalho abordará somente o
+modelo COM-Poisson, que é apresentado com detalhes na seção
+\ref{cap02:compoisson}.
 
-Estudos aplicados e teóricos são citados
+Um outro fenômeno que é frequente em dados de contagem é a ocorrência
+excessiva de zeros. Esse fenômeno sugere a modelagem de dois processos
+geradores de dados, o gerador de zeros extra e o gerador das
+contagens. Existem ao menos duas abordagens pertinentes para estes casos
+que são os modelos de mistura e os modelos condicionais. Na abordagem
+por modelos de mistura a variável resposta é modelada como uma mistura
+de duas distribuições, no trabalho de \citeonline{Lambert1992},
+uma mistura da distribuição Bernoulli com uma distribuição de Poisson ou
+Binomial Negativa. Considerando os modelos condicionais, também chamados
+de modelos de barreira \cite{Ridout1998}, temos que a modelagem da
+variável resposta é realizada em duas etapas. A primeira refere-se ao
+processo gerador de contagens nulas e a segunda ao gerador de contagens
+não nulas. Nesta trabalho a modelagem de excesso de zeros se dará
+somente via modelos de barreira. A seção \ref{cap02:zeros} é destinada a
+um breve detalhamento desta abordagem.
+
+Nesta capítulo também abordamos a situação da inclusão de efeitos
+aleatórios no seção \ref{cap02:aleatorio}. Em análise de dados de
+contagem a inclusão desses efeitos perimitem acomodar variabilidade
+extra e incorporar a estrutura amostral do problema como em experimentos
+com medidas repetidas ou longitudinais e experimentos em parcelas
+subdivididas.
 
 \section{Modelo Poisson}
-\label{rev-poisson}
-\lipsum[1]
+\label{cap02:poisson}
+
+A Poisson é uma das principais distribuição de probabilidades
+discretas. Com suporte nos inteiros não negativos, dizemos que uma
+variável aleatória segue um modelo Poisson se sua função massa de
+probabilidade for
+
+\begin{equation}
+  \label{eqn:pmf-poisson}
+  Pr(Y = y \mid \lambda) = \frac{\lambda^ye^{-\lambda}}{y!}
+    \qquad y = 0, 1, 2, \cdots
+\end{equation}
+
+\noindent
+em que $\lambda > 0$ representa a taxa de ocorrência do evento de
+interesse. Uma particularidade já destacada desta distribuição é que
+$E(X) = V(X) = \lambda$. Isso torna a distribuição Poisson bastante
+reestritiva. Na figura \ref{fig:distr-poisson} são apresentadas as
+ditribuições Poisson para diferentes parâmetros, note que devido a
+propriedade $E(X) = V(X)$ contagens maiores também são mais dispersas.
+
+<<distr-poisson, fig.cap="Probabilidades pela distribuição Poisson para diferentes valores de $\\lambda$", fig.height=3.5, fig.width=7>>=
+
+lambdas <- c("p1" = 3, "p2" = 8, "p3" = 15)
+y <- 0:30
+py <- sapply(lambdas, function(p) dpois(y, p))
+da <- as.data.frame(py)
+da <- cbind(y, stack(da))
+
+fl <- substitute(expression(
+    lambda == p1, lambda == p2, lambda == p3),
+    list(p1 = lambdas[1], p2 = lambdas[2], p3 = lambdas[3]))
+
+xyplot(values ~ y | factor(ind), data = da,
+       layout = c(NA, 1),
+       ylab = expression(Pr(Y == y)),
+       type = c("h", "g"), as.table = TRUE,
+       strip = strip.custom(factor.levels = fl))
+
+@
+
+Uma propriedade importante da distribuição Poisson é sua relação com a
+distribuição Exponencial. Essa relação estabelece que se os tempos entre
+a ocorrência de eventos se distribuem conforme modelo Exponencial de
+parâmetro $\lambda$ a contagem de eventos em um intervalo de tempo $t$
+tem distribuição Poisson com média $\lambda t$. A distribuição
+\textit{Gamma-Count}, citada na tabela \ref{tab:distribuicoes}, estende
+esta propriedade do processo adotando a distribuição Gama para os tempos
+entre eventos tornando a distribuição da contagem decorrente mais
+flexível \cite{Winkelmann1995, Zeviani2014}.
+
+Outra propriedade que decorre da construção do modelo Poisson é sobre a
+razão entre probabilidades sucessivas, $\frac{P(Y=y-1)}{P(Y=y)} =
+\frac{y}{\lambda}$. Essa razão é linear em $y$ e tem sua taxa de
+crescimento ou decrescimento como $\frac{1}{\lambda}$. Os modelos Katz e
+COM-Poisson se baseiam na generalização da razão de probabilidades a fim
+de flexibilizar a distribuição decorrente.
+
+A utilização do modelo Poisson na análise de dados se dá por meio do
+modelo de regressão Poisson. Seja $Y_i$ variáveis aleatórias
+condicionalmente independentes, dados as covariáveis $X_i$,
+$i=1,2,\cdots,n$. O modelo de regressão log-linear Poisson, sob a teoria
+dos MLG's é definido como
+
+\begin{equation}
+  \label{eqn:reg-poisson}
+  \begin{split}
+    Y_i \mid & X_i \sim Poisson(\mu_i) \\
+    &\log(\mu_i) = X_i\beta
+  \end{split}
+\end{equation}
+
+\noindent
+em que $\mu_i > 0$ é a média da variável aleatória $Y_i \mid X_i$ que é
+calculada a partir do vetor $\beta \in \mathbb{R}^p$.
+
+O processo de estimação do vetor $\beta$ é baseado na maximização da
+verossimilhança que nas distribuições que pertencem à família
+exponencial, os MLG's, é realizado via algoritmo de mínimos quadrados
+ponderados iterativamente, ou, do inglês \textit{Iteractive Weighted
+  Least Squares - IWLS} \cite{Nelder1972}.
+
+\subsection{Estimação via Quase-Verossimilhança}
+\label{cap02:estimacao-via-quase-verossimilhanca}
+
+Em 1974 \citeauthoronline{Wedderburn1974} propôs uma forma de estimação
+a partir de uma função biparamétrica, denoninada
+quase-verossimilhança. Suponha que temos $y_i$ observações independentes
+com esperanças $\mu_i$ e variâncias $V(\mu_i)$. A função de
+quase-verossimilhança é é expressa como
+
+\begin{equation}
+  \label{eqn:quase-verossimilhanca}
+  Q(\mu_i \mid y_i) = \int_y^{\mu_i} \frac{y_i - t}{\phi V(\mu_i)}dt
+\end{equation}
+
+Note na expressão \ref{eqn:quase-verossimilhanca} que a função de
+quase-verossimilhança é definida a partir da especificação de $\mu_i$,
+$V(\mu_i)$ e $\phi$. O processo de estimação via maximização dessa
+função compartilha as mesmas estimativas para $\mu_i$, porém a dispersão
+de $y_i$, $V(y_i) = \phi V(\mu_i)$ é corrigida pelo parâmetro adicional
+$\phi$.
+
+Assim os problemas com a fuga da suposição de equidispersão podem ser
+superados quando a estimação por máxima quase-verossimilhança é
+adotado. Porém um resultado dessa abordagem é que
+
+$$
+-E\left ( \frac{\partial^2 Q(\mu \mid y)}{\partial \mu^2} \right) \leq
+-E\left ( \frac{\partial^2 \ell(\mu \mid y)}{\partial \mu^2} \right)
+$$
+
+\noindent
+ou seja a informação a respeito de $\mu$ quando se conhece apenas $\phi$
+e $V(\mu)$, a relação entre média e variância, é menor do que a
+informação quando se conhece a distribuição da variável resposta, dada
+pela log-verossimilhança $\ell(\mu \mid y)$. Além disso ressalta-se que,
+de forma geral, não se recupera a distribuição de $Y$ somente com as
+especificações de $\phi$ e $V(\mu)$.
+
+Em modelos de regressão, definimos $g(\mu_i) = X\beta$ e $V(\mu_i)$ que
+definem a função de quase-verossimilhança. Nessa abordagem são estimados
+os parâmetros $\beta$ e $\phi$. A estimativa do vetor $\beta$ pode ser
+obtidas pelo algoritmo \textit{IWLS}, usando as funções quase-escore e
+matriz de quase-informação. Para o parâmetro $\phi$ um estimador usual é
+o baseado na estatística $\chi^2$ de Pearson.
+
+\begin{equation}
+  \label{eqn:estimador-phi}
+  \hat{\phi} = \frac{1}{n-p} \sum_{i=1}^n
+                 \frac{(y_i - \hat{\mu_i})^2}{V(\hat{\mu_i})}
+\end{equation}
 
 \section{Modelo Binomial Negativo}
-\label{rev-binomneg}
+\label{cap02:binomneg}
+
+\section{Modelo COM-Poisson}
+\label{cap02:compoisson}
 \lipsum[1]
 
 \section{Modelos para excesso de zeros}
-\label{rev-zeros}
+\label{cap02:zeros}
 \lipsum[1]
 
 \section{Modelos de efeitos aleatórios}
-\label{rev-aleatorio}
-
-\section{Modelo COM-Poisson}
-\label{rev-compoisson}
-\lipsum[1]
+\label{cap02:aleatorio}
