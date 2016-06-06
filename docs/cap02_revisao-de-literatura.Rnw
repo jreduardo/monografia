@@ -232,6 +232,196 @@ o baseado na estatística $\chi^2$ de Pearson.
 \section{Modelo Binomial Negativo}
 \label{cap02:binomneg}
 
+Uma das principais alternativas paramétricas para dados de contagem
+superdispersos é a adoção da distribuição Binomial Negativa. A função
+massa de probabilidade da distribuição Binomial Negativa pode ser
+deduzida de um processo hierárquico de efeitos aleatórios onde se assume
+que
+
+\begin{equation}
+  \label{eqn:proc-binomneg}
+  \begin{split}
+    Y \mid & b \sim Poisson(b) \\
+    & b \sim Gama(\mu, \phi)
+  \end{split}
+\end{equation}
+
+\noindent
+A função massa de probabilidade decorrente da estrutura descrita em
+\ref{eqn:proc-binomneg} é deduzida integrando os efeitos aleatórios,
+considere $f(y \mid b)$ como a função massa de probablidade da
+distribuição Poisson (vide expressão em \ref{eqn:pmf-poisson}) e $g(b
+\mid \mu, \phi)$ a função densidade da distribuição Gama \footnote{O
+  desenvolvimento detalhado da integral pode ser visto em
+  \citeonline[pág. 303-305]{Paula2013}. Obs.: A função densidade do
+  modelo Gama está parametrizada para que $\mu$ represente a média da
+  distribuição.}
+
+\begin{equation}
+  \label{eqn:proc-binomneg}
+  \begin{split}
+    Pr(Y = y \mid \mu,\phi) &= \int_0^\infty f(y \mid b)
+       g(b \mid \mu,\phi) db\\
+    &= \frac{\phi^\phi}{y!\mu^\phi\Gamma(\phi)}
+       \int_0^\infty e^{-b(1 + \phi/\mu)} b^{y+\phi-1}db \\
+    &= \frac{\Gamma(\phi + y)}{\Gamma(y+1)\Gamma(\phi)}
+       \left ( \frac{\mu}{\mu + \phi} \right )^y
+       \left ( \frac{\phi}{\mu + \phi} \right )^\phi
+       \qquad y = 0, 1, 2, \cdots
+  \end{split}
+\end{equation}
+
+\noindent
+com $\mu >0$ e $\phi > 0$. Ressaltamos que esse é um caso particular de
+um modelo de efeito aleatório cuja a integral tem solução analítica e
+por consequência o modelo marginal tem forma fechada. Outro caso que se
+baseia no mesmo princípio é o modelo \textit{Inverse Gaussian Poisson},
+que como o nome sugere adota a distribuição Inversa Gaussiana para os
+efeitos aleatórios. Na figura \ref{fig:distr-binomneg} são apresentadas
+as distribuições Binomial Negativa para diferentes parâmetros $\phi$ em
+comparação com a distribuição Poisson equivalente em locação. Note que
+quanto menor o parâmetro $\phi$, maior a dispersão da distribuição. Isso
+introduz uma propriedade importante desse modelo, para $\phi \rightarrow
+\infty$ a distribuição reduz-se a Poisson.
+
+<<distr-binomneg, fig.cap="Probabilidades pela distribuição Binomial Negativa para diferentes valores de $\\phi$ com $\\mu = 5$", fig.height=3.5, fig.width=7>>=
+
+##-------------------------------------------
+## Parametros da distribuição
+mu <- 5
+phis <- c("p1" = 1, "p2" = 5, "p3" = 30)
+vars <- mu + (1/phis) * mu^2
+
+##-------------------------------------------
+## Calculando as probabilidades
+y <- 0:15
+
+## Binomial Negativa
+py.bn <- sapply(phis, function(p) dnbinom(y, size = p, mu = mu))
+da.bn <- as.data.frame(py.bn)
+da.bn <- cbind(y, stack(da.bn))
+
+## Poisson
+py.po <- sapply(phis, function(p) dpois(y, lambda = mu))
+da.po <- as.data.frame(py.po)
+da.po <- cbind(y, stack(da.po))
+
+##-------------------------------------------
+## Objetos para grafico da lattice
+fl <- substitute(
+    expression(phi == p1, phi == p2, phi == p3),
+    list(p1 = phis[1], p2 = phis[2], p3 = phis[3]))
+cols <- trellis.par.get("superpose.line")$col[1:2]
+yaxis <- pretty(da.po$values, n = 2)
+ylim <- c(-0.07, max(da.po$values)*1.2)
+key <- list(
+    columns = 2,
+    lines = list(lty = 1, col = cols),
+    text = list(c("Poisson", "Binomial Negativa")))
+
+
+##-------------------------------------------
+## Grafico
+xyplot(values ~ c(y - 0.15) | ind, data = da.po,
+       type = c("h", "g"),
+       xlab = "y", ylab = expression(P(Y == y)),
+       ylim = ylim, xlim = extendrange(y),
+       scales = list(y = list(at = yaxis)),
+       layout = c(NA, 1),
+       key = key,
+       strip = strip.custom(factor.levels = fl)) +
+    as.layer(xyplot(
+        values ~ c(y + 0.15) | ind, data = da.bn,
+        type = "h", col = cols[2]))
+for(i in 1:3){
+    trellis.focus("panel", i, 1, highlight=FALSE)
+    grid::grid.text(label = sprintf("E[Y]:  %.1f\nV[Y]:  %.1f",
+                                    mu, mu),
+                    x = .62, y = 0.03,
+                    default.units = "npc",
+                    gp = grid::gpar(col = cols[1]),
+                    just = c("left", "bottom"))
+    grid::grid.text(label = sprintf("E[Y]:  %.1f\nV[Y]:  %.1f",
+                                    mu, vars[i]),
+                    x = .08, y = 0.03,
+                    default.units = "npc",
+                    gp = grid::gpar(col = cols[2]),
+                    just = c("left", "bottom"))
+}
+trellis.unfocus()
+
+@
+
+Os momentos média e variância da distribuição Binomial Negativa são
+expressos como $E(Y) = \mu$ e $V(Y) = \mu + \mu^2/\phi$. Note que pelas
+expressões fica evidente a característica da Binomial Negativa de
+acomodar somente superdispersão, pois $E(Y)$ é menor que $V(Y)$ para
+qualquer $\phi$. Percebemos também quanto maior o parâmetro $\phi$ mais
+$E(Y)$ se aproxima de $V(Y)$, e no limite $\phi \rightarrow \infty$,
+$E(Y) = V(Y)$ fazendo com que a distribuição Binomial Negativa se reduza
+a Poisson. A relação funcional entre média e variância é ilustrada na
+figura \ref{fig:mv-binombeg} onde apesentamos as médias e variâncias
+para $\mu$ entre 0 e 10 e $\phi$ entre 0 e 50. O comportamento dessa
+relação proporciona um mairo flexibilidade à distribuição em acomodar
+superdispersão, uma característica importante exibida nesta figura é que
+para a Binomial Negativa se aproximar a Poisson em contagens altas o
+$\phi$ deve ser extremamente grande.
+
+<<mv-binomneg, fig.cap="Relação Média e Variância na distribuição Binomial Negativa", fig.height=4, fig.width=4, fig.show="hide", results="asis">>=
+
+##-------------------------------------------
+## Parâmetros considerados
+phi <- seq(0.5, 50, length.out = 50)
+col <- rev(brewer.pal(n = 8, name = "RdBu"))
+col <- colorRampPalette(colors = col)(length(phi))
+
+##-------------------------------------------
+## Etiquetas da legenda
+labels <- substitute(
+    expression(phi == p1, phi == p2, phi == p3),
+    list(p1 = min(phi), p2 = median(phi), p3 = max(phi)))
+
+##-------------------------------------------
+## Gráfico
+
+## Curva identidade representando a Poisson
+par(mar = c(4, 4, 3, 3))
+curve(mu + 1*0,
+      from = 0, to = 10, xname = "mu",
+      ylab = expression(V(Y) == mu %.% (mu + mu^2~"/"~phi)),
+      xlab = expression(E(Y) == mu))
+grid()
+## Curvas da relação média e variância da Binomial Negativa
+for (a in seq_along(phi)) {
+    curve(mu + (mu^2)/phi[a],
+          add = TRUE, xname = "mu", col = col[a], lwd = 2)
+}
+plotrix::color.legend(
+    xl = 11, yb = 2.5, xr = 12, yt = 6.5,
+    gradient = "y", align = "rb",
+    legend = round(fivenum(phi)[c(1, 3, 5)]),
+    rect.col = col)
+mtext(text = expression(phi), side = 3, cex = 1.5,
+      line = -4.5, at = 11.5)
+
+wrapfigure()
+@
+
+O emprego do modelo Binomial Negativo em problemas se regressão ocorre
+de maneira similar aos MLG's, com excessão de que a distribuição só
+pertence a família exponencial de distribuições se o parâmetro $\phi$
+for conhecido e assim o processo sofre algumas
+alterações. Primeiramente, assim como na Poisson, definimos $g(\mu_i) =
+X\beta$, comumente utiliza-se a função $g(\mu_i) =
+\log(\mu_i)$. Desenvolvendo a log-verossimilhança e suas funções
+derivadas, função escore e matriz de informação de Fisher chegamos que a
+matriz de informação é bloco diagonal caracterizando a ortogonalidade
+dos parâmetros $\beta$ de locação e $\phi$ de dispersão. Deste fato
+decorre que a estimação dos parâmetros pode ser realizada em paralelo,
+ou seja, estima-se o vetor $beta$ pelo método de \textit{IWLS} e
+posteriormente o parâmetro $\phi$ pelo método de Newton-Raphson, faz-se
+osdois procedimentos simultaneamente até a convengência dos parâmetros.
+
 \section{Modelo COM-Poisson}
 \label{cap02:compoisson}
 \lipsum[1]
