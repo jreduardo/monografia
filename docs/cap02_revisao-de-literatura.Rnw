@@ -799,7 +799,155 @@ COM-Poisson são discutidos na seção \ref{cap03:metodos}.
 
 \section{Modelos para excesso de zeros}
 \label{cap02:zeros}
-\lipsum[1]
+
+Problemas com excesso de zeros são comuns em dados de
+contagem. Caracteriza-se como excesso de zeros casos em que a quantidade
+observada de contagens nulas supera substancialmente aquela esperada
+pelo modelo de contagem adotado, no caso do modelo Poisson
+$e^{-\lambda}$.
+
+As contagens nulas que geram o excesso de zeros podem ser decorridas de
+duas formas distintas. A primeira denominamos de zeros estruturais,
+quando a ocorrência de zero se dá pela ausência de determinada
+característica na população e a segunda, que denominamos zeros amostrais
+ocorre segundo um processo gerador de dados de contagem (e.g processo
+Poisson). Assim, de forma geral temos dois processos geradores de dados
+atuantes na geração de uma variável aleatória de contagem com excessivos
+zeros.
+
+Em geral, quando dados de contagem apresentam excessos de valores zero
+também apresentarão subdispersão. Todavia, essa dispersão pode ser
+exclusivamente devido ao excesso de zeros e assim os modelos
+alternativos já apresentados não terão um bom desempenho. Uma ilustração
+deste fato é ilustrada pela figura \ref{fig:ilustra-zeros}, em que
+simulamos um conjunto de dados com excesso de ajustamos um modelo
+COM-Poisson. Note que em ambos os casos o modelo se ajustou
+adequadamente, indicando os excessos de zeros devem ser abordados de
+forma diferente.
+
+<<ilustra-zeros, fig.cap="Ilustração de dados de contagem com excesso de zeros", fig.height=3, fig.width=5>>=
+
+##-------------------------------------------
+## Simula os dados
+set.seed(20124689)
+n <- 1000
+
+lambda <- 2; pi <- 0.9
+y1 <- sapply(rbinom(n, 1, pi), function(x) {
+    ifelse(x == 0, 0, rpois(1, lambda))
+})
+
+lambda <- 5; pi <- 0.85
+y2 <- sapply(rbinom(n, 1, pi), function(x) {
+    ifelse(x == 0, 0, rpois(1, lambda))
+})
+
+##-------------------------------------------
+## Estimando as probabilidades
+sim <- list("s1" = as.integer(y1), "s2" = as.integer(y2))
+probs <- sapply(sim, function(y) {
+    yu <- 0:max(y)
+    ##-------------------------------------------
+    m0 <- glm(y ~ 1, family = poisson)
+    py_pois <- dpois(yu, exp(m0$coef))
+    ##-------------------------------------------
+    m1 <- cmp(y ~ 1, data = data.frame(y = y), sumto = 40)
+    py_dcmp <- dcmp(yu, lambda = exp(m1@coef[-1]),
+                    nu = exp(m1@coef[1]), sumto = 40)
+    ##-------------------------------------------
+    py_real <- c(prop.table(table(y)))
+    ##-------------------------------------------
+    cbind(yu, py_real, py_pois, py_dcmp)
+}, simplify = FALSE)
+da <- plyr::ldply(probs, .id="caso")
+
+##-------------------------------------------
+## Objetos para grafico da lattice
+ylim <- with(da, extendrange(c(0, max(py_real, py_dcmp))))
+cols <- trellis.par.get("superpose.line")$col[1:2]
+key <- list(
+    columns = 2,
+    lines = list(lty = 1, col = cols),
+    text = list(c("Observado", "COM-Poisson")))
+
+##-------------------------------------------
+## Gráfico
+xyplot(py_real ~ c(yu - 0.15) | caso, data = da,
+       type = c("h", "g"),
+       xlab = "y",
+       ylab = expression(Pr(Y==y)),
+       ylim = ylim,
+       key = key,
+       strip = strip.custom(factor.levels = paste("Simulação", 1:2))) +
+    as.layer(xyplot(
+        py_dcmp ~ c(yu + 0.15) | caso, data = da,
+        type = "h", col = cols[2]))
+
+@
+
+
+\citeonline[capítulo 7]{Hilbe2014} discute sobre a interpretação e
+modelagem de dados de contagem com excesso de zeros. Para essa situação
+temos ao menos duas abordagens i) os modelos de mistura
+\cite{Lambert1992}, também chamados de inflacionados, em inglês
+\textit{Zero Inflated Models} e ii) os modelos condicionais
+\cite{Ridout1998}, também chamados de modelos de barreira, em inglês
+\textit{Hurdle Models}. Neste trabalho somente a abordagem via modelos
+condicionais será abordada. A função massa de probabilidade do modelo
+Hurdle é
+
+\begin{equation}
+  \label{eqn:pmf-hurdle}
+  Pr(Y = y \mid \pi, \Theta_c) =
+    \begin{dcases*}
+      \pi & \text{se } y = 0,\\
+      (1 - \pi) \frac{Pr(Z = z \mid \Theta_c)}{1 - Pr(Z = 0 \mid
+        \Theta_c)} & \text{se } y = 1, 2, \dots
+    \end{dcases*}
+\end{equation}
+
+\noindent
+em que $0<\pi<1$, representa a probabilidade de ocorrência de zeros e
+$Pr(Z = z \mid \Theta_c)$ a função massa de probabilidade de uma
+variável aleatória de contagem $Z$, como a Poisson ou a Binomial
+Negativa.
+
+Da especificação em \ref{eqn:pmf-hurdle}, os momentos média e variância
+são obtidos facilmente usando as definições $E(Y) = \sum_{y=1}^\infty y
+\cdot Pr(Y=y)$ e $V(Y) = \sum_{y=1}^\infty y^2 \cdot Pr(Y=y) - E^2(Y)$
+
+$$
+E(Y) = \frac{E(Z)(1-\pi)}{1-Pr(Z = 0)} \qquad
+V(Y) = \frac{1-\pi}{1-Pr(Z = 0)} \left [ E(Z) \frac{(1-\pi)}{1-Pr(Z =
+    0)} \right ]
+$$
+
+Para a inclusão de covariáveis, caracterizando um problema de regressão,
+dado que o modelo tem dois processos atuantes devemos modelar ambos como
+se segue
+
+\begin{equation}
+  \label{eqn:reg-hurdle}
+  \log \left (\frac{\pi_i}{1-\pi_i} \right ) = G_i\gamma \qquad e \qquad
+  \begin{matrix}
+    Z_i \sim D(\mu_i, \phi) \\
+    g(\mu_i) = X_i\beta
+  \end{matrix}
+\end{equation}
+
+\noindent
+com $i = 1, 2, \cdots, n$, $G_i$ e $X_i$ as covariáveis da i-ésima
+observação consideradas para explicação da contagens nulas e não nulas
+respectivamente, $D(\mu_i, \phi)$ uma distribuição de probabilidades
+para considerada para as contagens não nulas que pode conter ou não um
+parâmetro $\phi$ adicional, se Poisson $D(\mu_i, \phi)$ se resume a
+$Poisson(\mu_i)$ e $g(\mu_i)$ uma função de ligação, nos casos Poisson e
+Binomial Negativa considera-se $\log(\mu_i)$. O que está implícito na
+formulação \ref{eqn:reg-hurdle} é que para a componente que explica a
+geração de zeros está sendo considerada a distribuição Bernoulli de
+parâmetro $\pi_i$, contudo pode-se utilizar distribuições censuradas a
+direita no ponto $y=1$ para estimação desta probabilidade, como explicam
+\citeonline{Zeileis2007}.
 
 \section{Modelos de efeitos aleatórios}
 \label{cap02:aleatorio}
