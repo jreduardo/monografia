@@ -60,10 +60,16 @@
 \usepackage{color}			% Controle das cores
 \usepackage{graphicx}			% Inclusão de gráficos
 \usepackage{microtype} 			% para melhorias de justificação
-\usepackage{amsmath,amssymb,amstext}
-\usepackage{mathtools}                  % Funcionalidades (como \dcases)
 \usepackage{setspace}
 \usepackage{wrapfig}
+
+% ---
+% Funções matematicas
+% ---
+\usepackage{amsmath,amssymb,amstext}
+\usepackage{mathtools}                  % Funcionalidades (como \dcases)
+\DeclareMathOperator{\Ell}{\mathcal{L}}
+\DeclareMathOperator{\R}{\mathbb{R}}
 
 % ---
 % Para tabelas
