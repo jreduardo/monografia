@@ -426,7 +426,364 @@ os dois procedimentos simultaneamente até a convengência dos parâmetros.
 
 \section{Modelo COM-Poisson}
 \label{cap02:compoisson}
-\lipsum[1]
+
+A distribuição de probabilidades COM-Poisson foi proposta em 1962, em um
+contexto de filas por \citeauthoronline{Conway1962} e generaliza a
+Poisson em termos da razão de probabilidades sucessivas, como veremos
+adiante. Seja $Y$ uma variável aleatória COM-Poisson, então sua função
+massa de probabilidade é
+
+\begin{equation}
+  \label{eqn:pmf-compoisson}
+  Pr(Y=y \mid \lambda, \nu) = \frac{\lambda^y}{(y!)^\nu Z(\lambda, \nu)}
+  \qquad y = 0, 1, 2, \cdots
+\end{equation}
+
+\noindent
+em que $\lambda > 0$, $\nu \geq 0$ e $Z(\lambda, \nu)$ é uma constante
+de normalização, calculada para que de fato seja uma função massa de
+probabilidade. $\sum_{i=1}^\infty Pr(Y = y) = 1$. $Z(\lambda, \nu)$ é
+definida como se segue
+
+\begin{equation}
+  \label{eqn:constante-z}
+  Z(\lambda, \nu) = \sum_{j=0}^\infty \frac{\lambda^j}{(j!)^\nu}
+\end{equation}
+
+O fato que torna a distribuição COM-Poisson mais flexível é a razão
+entre probabilidades sucessivas
+
+\begin{equation}
+  \label{eqn:prob-ratio}
+  \frac{Pr(Y=y-1)}{Pr(Y=y)} = \frac{y^\nu}{\lambda}
+\end{equation}
+
+\noindent
+que se caracteriza não necessariamente linear em $y$, diferentemente da
+Poisson, o que permite caudas mais pesadas ou mais magras à distribuição
+\cite{Sellers2010}. Na figura \ref{fig:distr-compoisson} apresentamos as
+dsitribuições COM-Poisson para diferentes valores de $\lambda$ e $\nu$
+em contraste com as equivalentes, em locação, distribuições
+Poisson. Nessa figura podemos apreciar a flexibilidade desse modelo,
+pois i) contempla o caso de subdispersão mesmo em contagens baixas
+($E(Y)=3$, painel a esquerda), a distribuição permite caudas pesadas e
+consequentemente uma dispersão extra Poisson, ii) contempla subdisersão
+mesmo em contagens altas, o que na Poisson teriamos variabilidade na mesma
+magnitude, na COM-Poisson podemos ter caudas mais magras concentrando as
+probabilidades em torno da média (painel a direita) e iii) tem como caso
+particular a Poisson quando o parâmetro $\nu = 1$ (painel central).
+
+<<distr-compoisson, fig.cap="Probabilidades pela distribuição COM-Poisson para diferentes parâmetros", fig.height=3.5, fig.width=7>>=
+
+library(MRDCr)
+##-------------------------------------------
+## Parametros da distribuição
+pars <- list("p1" = c(1.362, 0.4), "p2" = c(8, 1), "p3" = c(915, 2.5))
+mus <- sapply(pars, function(p) calc_mean_cmp(p[1], p[2], sumto = 50))
+vars <- sapply(pars, function(p) calc_var_cmp(p[1], p[2], sumto = 50))
+
+##-------------------------------------------
+## Calculando as probabilidades
+y <- 0:30
+
+## COM-Poisson
+py.co <- sapply(pars, function(p) dcmp(y, p[1], p[2], sumto = 50))
+da.co <- as.data.frame(py.co)
+da.co <- cbind(y, stack(da.co))
+
+## Poisson
+py.po <- sapply(mus, function(p) dpois(y, lambda = p))
+da.po <- as.data.frame(py.po)
+da.po <- cbind(y, stack(da.po))
+
+##-------------------------------------------
+## Objetos para grafico da lattice
+l <- sapply(pars, function(p) p[1])
+n <- sapply(pars, function(p) p[2])
+fl <- substitute(
+    expression(lambda == l1~","~nu == n1,
+               lambda == l2~","~nu == n2,
+               lambda == l3~","~nu == n3),
+    list(l1 = l[1], l2 = l[2], l3 = l[3],
+         n1 = n[1], n2 = n[2], n3 = n[3]))
+cols <- trellis.par.get("superpose.line")$col[1:2]
+yaxis <- pretty(da.po$values, n = 2)
+ylim <- c(-0.1, max(da.po$values)*1.2)
+key <- list(
+    columns = 2,
+    lines = list(lty = 1, col = cols),
+    text = list(c("Poisson", "COM-Poisson")))
+
+##-------------------------------------------
+## Grafico
+xyplot(values ~ c(y - 0.15) | ind, data = da.po,
+       type = c("h", "g"),
+       xlab = "y", ylab = expression(P(Y == y)),
+       ylim = ylim, xlim = extendrange(y),
+       scales = list(y = list(at = yaxis)),
+       layout = c(NA, 1),
+       key = key,
+       strip = strip.custom(factor.levels = fl)) +
+    as.layer(xyplot(
+        values ~ c(y + 0.15) | ind, data = da.co,
+        type = "h", col = cols[2]))
+for(i in 1:3){
+    trellis.focus("panel", i, 1, highlight=FALSE)
+    grid::grid.text(label = sprintf("E[Y]:  %.1f\nV[Y]:  %.1f",
+                                    mus[i], mus[i]),
+                    x = .57, y = 0.04,
+                    default.units = "npc",
+                    gp = grid::gpar(col = cols[1]),
+                    just = c("left", "bottom"))
+grid::grid.text(label = sprintf("E[Y]:  %.1f\nV[Y]:  %.1f",
+                                mus[i], vars[i]),
+                x = .05, y = 0.03,
+                default.units = "npc",
+                gp = grid::gpar(col = cols[2]),
+                just = c("left", "bottom"))
+}
+trellis.unfocus()
+
+@
+
+Uma das vantagens do modelo COM-Poisson é que possui, além da Poisson
+quando $\nu = 1$ outros distribuições bem conhecidas como casos
+particulares. Esses casos particulares ocorrem essencialmente devido a
+forma assumida pela série infinita $Z(\lambda, \nu)$. Quando $\lambda =
+1$, $Z(\lambda, \nu = 1) = e^\lambda$ e substituindo na expressão
+\ref{eqn:pmf-compoisson} temos a distribuição Poisson resultante. Quando
+$\nu \rightarrow \infty,\, Z(\lambda, \nu) \rightarrow 1+\lambda$ e a
+distribuição COM-Poisson se aproxima de uma distribuição Bernoulli com
+$P(Y=1)=\frac{\lambda}{1+\lambda}$. E quando $\nu = 0$ e $\lambda < 1$
+$Z(\lambda, \nu)$ é uma soma geométrica que resulta em
+$(1-\lambda)^{-1}$ e a expressão \ref{eqn:pmf-compoisson} se resume a
+uma distribuição Geométrica com $P(Y=0)=(1-\lambda)$
+\cite{Shmueli2005}. Os três respectivos casos particulares citados são
+ilustrados na figura \ref{fig:casos-particulares}, onde determinamos os
+parâmetros conforme reestrições para redução da distribuição.
+
+<<casos-particulares, fig.cap="Exemplos de casos particulares da distribuição COM-Poisson", fig.height=3, fig.width=7>>=
+
+library(MRDCr)
+##-------------------------------------------
+## Parametros da distribuição
+pars <- list("p1" = c(5, 1), "p2" = c(3, 20), "p3" = c(0.5, 0))
+
+##-------------------------------------------
+## Calculando as probabilidades
+y <- list(y1 = 0:10, y2 = 0:2, y3 = 0:6)
+
+## COM-Poisson
+py.co <- sapply(1:3, function(p)
+    dcmp(y[[p]], pars[[p]][1], pars[[p]][2], sumto = 50))
+q <- sapply(py.co, length)
+
+da <- data.frame(values = unlist(py.co),
+                 y = unlist(y),
+                 ind = rep(names(pars), q))
+
+##-------------------------------------------
+## Objetos para grafico da lattice
+l <- sapply(pars, function(p) p[1])
+n <- sapply(pars, function(p) p[2])
+fl <- substitute(
+    expression(atop("Poisson", lambda == l1~","~nu == n1),
+               atop("Bernoulli", lambda == l2~","~nu == n2),
+               atop("Geométrica", lambda == l3~","~nu == n3)),
+    list(l1 = l[1], l2 = l[2], l3 = l[3],
+         n1 = n[1], n2 = n[2], n3 = n[3]))
+
+##-------------------------------------------
+## Grafico
+xyplot(values ~ c(y - 0.15) | ind, data = da,
+       type = c("h", "g"),
+       xlab = "y", ylab = expression(P(Y == y)),
+       scales = list(relation = "free"),
+       layout = c(NA, 1),
+       par.strip = list(lines = 3),
+       strip = strip.custom(factor.levels = fl))
+
+@
+
+Um inconveniente desse modelo é que os momentos média e variância não
+tem forma fechada. Sendo assim podem ser calculados a partir da
+definição
+
+$$
+  E(Y) = \sum_{y = 0}^{\infty} y \cdot p(y) \qquad \qquad
+  V(Y) = \sum_{y = 0}^{\infty} y^2 \cdot p(y) - E^2(Y)
+$$
+
+\citeonline{Shmueli2005}, a partir de uma aproximação para $Z(\lambda,
+\nu)$, apresenta uma forma aproximada para os momentos da distribuição
+
+\begin{equation}
+  \label{eqn:cmp-mean-aprox}
+  E(Y) \approx \lambda^{1/\nu} - \frac{\nu - 1}{2\nu} \qquad \qquad
+  V(Y) \approx \frac{\lambda^{1/\nu}}{\nu}
+\end{equation}
+
+\noindent
+os autores ressaltam que essa aproximação é satisfatória para $\nu \leq
+1$ ou $\lambda > 10^\nu$. Na figura \ref{fig:mv-compoisson}
+representamos de forma gráfica a relação média e variância aproximada
+pelas expressões em \ref{eqn:cmp-mean-aprox}. Note que temos quase uma
+relação linear entre média e variância, \citeonline{Sellers2010}
+descrevem que essa pode ser aproximada por $\frac{1}{\nu}E(Y)$. Dessas
+aproximações, bem como das visualizações em \ref{fig:distr-compoisson},
+\ref{fig:casos-particulares} e \ref{fig:mv-compoisson} temos que o
+parâmetros $\nu$, ou $\frac{1}{\nu}$, controla a precisão da distribuição,
+sendo ela equidispersa $\mu = 1$, superdispersa quando $\nu < 1$
+e subdispersa quando $\nu > 1$.
+
+<<mv-compoisson, fig.cap="Relação Média e Variância na distribuição COM-Poisson", fig.height=4, fig.width=4, fig.show="hide", results="asis">>=
+
+##-------------------------------------------
+## Parâmetros considerados
+nu <- seq(0.3, 4, length.out = 50)
+col <- brewer.pal(n = 8, name = "RdBu")
+col <- colorRampPalette(colors = col)(length(phi))
+
+##-------------------------------------------
+## Etiquetas da legenda
+labels <- substitute(
+    expression(nu == p1, nu == p2, nu == p3),
+    list(p1 = min(nu), p2 = median(nu), p3 = max(nu)))
+
+##-------------------------------------------
+## Gráfico
+
+par(mar = c(5, 5, 3, 3) + 0.1)
+## Curva identidade representando a Poisson
+curve((1/1)*(mu + (1 - 1)/(2*1)), xlab = "", ylab = "",
+      from = 0, to = 10, xname = "mu")
+title(ylab = expression(V(X) == frac(nu*(E(X) + 1)-1, nu^2)),
+      line = 2.5)
+title(xlab = expression(E(X) == lambda^{1/nu} - frac(nu-1, 2*nu)),
+      line = 4)
+grid()
+
+## Curvas da relação média e variância da Binomial Negativa
+for (a in seq_along(phi)) {
+    curve((1/nu[a])*(mu + (nu[a] - 1)/(2*nu[a])),
+          add = TRUE, xname = "mu", col = col[a], lwd = 2)
+}
+plotrix::color.legend(
+    xl = 11, yb = 2.5, xr = 12, yt = 6.5,
+    gradient = "y", align = "rb",
+    legend = round(fivenum(nu)[c(1, 3, 5)]),
+    rect.col = col)
+mtext(text = expression(nu), side = 3, cex = 1.5,
+      line = -4, at = 11.5)
+
+wrapfigure()
+
+@
+
+Embora o modelo COM-Poisson não tenha expressão fechada para a média da
+distribuição pode-se utilizá-lo como modelo associado a distribuição
+condicional da variável resposta de contagem. Isso é feito incorporando
+um preditor linear em $\lambda$, que embora não representa a média está
+associado com a locação da distribuição, ou seja, modela-se a média
+indiretamente nessa abordagem. O modelo de regressão é definido com as
+variáveis aleatórias condicionalmente independentes $Y_1, Y_2, \cdots,
+Y_n$, dado o vetor de covariáveis $X_i = (x_{i1}, x_{i2}, \cdots,
+x_{ip})$ seguindo um modelo COM-Poisson de parâmetros $\lambda_i =
+e^{X_i\beta}$, $i = 1, 2, \cdots, n$ e $\nu$ comum a todas as
+observações. Sob a notação de MLG's, temos em \ref{eqn:reg-poisson} o
+modelo devidamente formulado
+
+\begin{equation}
+  \label{eqn:reg-compoisson}
+  \begin{split}
+    Y_i \mid & X_i \sim \textit{COM-Poisson}(\lambda_i, \nu) \\
+    &\eta(E(Y_i \mid X_i)) = \log(\lambda_i) = X_i\beta
+  \end{split}
+\end{equation}
+
+O algoritmo para estimação do conjunto de parâmetros $\Theta = (\nu,
+\beta)$ do modelo é baseado na maximização da log-verossimilhança, que
+decorrente da especificação em \ref{eqn:reg-compoisson} é
+
+\begin{equation}
+  \label{eqn:loglik-compoisson}
+  \ell(\nu, \beta \mid \underline{y}) = \sum_i^n y_i \log(\lambda_i) -
+  \nu \sum_i^n \log(y!) - \sum_i^n \log(Z(\lambda_i, \nu))
+\end{equation}
+
+\noindent
+e então as estimativas de máxima verossimilhança são
+
+$$
+\hat{\Theta} = (\hat{\nu}, \hat{\beta}) =
+\underset{(\nu,\,\beta)}{\textrm{arg max }} \ell(\nu, \beta \mid
+\underline{y})
+$$
+
+<<constante-z, fig.cap="Convergência da constante de normalização da COM-Poisson para diferentes conjuntos de parâmetros", fig.height=3, fig.width=7>>=
+
+##-------------------------------------------
+## Calcula Z para um c(lambda, phi)
+funZ <- function(lambda, nu, maxit = 500, tol = 1e-5) {
+    z <- rep(NA, maxit)
+    j = 1
+    ##
+    z[j] <- exp(j * log(lambda) - nu * lfactorial(j))
+    ##
+    while (abs(z[j] - 0) > tol && j <= maxit) {
+        j = j + 1
+        z[j] <- exp(j * log(lambda) - nu * lfactorial(j))
+    }
+    return(cbind("j" = 0:j, "z" = c(1, z[!is.na(z)])))
+}
+
+##-------------------------------------------
+## Parametros da distribuição
+pars <- list("p1" = c(1.362, 0.4), "p2" = c(8, 1), "p3" = c(915, 2.5))
+
+##-------------------------------------------
+## Calculando as componentes das constantes
+zs <- sapply(pars, function(p) funZ(p[1], p[2]), simplify = FALSE)
+da <- plyr::ldply(zs)
+
+##-------------------------------------------
+## Objetos para grafico da lattice
+l <- sapply(pars, function(p) p[1])
+n <- sapply(pars, function(p) p[2])
+fl <- substitute(
+    expression(lambda == l1~","~nu == n1,
+               lambda == l2~","~nu == n2,
+               lambda == l3~","~nu == n3),
+    list(l1 = l[1], l2 = l[2], l3 = l[3],
+         n1 = n[1], n2 = n[2], n3 = n[3]))
+
+##-------------------------------------------
+## Gráfico
+xyplot(z ~ j | .id, data = da,
+       type = c("b", "g"), pch = 19,
+       scales = "free",
+       ylab = list(
+           expression(frac(lambda^j, "(j!)"^nu)),
+           rot = 0),
+       strip = strip.custom(factor.levels = fl))
+
+@
+
+Note que nessa maximização a constante de normalização $Z(\lambda,
+\nu)$, conforme definida em \ref{eqn:constante-z} é calcula para cada
+indivíduo o que potencialmente torna o processo de estimação lento. Uma
+ilustração do número de incrementos considerados para cálculo da
+constante $Z(\lambda, \nu)$ é apresentado na figura
+\ref{fig:constante-z}, neste ilustração foram utilizados os mesmos
+parâmetros definidos em \ref{fig:distr-compoisson} e note que o número
+de incrementos considerados para convergência \footnote{Adotou-se como
+  critério de convergência a iteração $j$ tal que $\lambda^j/(j!)^\nu <
+  0,00001$}. de $Z(\lambda, \nu)$ foram \Sexpr{c(table(da$.id))} nos
+primeiro, segundo e terceiro painéis respectivamente.
+
+Detalhes computacionais do algoritmo de maximização e manipulações
+algébricas para eficiência na avaliação da log-verossimilhança no modelo
+COM-Poisson são discutidos na seção \ref{cap03:metodos}.
 
 \section{Modelos para excesso de zeros}
 \label{cap02:zeros}
