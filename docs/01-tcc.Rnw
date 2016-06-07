@@ -57,10 +57,11 @@
 \usepackage[T1]{fontenc}		% Selecao de codigos de fonte.
 \usepackage[utf8]{inputenc}		% Codificacao do documento (conversão automática dos acentos)
 \usepackage{indentfirst}		% Indenta o primeiro parágrafo de cada seção.
-\usepackage{color}				% Controle das cores
+\usepackage{color}			% Controle das cores
 \usepackage{graphicx}			% Inclusão de gráficos
 \usepackage{microtype} 			% para melhorias de justificação
 \usepackage{amsmath,amssymb,amstext}
+\usepackage{mathtools}                  % Funcionalidades (como \dcases)
 \usepackage{setspace}
 \usepackage{wrapfig}
 
