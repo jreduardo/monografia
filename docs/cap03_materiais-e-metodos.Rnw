@@ -2,8 +2,10 @@
 % CAPÍTULO 3 - MATERIAIS E MÉTODOS
 % ------------------------------------------------------------------------
 
-\section{Seção}
+\section{Materias}
+\label{cap03:materiais}
 \lipsum[1-3]
 
-\subsection{Subseção}
+\section{Métodos}
+\label{cap03:metodos}
 \lipsum[1-5]
