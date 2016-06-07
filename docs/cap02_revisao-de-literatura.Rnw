@@ -951,3 +951,97 @@ direita no ponto $y=1$ para estimação desta probabilidade, como explicam
 
 \section{Modelos de efeitos aleatórios}
 \label{cap02:aleatorio}
+
+Nas seções anteriores exploramos modelos que flexibilizam algumas
+suposições do modelo Poisson. Basicamente pertimindo casos não
+equidispersos e modelando conjuntamente um processo gerador de zeros
+extra. Contudo uma suposição dos modelos de regressão para dados de
+contagem vistos até aqui é que as variáveis aleatória $Y_1, Y_2, \cdots,
+Y_n$ são condicionalmente indenpendentes, dado o vetor de
+covariáveis. Porém não são raras as situações em que essa suposição não
+se mostra adequada. \citeonline{Ribeiro2012} cita alguns exemplos:
+
+\begin{itemize}
+  \item as observações podem ser correlacionadas no espaço,
+  \item as observações podem ser correlacionadas no tempo,
+  \item interações complexas podem ser necessárias para modelar o efeito
+    conjunto de algumas covariáveis,
+  \item heterogeneidade entre indivíduos ou unidades podem não ser
+    suficientemente descrita por covariáveis.
+\end{itemize}
+
+Nessas situações pode-se estender a classe de modelos de regressão
+com a adição de efeitos aleatórios que incorporam variáveis não
+observáveis (latentes) ao modelo, permitindo assim acomodar uma
+variabilidade, que pode ser ou não estruturada, não prescrita pelo
+modelo. De forma geral a especificação dos modelos de efeitos aleatórios
+segue uma especificação hierárquica
+
+\begin{equation}
+  \label{eqn:reg-misto}
+  \begin{split}
+    Y_{ij} \mid b_{i},& X_{ij} \sim \textrm{D}(\mu_{ij}, \phi) \\
+    g(&\mu_{ij}) =  X_{ij}\beta + Z_ib_i \\
+    & b \sim \textrm{K}(\Theta_b)
+  \end{split}
+\end{equation}
+
+\noindent
+para $i = 1, 2, \cdots, m$ (grupos com efeitos aleatórios comuns) e $j =
+1, 2, \cdots, n$ (observações) com D$(\mu_{ij}, \phi)$, uma distribuição
+considerada para as variáveis resposta condicionalmente independentes,
+$g(\mu_{ij})$ uma função de ligação conforme definada na teoria dos
+MLG's, $X_{ij}$ e $Z_{i}$ as vetores conhecidos representando os efeitos
+das covariáveis de interesse, $b_i$ uma quantidade aleatória provida de
+uma distribuição K$(\Theta_b)$. Note que nesses modelos uma quantidade
+aleatória é somada ao preditor linear, diferentemente dos modelos de
+efeitos fixos e a partir desta quantidade é possível induzir um
+comportamento correlato entre as observações.
+
+Como temos duas quantidades aleatórias no modelo, $Y \mid X$ e $b$, a
+verossimilhança para um modelo de efeito aleatório é dada integrando-se
+os efeitos aleatórios
+
+\begin{equation}
+  \label{eqn:loglik-misto}
+  \Ell(\beta, \phi, \Theta_b \mid \underline{y}) = \prod_{i=1}^m \int_{\R^q}
+  \left ( \prod_{j=1}^{n_i} f_D(y_{ij}, \mu, b_i)\right ) \cdot f_K(b
+  \mid \Theta_b) db_i
+\end{equation}
+
+Perceba que na avaliação da verossimilhança é necessário o cálculo de
+$m$ integrais de dimensão $q$. Para muitos casos essa integral não tem
+forma analítica sendo necessários métodos númericos de aproximação, que
+são discutidos na seção \ref{cap03:metodos}. E as estimativas de máxima
+verossimilhança são
+
+$$
+\hat{\Theta} = (\hat{\beta}, \hat{\Theta_b}) =
+\underset{(\beta,\,\Theta_b)}{\textrm{arg max }} \log(\Ell(\beta, \phi,
+\Theta_b \mid \underline{y}))
+$$
+
+\noindent
+note que no processo de estimação dos modelos de efeitos aleatórios,
+métodos numéricos são intensivamente utilizados, pois a cada iteração do
+algoritmo de maximização da log-verossimilhança $m$ integrais de
+dimensão $q$ são aproximadas, ou seja, métodos de aproximação de
+integrais são utilizados concomitantemente ao método de maximização.
+
+Em modelos de contagem de efeitos mistos é comum adotar como
+distribuição para os efeitos aleatórios uma Normal $q$-variada com média
+0 e matriz de variância e covariâncias $\Sigma$, ou seja, na
+especificação \ref{eqn:reg-misto} K$(\Theta_b) = NMV_q(0, \Sigma)$. Para
+estes casos os principais métodos de aproximação da integral tem
+desempenhos melhores \cite{Bates2015}.
+
+Como mencionado anteriormente modelos de efeitos aleatórios são
+candidatos a modelagem de dados superdispersos. Quando não há uma
+estrutura de delineamento experimental ou observacional pode-se incluir
+efeitos aleatórios a nível de observação (e então $m=n$, ou seja, os
+vetores $Y$ e $b$ tem mesma dimensão). Casos particulares de modelos de
+efeitos aleatórios, onde o efeito aleatório é adiciona a nível de
+observação são o modelo Binomial Negativo e o \textit{Inverse Gaussian
+  Model}, em ambos os casos a integral, definida em
+\ref{eqn:loglik-misto} tem solução analítica e consequentemente a
+marginal em $Y$ forma fechada.
