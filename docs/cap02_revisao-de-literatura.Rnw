@@ -379,10 +379,10 @@ labels <- substitute(
 ## Gráfico
 
 ## Curva identidade representando a Poisson
-par(mar = c(4, 4, 3, 3))
+par(mar = c(4, 4.2, 3, 3))
 curve(mu + 1*0,
       from = 0, to = 10, xname = "mu",
-      ylab = expression(V(Y) == mu %.% (mu + mu^2~"/"~phi)),
+      ylab = expression(V(Y) == mu + mu^2~"/"~phi),
       xlab = expression(E(Y) == mu))
 grid()
 ## Curvas da relação média e variância da Binomial Negativa
@@ -422,7 +422,7 @@ dos parâmetros $\beta$ de locação e $\phi$ de dispersão. Deste fato
 decorre que a estimação dos parâmetros pode ser realizada em paralelo,
 ou seja, estima-se o vetor $beta$ pelo método de \textit{IWLS} e
 posteriormente o parâmetro $\phi$ pelo método de Newton-Raphson, faz-se
-osdois procedimentos simultaneamente até a convengência dos parâmetros.
+os dois procedimentos simultaneamente até a convengência dos parâmetros.
 
 \section{Modelo COM-Poisson}
 \label{cap02:compoisson}
