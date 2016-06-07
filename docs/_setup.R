@@ -33,6 +33,7 @@ opts_chunk$set(
     message = FALSE,
     echo = FALSE,
     tidy = TRUE,
+    cache = TRUE,
     fig.width = 7,
     fig.height = 5,
     fig.align = "center",
