@@ -790,7 +790,7 @@ constante $Z(\lambda, \nu)$ é apresentado na figura
 parâmetros definidos em \ref{fig:distr-compoisson} e note que o número
 de incrementos considerados para convergência \footnote{Adotou-se como
   critério de convergência a iteração $j$ tal que $\lambda^j/(j!)^\nu <
-  0,00001$}. de $Z(\lambda, \nu)$ foram \Sexpr{c(table(da$.id))} nos
+  0,00001$}. de $Z(\lambda, \nu)$ foram \Sexpr{c(table(da[, ".id"]))} nos
 primeiro, segundo e terceiro painéis respectivamente.
 
 Detalhes computacionais do algoritmo de maximização e manipulações
