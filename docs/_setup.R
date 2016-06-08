@@ -41,6 +41,7 @@ opts_chunk$set(
 
 ##======================================================================
 ## Configura opções de gráficos do knitr
+library(lattice)
 library(latticeExtra)
 mycol <- c(1, "#377EB8", "#E41A1C", "#4DAF4A",
            "#ff00ff", "#FF7F00", "#984EA3", "#FFFF33")
@@ -59,7 +60,21 @@ ps <- list(
     superpose.symbol = list(col = mycol, pch = 1),
     superpose.polygon = list(col = mycol),
     strip.background = list(col = c("gray90", "gray70")))
+
+##======================================================================
+## Para incluir fonte (source) nas figuras
+
+## da lattice (use o argumento sub = "texto" nos graficos)
+ps$par.sub.text <- list(font = 1, just = "left", cex = 0.9,
+                        x = grid::unit(5, "mm"))
 trellis.par.set(ps)
+
+## da graphics (use fonte("texto") após os gráficos)
+fonte <- function(texto, side = 1, line = -1, adj = 0,
+                  outer = TRUE, ...) {
+    mtext("Fonte: Elaborado pelo autor.", cex = 0.9,
+          side = side, line = line, adj = adj, outer = outer, ...)
+}
 
 ##======================================================================
 ## Configura opções de output no documento

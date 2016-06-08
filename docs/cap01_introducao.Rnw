@@ -110,7 +110,7 @@ coords <- sapply(list("equi" = equi, "over" = over, "unde" = unde),
 da <- plyr::ldply(coords, .id="caso")
 
 library(latticeExtra)
-col <- trellis.par.get("superpose.line")$col[1]
+col <- "gray50"
 xyplot(y ~ x | caso, data = da,
        layout = c(NA, 1),
        as.table = TRUE,
@@ -121,8 +121,8 @@ xyplot(y ~ x | caso, data = da,
        strip = strip.custom(
            factor.levels = c("Equidispersão",
                              "Superdispersão",
-                             "Subdispersão")
-       ),
+                             "Subdispersão")),
+       sub = "Fonte: Elaborado pelo autor.",
        panel = function(x, y, subscripts, ...) {
            l <- seq(min(x), max(x), length.out = 10)
            panel.abline(h = l, v = l, col = col, lty = 2)

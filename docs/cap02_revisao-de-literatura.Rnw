@@ -59,6 +59,8 @@ Katz                                & \checkmark        & \checkmark     & \chec
 \textit{Double-Poisson}             & \checkmark        & \checkmark     & \checkmark   \\
 \textit{Lagrangian Poisson}         & \checkmark        & \checkmark     & \checkmark   \\
   \bottomrule
+  \\[-0.3cm]
+  {\small Fonte: Elaborado pelo autor.}
 \end{tabular}
 \end{table}
 %%----------------------------------------------------------------------
@@ -133,7 +135,8 @@ xyplot(values ~ y | factor(ind), data = da,
        layout = c(NA, 1),
        ylab = expression(Pr(Y == y)),
        type = c("h", "g"), as.table = TRUE,
-       strip = strip.custom(factor.levels = fl))
+       strip = strip.custom(factor.levels = fl),
+       sub = "Fonte: Elaborado pelo autor.")
 
 @
 
@@ -313,7 +316,7 @@ fl <- substitute(
     list(p1 = phis[1], p2 = phis[2], p3 = phis[3]))
 cols <- trellis.par.get("superpose.line")$col[1:2]
 yaxis <- pretty(da.po$values, n = 2)
-ylim <- c(-0.07, max(da.po$values)*1.2)
+ylim <- c(-0.08, max(da.po$values)*1.2)
 key <- list(
     columns = 2,
     lines = list(lty = 1, col = cols),
@@ -329,7 +332,8 @@ xyplot(values ~ c(y - 0.15) | ind, data = da.po,
        scales = list(y = list(at = yaxis)),
        layout = c(NA, 1),
        key = key,
-       strip = strip.custom(factor.levels = fl)) +
+       strip = strip.custom(factor.levels = fl),
+       sub = "Fonte: Elaborado pelo autor.") +
     as.layer(xyplot(
         values ~ c(y + 0.15) | ind, data = da.bn,
         type = "h", col = cols[2]))
@@ -379,7 +383,7 @@ labels <- substitute(
 ## Gráfico
 
 ## Curva identidade representando a Poisson
-par(mar = c(4, 4.2, 3, 3))
+par(mar = c(5.5, 4.2, 3, 3))
 curve(mu + 1*0,
       from = 0, to = 10, xname = "mu",
       ylab = expression(V(Y) == mu + mu^2~"/"~phi),
@@ -396,7 +400,8 @@ plotrix::color.legend(
     legend = round(fivenum(phi)[c(1, 3, 5)]),
     rect.col = col)
 mtext(text = expression(phi), side = 3, cex = 1.5,
-      line = -4.5, at = 11.5)
+      line = -4, at = 11.5)
+fonte("Fonte: Elaborado pelo autor.")
 
 wrapfigure()
 @
@@ -523,7 +528,8 @@ xyplot(values ~ c(y - 0.15) | ind, data = da.po,
        scales = list(y = list(at = yaxis)),
        layout = c(NA, 1),
        key = key,
-       strip = strip.custom(factor.levels = fl)) +
+       strip = strip.custom(factor.levels = fl),
+       sub = "Fonte: Elaborado pelo autor.") +
     as.layer(xyplot(
         values ~ c(y + 0.15) | ind, data = da.co,
         type = "h", col = cols[2]))
@@ -531,7 +537,7 @@ for(i in 1:3){
     trellis.focus("panel", i, 1, highlight=FALSE)
     grid::grid.text(label = sprintf("E[Y]:  %.1f\nV[Y]:  %.1f",
                                     mus[i], mus[i]),
-                    x = .57, y = 0.04,
+                    x = .57, y = 0.03,
                     default.units = "npc",
                     gp = grid::gpar(col = cols[1]),
                     just = c("left", "bottom"))
@@ -600,7 +606,8 @@ xyplot(values ~ c(y - 0.15) | ind, data = da,
        xlab = "y", ylab = expression(P(Y == y)),
        scales = list(relation = "free"),
        layout = c(NA, 1),
-       par.strip = list(lines = 2, col = "transparent"))
+       par.strip = list(lines = 2, col = "transparent"),
+       sub = "Fonte: Elaborado pelo autor.")
 distr <- c("Poisson", "Bernoulli", "Geométrica")
 ##-------------------------------------------
 ## http://stackoverflow.com/questions/33632344/strip-with-two-lines-title-r-lattice-plot
@@ -665,7 +672,7 @@ labels <- substitute(
 ##-------------------------------------------
 ## Gráfico
 
-par(mar = c(5, 5, 3, 3) + 0.1)
+par(mar = c(6.5, 5, 3, 3) + 0.1)
 ## Curva identidade representando a Poisson
 curve((1/1)*(mu + (1 - 1)/(2*1)), xlab = "", ylab = "",
       from = 0, to = 10, xname = "mu")
@@ -686,7 +693,8 @@ plotrix::color.legend(
     legend = round(fivenum(nu)[c(1, 3, 5)]),
     rect.col = col)
 mtext(text = expression(nu), side = 3, cex = 1.5,
-      line = -4, at = 11.5)
+      line = -3.5, at = 11.5)
+fonte("Fonte: Elaborado pelo autor.")
 
 wrapfigure()
 
@@ -777,7 +785,8 @@ xyplot(z ~ j | .id, data = da,
        ylab = list(
            expression(frac(lambda^j, "(j!)"^nu)),
            rot = 0),
-       strip = strip.custom(factor.levels = fl))
+       strip = strip.custom(factor.levels = fl),
+       sub = "Fonte: Elaborado pelo autor.")
 
 @
 
@@ -878,7 +887,8 @@ xyplot(py_real ~ c(yu - 0.15) | caso, data = da,
        ylab = expression(Pr(Y==y)),
        ylim = ylim,
        key = key,
-       strip = strip.custom(factor.levels = paste("Simulação", 1:2))) +
+       strip = strip.custom(factor.levels = paste("Simulação", 1:2)),
+       sub = "Fonte: Elaborado pelo autor.") +
     as.layer(xyplot(
         py_dcmp ~ c(yu + 0.15) | caso, data = da,
         type = "h", col = cols[2]))
