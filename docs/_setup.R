@@ -69,11 +69,26 @@ ps$par.sub.text <- list(font = 1, just = "left", cex = 0.9,
                         x = grid::unit(5, "mm"))
 trellis.par.set(ps)
 
+## da lattice combinados (1. use ps.sub como par.settings, nos gráficos
+## bottom da combinação e 2. use fonte.xy("texto") após o print dos
+## gráficos)
+library(grid)
+library(gridExtra)
+ps.sub <- list(layout.heights = list(bottom.padding = 5))
+fonte.xy <- function(texto, ...) {
+    grid::grid.text(texto, x = 0.01, y = 0.01,
+                    default.units = "npc",
+                    just = c("left", "bottom"), ...)
+    invisible()
+}
+
+
 ## da graphics (use fonte("texto") após os gráficos)
 fonte <- function(texto, side = 1, line = -1, adj = 0,
                   outer = TRUE, ...) {
     mtext("Fonte: Elaborado pelo autor.", cex = 0.9,
           side = side, line = line, adj = adj, outer = outer, ...)
+    invisible()
 }
 
 ##======================================================================
