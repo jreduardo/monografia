@@ -385,7 +385,7 @@ labels <- substitute(
 ## Gráfico
 
 ## Curva identidade representando a Poisson
-par(mar = c(5.5, 4.2, 3, 3))
+par(mar = c(5.5, 4.2, 3, 3), las = 1)
 curve(mu + 1*0,
       from = 0, to = 10, xname = "mu",
       ylab = expression(V(Y) == mu + mu^2~"/"~phi),
@@ -606,7 +606,7 @@ fl <- substitute(
 xyplot(values ~ c(y - 0.15) | ind, data = da,
        type = c("h", "g"),
        xlab = "y", ylab = expression(P(Y == y)),
-       scales = list(relation = "free"),
+       scales = list(relation = "free", rot = 0),
        layout = c(NA, 1),
        par.strip = list(lines = 2, col = "transparent"),
        sub = "Fonte: Elaborado pelo autor.")
@@ -674,7 +674,7 @@ labels <- substitute(
 ##-------------------------------------------
 ## Gráfico
 
-par(mar = c(6.5, 5, 3, 3) + 0.1)
+par(mar = c(6.5, 5, 3, 3) + 0.1, las = 1)
 ## Curva identidade representando a Poisson
 curve((1/1)*(mu + (1 - 1)/(2*1)), xlab = "", ylab = "",
       from = 0, to = 10, xname = "mu")
