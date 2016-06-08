@@ -59,9 +59,11 @@ Katz                                & \checkmark        & \checkmark     & \chec
 \textit{Double-Poisson}             & \checkmark        & \checkmark     & \checkmark   \\
 \textit{Lagrangian Poisson}         & \checkmark        & \checkmark     & \checkmark   \\
   \bottomrule
-  \\[-0.3cm]
-  {\small Fonte: Elaborado pelo autor.}
 \end{tabular}
+\begin{tablenotes}
+  \small
+\item Fonte: Elaborado pelo autor.
+\end{tablenotes}
 \end{table}
 %%----------------------------------------------------------------------
 
@@ -860,7 +862,7 @@ probs <- sapply(sim, function(y) {
     m0 <- glm(y ~ 1, family = poisson)
     py_pois <- dpois(yu, exp(m0$coef))
     ##-------------------------------------------
-    m1 <- cmp(y ~ 1, data = data.frame(y = y), sumto = 40)
+    m1 <- MRDCr::cmp(y ~ 1, data = data.frame(y = y), sumto = 40)
     py_dcmp <- dcmp(yu, lambda = exp(m1@coef[-1]),
                     nu = exp(m1@coef[1]), sumto = 40)
     ##-------------------------------------------

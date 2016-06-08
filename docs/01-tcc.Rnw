@@ -64,6 +64,13 @@
 \usepackage{wrapfig}
 
 % ---
+% Para titulo em destaque sem sequencia de numeração
+% ---
+\newcommand{\datatitle}[1]{
+  \normalsize \textsc{#1}
+}
+
+% ---
 % Funções matematicas
 % ---
 \usepackage{amsmath,amssymb,amstext}
@@ -75,6 +82,8 @@
 % Para tabelas
 % ---
 \usepackage{multirow}
+\usepackage{array}
+\usepackage{threeparttable}
 
 % ---
 % Pacotes e definições adcionais, para adequações especificas
