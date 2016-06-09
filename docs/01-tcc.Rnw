@@ -273,9 +273,13 @@ source("_setup.R")
 \begin{epigrafe}
     \vspace*{\fill}
 	\begin{flushright}
-		\textit{``The numbers are where the scientific \\ discussion
-		should start, not end.}\\
-		--- Steven N. Goodman
+          \textit{``Software is like sex: it's better when \\
+            it's free``}\\
+          --- Linus Torvalds \\[1cm]
+
+          \textit{``The numbers are where the scientific \\ discussion
+            should start, not end.''}\\
+          --- Steven N. Goodman
 	\end{flushright}
 \end{epigrafe}
 % ---
