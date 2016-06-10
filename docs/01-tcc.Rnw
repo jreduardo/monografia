@@ -396,6 +396,7 @@ source("_setup.R")
 \partapendices
 
 \chapter{Lipsum}
+\label{ap:tccPackage}
 \lipsum[20]
 
 \end{apendicesenv}

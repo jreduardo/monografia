@@ -550,9 +550,22 @@ verossimilhança das funções implementadas para o modelo COM-Poisson ,
 modelos Poisson e Binomial Negativo com componente de barreira para
 modelagem de excesso de zeros e \texttt{lme4} (versão
 \Sexpr{packageVersion("lme4")}) para ajuste dos modelos Poisson com
-efeitos aleatórios normais.
+efeitos aleatórios normais. Para apresentação gráfica dos resultados os
+pacotes \texttt{lattice} (versão \Sexpr{packageVersion("lattice")}),
+\texttt{latticeExtra} (versão \Sexpr{packageVersion("latticeExtra")}) e
+\texttt{corrplot} (versão \Sexpr{packageVersion("corrplot")}) são
+intensivamente utilizados e finalmente para elaboração do relatório,
+mesclando códigos em R e escrita na liguagem de marcação \LaTeX{}, o
+pacote \texttt{knitr} (versão \Sexpr{packageVersion("knitr")}) é
+requisitado.
 
-
+Destaca-se nesse trabalho que todas as funções implementadas para ajuste
+e inferência dos modelos de regressão COM-Poisson estão disponíveis, em
+formato de um pacote R \texttt{tccPackage}, no endereço
+\url{https://github.com/jreduardo/tccPackage}. No capítulo
+\ref{cap:resultados-e-discussao} destacamos as chamadas de algumas
+funções e no apêndice \ref{ap:tccPackage} mostramos o emprego do pacote
+na análise de dois conjuntos de dados exibidos no trabalho.
 
 \section{Métodos}
 \label{cap03:metodos}
