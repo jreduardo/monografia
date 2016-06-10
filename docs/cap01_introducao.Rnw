@@ -109,7 +109,6 @@ coords <- sapply(list("equi" = equi, "over" = over, "unde" = unde),
                  })
 da <- plyr::ldply(coords, .id="caso")
 
-library(latticeExtra)
 col <- "gray50"
 xyplot(y ~ x | caso, data = da,
        layout = c(NA, 1),

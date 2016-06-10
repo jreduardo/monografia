@@ -324,7 +324,6 @@ key <- list(
     lines = list(lty = 1, col = cols),
     text = list(c("Poisson", "Binomial Negativa")))
 
-
 ##-------------------------------------------
 ## Grafico
 xyplot(values ~ c(y - 0.15) | ind, data = da.po,
@@ -482,10 +481,12 @@ particular a Poisson quando o parâmetro $\nu = 1$ (painel central).
 
 <<distr-compoisson, fig.cap="Probabilidades pela distribuição COM-Poisson para diferentes parâmetros", fig.height=3.5, fig.width=7>>=
 
-library(MRDCr)
+library(tccPackage)
 ##-------------------------------------------
 ## Parametros da distribuição
-pars <- list("p1" = c(1.362, 0.4), "p2" = c(8, 1), "p3" = c(915, 2.5))
+pars <- list("p1" = log(c(1.362, 0.4)),
+             "p2" = log(c(8, 1)),
+             "p3" = log(c(915, 2.5)))
 mus <- sapply(pars, function(p) calc_mean_cmp(p[1], p[2], sumto = 50))
 vars <- sapply(pars, function(p) calc_var_cmp(p[1], p[2], sumto = 50))
 
@@ -505,8 +506,8 @@ da.po <- cbind(y, stack(da.po))
 
 ##-------------------------------------------
 ## Objetos para grafico da lattice
-l <- sapply(pars, function(p) p[1])
-n <- sapply(pars, function(p) p[2])
+l <- sapply(pars, function(p) exp(p[1]))
+n <- sapply(pars, function(p) exp(p[2]))
 fl <- substitute(
     expression(lambda == l1~","~nu == n1,
                lambda == l2~","~nu == n2,
@@ -572,10 +573,12 @@ parâmetros conforme reestrições para redução da distribuição.
 
 <<casos-particulares, fig.cap="Exemplos de casos particulares da distribuição COM-Poisson", fig.height=3, fig.width=7>>=
 
-library(MRDCr)
+library(tccPackage)
 ##-------------------------------------------
 ## Parametros da distribuição
-pars <- list("p1" = c(5, 1), "p2" = c(3, 20), "p3" = c(0.5, 0))
+pars <- list("p1" = log(c(5, 1)),
+             "p2" = log(c(3, 20)),
+             "p3" = log(c(0.5, 0)))
 
 ##-------------------------------------------
 ## Calculando as probabilidades
@@ -592,8 +595,8 @@ da <- data.frame(values = unlist(py.co),
 
 ##-------------------------------------------
 ## Objetos para grafico da lattice
-l <- sapply(pars, function(p) p[1])
-n <- sapply(pars, function(p) p[2])
+l <- sapply(pars, function(p) exp(p[1]))
+n <- sapply(pars, function(p) exp(p[2]))
 fl <- substitute(
     expression(lambda == l1~","~nu == n1,
                lambda == l2~","~nu == n2,
@@ -603,7 +606,7 @@ fl <- substitute(
 
 ##-------------------------------------------
 ## Grafico
-xyplot(values ~ c(y - 0.15) | ind, data = da,
+xyplot(values ~ y | ind, data = da,
        type = c("h", "g"),
        xlab = "y", ylab = expression(P(Y == y)),
        scales = list(relation = "free", rot = 0),
@@ -663,7 +666,7 @@ e subdispersa quando $\nu > 1$.
 ## Parâmetros considerados
 nu <- seq(0.3, 4, length.out = 50)
 col <- brewer.pal(n = 8, name = "RdBu")
-col <- colorRampPalette(colors = col)(length(phi))
+col <- colorRampPalette(colors = col)(length(nu))
 
 ##-------------------------------------------
 ## Etiquetas da legenda
@@ -685,7 +688,7 @@ title(xlab = expression(E(X) == lambda^{1/nu} - frac(nu-1, 2*nu)),
 grid()
 
 ## Curvas da relação média e variância da Binomial Negativa
-for (a in seq_along(phi)) {
+for (a in seq_along(nu)) {
     curve((1/nu[a])*(mu + (nu[a] - 1)/(2*nu[a])),
           add = TRUE, xname = "mu", col = col[a], lwd = 2)
 }
@@ -855,6 +858,8 @@ y2 <- sapply(rbinom(n, 1, pi), function(x) {
 
 ##-------------------------------------------
 ## Estimando as probabilidades
+library(tccPackage)
+
 sim <- list("s1" = as.integer(y1), "s2" = as.integer(y2))
 probs <- sapply(sim, function(y) {
     yu <- 0:max(y)
@@ -862,9 +867,9 @@ probs <- sapply(sim, function(y) {
     m0 <- glm(y ~ 1, family = poisson)
     py_pois <- dpois(yu, exp(m0$coef))
     ##-------------------------------------------
-    m1 <- MRDCr::cmp(y ~ 1, data = data.frame(y = y), sumto = 40)
-    py_dcmp <- dcmp(yu, lambda = exp(m1@coef[-1]),
-                    nu = exp(m1@coef[1]), sumto = 40)
+    m1 <- cmp(y ~ 1, data = data.frame(y = y), sumto = 40)
+    py_dcmp <- dcmp(yu, loglambda = m1@coef[-1],
+                    phi = m1@coef[1], sumto = 40)
     ##-------------------------------------------
     py_real <- c(prop.table(table(y)))
     ##-------------------------------------------

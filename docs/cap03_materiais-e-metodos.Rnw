@@ -239,6 +239,7 @@ as variáveis de contagem (\textbf{citar o artigo do experimento}).
 
 <<descr-soyaBeans, fig.height=4, fig.width=7.2, fig.cap="Disposição das variáveis de contagem nº de grãos e nº de vagens viáveis por parcela observadas no experimento com a cultura de soja">>=
 
+cols <- trellis.par.get("superpose.line")$col[1:2]
 key <- list(
     title = "Variável de contagem",
     cex.title = 1,
@@ -248,7 +249,7 @@ key <- list(
     text = list(c("Nº de grãos por parcela", "Nº de vagens viáveis")))
 
 xyplot(ngra + nvag ~ K | umid,
-       data = soja,
+       data = soyaBeans,
        xlab = "Nível de adubação potássica",
        ylab = "Contagem",
        type = c("p", "g", "smooth"),
@@ -504,7 +505,7 @@ key <- list(
     text = list(c("Média de nematóides por cultura",
                   "Média de nematóides geral")))
 
-xyplot(nema ~ cult, data = nematoide,
+xyplot(nema ~ cult, data = nematodes,
        type = c("p", "g"),
        key = key,
        xlab = "Linhagem de feijoeiro",
