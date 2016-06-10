@@ -472,6 +472,69 @@ suppressWarnings({
 
 @
 
+\datatitle{Número de Nematóides em Raízes de Feijoeiro}
+
+<<data-nematodes, include=FALSE>>=
+
+data(nematodes, package = "tccPackage")
+str(nematodes)
+
+@
+
+Este último conjunto de dados explorado no trabalho, são resultados de
+um experimento em casa de vegetação que estudou a reprodução de
+nematóides em cultivares/linhagens de feijoeiro. O solo dos vasos foi
+inicialmente contaminado com namatóides e as parcelas tiveram duas
+plantas. Ao final do experimento, as raízes das duas plantas por parcela
+foram lavadas, trituradas, peneiradas e diluídas e as contagens dos
+nematóides realizadas em alíquotas dessa solução. Perceba que temos,
+incidindo sobre a contagem a quantidade de raízes produzidas por parcela
+e ainda o volume usado para diluir essa quantidade, pois as contagens
+são realizades em alíquotas da solução composta pela razão entre massa
+fresca de raízes (em gramas) e volume utilizado para diluição (em
+milimetros).
+
+<<descr-nematodes, fig.height=4, fig.width=4, fig.show="hide", results="asis", fig.cap="Dispersão do número de nematóides em uma alíquota de 1ml provida pela solução de 1 g/ml de massa fresca diluída.">>=
+
+cols <- trellis.par.get("superpose.line")$col[1:2]
+key <- list(
+    ## corner = c(0.1, 0.9),
+    type = "b", divide = 1,
+    lines = list(pch = c(NA, 15), lty = c(2, 0), col = cols),
+    text = list(c("Média de nematóides por cultura",
+                  "Média de nematóides geral")))
+
+xyplot(nema ~ cult, data = nematoide,
+       type = c("p", "g"),
+       key = key,
+       xlab = "Linhagem de feijoeiro",
+       ylab = "Contagem de Nematóides",
+       panel = function(x, y, ...) {
+           means <- aggregate(y, list(x), mean)
+           panel.xyplot(x, y, ...)
+           panel.abline(h = mean(y), lty = 2, col = cols[1])
+           panel.points(x = means[, 1], y = means[, 2],
+                        pch = 15, col = cols[2])
+       },
+       par.settings = ps.sub)
+
+fonte.xy("Fonte: Elaborado pelo autor.")
+
+wrapfigure()
+
+@
+
+Na figura \ref{fig:descr-nematodes} apresentamos a dispersão das
+contagens de nematóides em uma alíquota de 1 ml da solução composta de
+uma grama de massa fresca de raíz por um milímetro de água. Note que as
+contagens para cada uma das culturas se distribuem em torno do perfil
+médio (linha pontilhada). Um detalhe interesse desse conjunto de dados é
+que as linhagens de feijoeiro avaliadas não foram escolhas subjetivas,
+pode-se interpretar as linhagens escolhidas como um sorteio aleatório
+dentre uma população de linhagens de feijoeiro. Assim esse experimento
+pode ser rotulado como um experimento de medidas repetidas, caso comum
+nas aplicações de modelos de efeitos aleatórios.
+
 \subsection{Recursos computacionais}
 \label{cap03:materiais-recursos}
 
