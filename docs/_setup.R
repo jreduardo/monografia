@@ -34,10 +34,19 @@ opts_chunk$set(
     echo = FALSE,
     tidy = TRUE,
     cache = TRUE,
+    ## dev = "tikz",
     fig.width = 7,
     fig.height = 5,
     fig.align = "center",
+    fig.pos = "!htb",
     dev.args = list(family = "Palatino"))
+
+##======================================================================
+## Configura opções de output no documento
+options(digits = 3, OutDec = ",",
+        xtable.caption.placement = "top",
+        xtable.include.rownames = FALSE,
+        xtable.booktabs = TRUE)
 
 ##======================================================================
 ## Configura opções de gráficos do knitr
@@ -82,7 +91,6 @@ fonte.xy <- function(texto, ...) {
     invisible()
 }
 
-
 ## da graphics (use fonte("texto") após os gráficos)
 fonte <- function(texto, side = 1, line = -1, adj = 0,
                   outer = TRUE, ...) {
@@ -92,8 +100,114 @@ fonte <- function(texto, side = 1, line = -1, adj = 0,
 }
 
 ##======================================================================
-## Configura opções de output no documento
-options(digits = 3, OutDec = ",",
-        xtable.caption.placement = "top",
-        xtable.include.rownames = FALSE,
-        xtable.booktabs = TRUE)
+## Para padronizar as analises de deviance de todos os modelos
+##   -
+myanova <- function(...) {
+    model.list <- list(...)
+    test <- "Chisq"
+    cls <- sapply(model.list, function(x) class(x)[1])
+    if (all(cls == "glm")) {
+        fam <- sapply(model.list, function(x) x$family$family)
+        if (all(fam == "quasipoisson")) {
+            test <- "F"
+        }
+    }
+    nps <- sapply(model.list, function(x) attr(logLik(x), "df"))
+    aic <- sapply(model.list, function(x) AIC(x))
+    if (test == "Chisq") {
+        lls <- sapply(model.list, function(x) logLik(x))
+        cst <- 2 * diff(lls)
+        pvs <- pchisq(cst, df = diff(nps), lower.tail = FALSE)
+        tab <- cbind(
+            "np" = nps,
+            "ll" = lls,
+            "AIC" = aic,
+            "2*dif" = c(NA, cst),
+            "dif np" = c(NA, diff(nps)),
+            "P(>Chisq)" = c(NA, pvs))
+    }
+    if (test == "F") {
+        sigma <- summary(model.list[[which.max(nps)]])$dispersion
+        df.sigma <- model.list[[which.max(nps)]]$df.residual
+        dev <- sapply(model.list, function(x) deviance(x))
+        dfs <- c(NA, -diff(dev))
+        dnp <- c(NA, diff(nps))
+        F <- c(NA, -diff(dev))/(dnp * sigma)
+        pvs <- pf(F, df1 = dnp, df2 = df.sigma, lower.tail = FALSE)
+        tab <- cbind(
+            "np" = nps,
+            "dev" = dev,
+            "AIC" = aic,
+            "F" = F,
+            "dif np" = dnp,
+            "P(>F)" = pvs)
+    }
+    return(tab)
+}
+
+##======================================================================
+## Definições de plot.profile.mle2 para perfil de log-verossimilhança
+
+cols <- trellis.par.get("superpose.line")$col[1:2]
+myplot <- function(perfil) {
+    par(mar = c(5, 5, 2, 2) + 0.1)
+    plot(perfil, conf = c(0.99, 0.95),
+         col.minval = 1, lty.minval = 3,
+         col.conf = "gray20", lty.conf = 2,
+         col.prof = 1, lty.prof = 1,
+         ylab = expression(sqrt(-2*(l(hat(phi)) - l(phi)))),
+         xlab = expression(phi), las = 1, main = "")
+    abline(v = 0, col = cols[2])
+    invisible()
+}
+
+myprof <- function(prof, conf = c(0.9, 0.95, 0.99),
+                   ylab = expression(abs(z)~~(sqrt(~Delta~"deviance"))),
+                   xlab = expression(phi),
+                   namestrip = expression("Perfil para"~phi),
+                   subset = 3.8,
+                   ...) {
+    ##-------------------------------------------
+    conf <- conf[order(conf, decreasing = TRUE)]
+    vx <- sapply(conf, function(x) confint(prof, level = x))
+    vz <- sqrt(qchisq(pmax(0, pmin(1, conf)), 1))
+    ##-------------------------------------------
+    ylab <- ylab
+    xlab <- xlab
+    ##-------------------------------------------
+    mle <- prof@summary@coef["phi", 1]
+    ##-------------------------------------------
+    da <- as.data.frame(prof)
+    xyplot(abs(z) ~ focal | param, data = da,
+           subset = abs(z) < subset,
+           type = c("l", "g"),
+           strip = strip.custom(
+               factor.levels = namestrip
+           ),
+           xlab = xlab, ylab = ylab,
+           ..., panel = function(x, y, ...) {
+               panel.xyplot(x, y, ...)
+               panel.arrows(c(vx), 0, c(vx), rep(vz, each = 2),
+                            code = 1, length = 0.1, lty = 2,
+                            col = "gray40")
+               panel.segments(vx[1, ], vz, vx[2, ], vz, lty = 2,
+                              col = "gray40")
+               panel.abline(h = 0, v = mle, lty = 3)
+               panel.text(x = rep(mle, 2), y = vz+0.1,
+                          labels = paste(conf*100, "%"),
+                          col = "gray20")
+               panel.abline(v = 0, col = cols[2])
+           })
+    ##-------------------------------------------
+}
+
+##======================================================================
+## Gráfico de correlação entre os parâmetros
+
+library(corrplot)
+mycorrplot <- function(Corr, ...) {
+    corrplot.mixed(
+        Corr, lower = "number", upper = "ellipse",
+        diag = "l", tl.pos = "lt", tl.col = "black",
+        tl.cex = 0.8, col = brewer.pal(9, "Greys")[-(1:3)], ...)
+}
