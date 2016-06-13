@@ -3,13 +3,13 @@
 % ------------------------------------------------------------------------
 
 Essa seção é destinada a apresentação dos conjuntos de dados analisados
-no trabalho, descrição dos recursos computacionais e métodos utilizados
+no trabalho e descrição dos recursos computacionais e métodos utilizados
 na análise. Na seção \ref{cap03:materiais-dados} os conjuntos de dados
 seão apresentados, ao todo são seis conjuntos de dados com diferentes
 características. Os recursos computacionais utilizados são descritos na
-seção \ref{cap03:materiais-recursos}. E na última seção
-\ref{cap03:metodos} deste capítulo são apresentados os métodos para
-ajuste e comparação dos modelos alternativos propostos.
+seção \ref{cap03:materiais-recursos}. Na última seção
+\ref{cap03:metodos} desse capítulo são apresentados os métodos para
+ajuste, avaliação e comparação dos modelos propostos.
 
 \section{Materias}
 \label{cap03:materiais}
@@ -17,20 +17,19 @@ ajuste e comparação dos modelos alternativos propostos.
 \subsection{Conjuntos de dados}
 \label{cap03:materiais-dados}
 
-A seguir são apresentados os seis conjuntos de dados analisados com os
-modelos alternativos propostos. Os dados em estudo são, quase em sua
-totalidade, resultantes de experimentos agronômicos com delineamentos
-balanceados o que é uma característica desejável, haja visto que o
-principal interesse é a avaliação do desempenho do modelo COM-Poisson
-quando empregado a análise desses dados.
+A seguir são apresentados os seis conjuntos de dados utilizados para
+avaliar o desempenho dos modelos COM-Poisson. Os dados em estudo são,
+quase em sua totalidade, resultantes de experimentos agronômicos com
+delineamentos balanceados, o que é uma característica desejável, haja
+visto que o principal interesse é a avaliação do desempenho do modelo
+COM-Poisson quando empregado a análise desses dados.
 
 A apresentação dos conjuntos segue a ordem de 1) descrição do
 experimento ou estudo em destaque, 2) definição das variáveis e suas
-unidades de medidas e 3) descrição de suas características potencialmente
-contempladas por modelos alternativos ao Poisson.
+unidades de medidas e 3) descrição de suas características,
+potencialmente contempladas por modelos alternativos ao Poisson.
 
-%% {\normalsize \textsc{Capulhos de Algodão em Função de Desfolha}}
-\subsubsection{Capulhos de Algodão em Sob Efeito de Desfolha Artificial}
+\subsubsection{Capulhos de algodão sob efeito de desfolha artificial}
 \label{sec:cottonBolls}
 
 <<data-cottonBolls, include=FALSE, echo=FALSE>>=
@@ -52,20 +51,23 @@ unidade experimental foi um vaso com duas plantas onde avaliou-se o
 número de capulhos produzidos ao final da ciclo cultura
 \apud{Zeviani2014}{Silva2012}. O experimento contou com
 \Sexpr{nrow(cottonBolls)} observações das quais temos as informações das
-variáveis.
+variáveis número de capulhos de algodão produzidos, \texttt{ncap},
+nível de desfolha de remoção foliar, \texttt{des} e estágio fenológico
+das planta na unidade experimental, \texttt{est}.
 
 Esse conjunto de dados já fora publicado sob a motivação da
 característica de subdispersão, na ocasião o modelo proposto na análise
-foi o \textit{Gamma-Count}. Na \ref{descr-cottonBolls}, apresenta-se os
-dados do experimento, à esquerda temos a disposição das cinco
-observações em cada tratamento (combinação de nível de desfolha e
-estágio fenológico do algodão) e à direita um outro gráfico descritivo
-cruzando médias e variâncias amostrais calculadas em cada tratamento, a
-linha pontilhada neste caso representa a característica de
-equidispersão. Note que em todos os tratamentos obteve-se a média
-menor que a variância apontando evidência de subdispersão.
+foi o \textit{Gamma-Count} \cite{Zeviani2014}. Na figura
+\ref{fig:descr-cottonBolls}, apresentamos os dados do experimento. A
+esquerda temos a disposição das cinco observações em cada tratamento
+(combinação de nível de desfolha e estágio fenológico do algodão) e à
+direita um gráfico descritivo cruzando médias e variâncias amostrais
+calculadas em cada tratamento, onde a linha pontilhada representa a
+característica de equidispersão, média igua a variância. Em todos os
+tratamentos obteve-se a média menor que a variância apontando evidência
+de subdispersão.
 
-<<descr-cottonBolls, fig.height=4.5, fig.width=8, fig.cap="(Esquerda) Número de capulhos produzidos para cada nível de desfolha e estágio fenológico. (Direita) Variância versus média amostral de cada uma das cinco repetições em cada combinação de nível de desfolha e estágio fenológico">>=
+<<descr-cottonBolls, fig.height=4.5, fig.width=8, fig.cap="(Esquerda) Número de capulhos produzidos para cada nível de desfolha e estágio fenológico. (Direita) Médias e variâncias das cinco repetições em cada combinação de nível de desfolha e estágio fenológico.">>=
 
 library(tccPackage)
 xy1 <- xyplot(ncap ~ des | est,
@@ -106,45 +108,32 @@ fonte.xy("Fonte: Traduzido de Zeviani et al. (Figura 2)")
 
 @
 
-\subsubsection{Avaliação da Exposição à Mosca-branca na produção da cultura
-  de algodão}
+\subsubsection{Produtividade de algodão sob efeito de insfestação de Mosca-branca}
 \label{sec:cottonBolls2}
 
 <<data-cottonBolls2, include=FALSE, echo=FALSE>>=
 
 data(cottonBolls2, package = "tccPackage")
 
-## niveis.des <- paste0(paste(unique(cottonBolls$des)*100,
-##                            collapse = ", "), "\\%")
+niveis.dexp <- paste0(paste(unique(cottonBolls2$dexp),
+                           collapse = ", "), " dias")
 
 @
 
 Experimento conduzido na Universidade Federal da Grande Dourados (UFGD)
 em 2007, cujo objetivo foi avaliar os impactos da exposição de plantas à
-alta infestação de Mosca-Branca \emph{Bemisia tabaci} em componentes de
+alta infestação de Mosca-branca \emph{Bemisia tabaci} em componentes de
 produção do algodão \footnote{Experimento ainda não publicado.}. No
 experimento, plantas de algodão foram expostas à alta infestação da
-praga por períodos diferentes e ao final avaliou-se o número de capulhos
-produzidos, o número de estruturas reprodutivas, o número de nós, a
-altura da planta e o peso dos capulhos por vaso. A condução do estudo
-deu-se via delineamento interamente casualizado com cinco vasos,
-contendo duas plantas, para cada período de exposição. Na figura
-\ref{fig:descr-cottonBolls2} apresentamos a disposição de cada uma das
-variáveis aleatórias de contagem número de estruturas reprodutivas,
-número de capulhos produzidos e número de nós da planta para os
-diferentes períodos em que as plantas estavam sob alta infestação de
-Mosca-branca. Notamos que para todas as contagens parece que há um
-comportamento subdisperso.
+praga por diferentes períodos, \Sexpr{niveis.dexp} onde avaliou-se o
+número de capulhos produzidos, \texttt{ncapu}, o número de estruturas
+reprodutivas, \texttt{nerep} e o número de nós \texttt{nnos}, como
+variáveis de interesse que representam a produtividade do cultivo de
+algodão. A condução do estudo deu-se via delineamento interamente
+casualizado com cinco vasos contendo duas plantas, para cada período de
+exposição.
 
-A indicação de subdispersão também se observa na tabela
-\ref{tab:mv-cottonBolls2}, cujo temos as médias e variâncias amostrais
-calculadas com as observações nos seis períodos de exposição à
-infestação de Mosca-branca. Note que nesse experimento também há
-indícios de subdispersão para todas as contagens realizados no
-experimento, ainda a manisfestação de subdispersão na contagem do número
-de nós da planta é mais expressiva.
-
-<<descr-cottonBolls2, fig.height=4, fig.width=7.2, fig.cap="Disposição das variáveis de contagem nº de estruturas reprodutivas, nº de capulhos produzidos e nº de nós da planta observadas sob diferentes dias de exposição à infestação de Mosca-branca">>=
+<<descr-cottonBolls2, fig.height=3.5, fig.width=7, fig.cap="Disposição das variáveis de contagem nº de estruturas reprodutivas, nº de capulhos produzidos e nº de nós da planta observadas sob diferentes dias de exposição à infestação de Mosca-branca.">>=
 
 vars <- c("dexp", "vaso", "planta", "nerep", "ncapu", "nnos")
 cottonBolls2 <- cottonBolls2[, vars]
@@ -153,7 +142,7 @@ da <- reshape2::melt(cottonBolls2, id = c("dexp", "vaso", "planta"),
                      variable.name = "va", value.name = "count")
 ## da <- aggregate(count ~ vaso + dexp + va, data = da, FUN = sum)
 
-xyplot(count ~ dexp | va, groups = planta, data = da,
+xyplot(count ~ dexp | va, data = da,
        type = c("p", "g", "smooth"),
        layout = c(NA, 1),
        ylab = "Contagens",
@@ -175,6 +164,21 @@ xyplot(count ~ dexp | va, groups = planta, data = da,
 fonte.xy("Fonte: Elaborado pelo autor.")
 
 @
+
+Na figura \ref{fig:descr-cottonBolls2} apresentamos a disposição de cada
+uma das variáveis aleatórias de contagem número de estruturas
+reprodutivas, número de capulhos produzidos e número de nós da planta
+para os diferentes períodos em que as plantas estiveram sob alta
+infestação de Mosca-branca. Para todas as contagens parece haver um
+comportamento subdisperso. A indicação de subdispersão também se observa
+na tabela \ref{tab:mv-cottonBolls2}, onde temos as médias e variâncias
+amostrais calculadas com as dez observações nos seis períodos de
+exposição à infestação de Mosca-branca. Em todos os casos observa-se as
+variâncias amostrais substancialmente menores que respectivas médias,
+ainda a manisfestação de subdispersão é mais expressiva na variável
+número de nós da planta. Portanto, nesse experimento modelos
+alternativos ao Poisson devem ser empregados, pois a suposição de
+equidispersão é violada.
 
 <<mv-cottonBolls2, include=FALSE>>=
 
@@ -220,8 +224,8 @@ mv <- cbind(mvr[1:6, 1], mv[1:6, ], mv[7:12, ], mv[13:18, ])
 \end{tablenotes}
 \end{table}
 
-\subsubsection{Avaliação de Umidade do Solo e Doses de Potássio na Cultura
-  da Soja}
+\subsubsection{Produtividade de soja sob efeito de umidade do solo e
+  adubação potássica}
 \label{sec:soyaBeans}
 
 <<data-soyaBeans, include=FALSE, echo=FALSE>>=
@@ -230,17 +234,28 @@ data(soyaBeans, package = "tccPackage")
 soyaBeans <- soyaBeans[-74, ] ## outlier identificado
 soyaBeans <- soyaBeans[, c("K", "umid", "bloc", "ngra", "nvag")]
 
+niveis.K <- paste0(
+    paste(unique(soyaBeans$K),
+          collapse = ", "), " mg dm$^{-3}$")
+
+niveis.umid <- paste0(
+    paste(unique(soyaBeans$umid),
+          collapse = ", "), " \\% do volume total dos poros")
+
 @
 
-Experimento fatorial 5 $\times$ 3 que estudou níveis de adubação
-potássica e níveis de umidade do solo nos componentes de produção da
-soja. O experimento foi instalado em casa de vegetação no delineamento
-de blocos casualizados completos e a unidade experimental foi um vaso
-com duas plantas de soja. No experimento foram medidas várias respostas,
-sendo que o número de vagens por vaso e o número de grãos por vaso foram
-as variáveis de contagem (\textbf{citar o artigo do experimento}).
+Experimento fatorial 5 $\times$ 3 que estudou diferentes níveis de
+adubação potássica aplicada ao solo, \Sexpr{niveis.K} e diferentes
+níveis de umidade do solo, \Sexpr{niveis.umid}, que representam pouca
+água, água em quantidade ideal e água em abundância, nos componentes de
+produção da soja. O experimento foi instalado em casa de vegetação no
+delineamento de blocos casualizados completos e a unidade experimental
+foi um vaso com duas plantas de soja. No experimento foram medidas
+várias variáveis respostas (que representam a produtividade), sendo que
+o número de vagens viáveis por vaso e o número de grãos por vaso foram
+as variáveis de contagem \cite{Serafim2012}.
 
-<<descr-soyaBeans, fig.height=4, fig.width=7.2, fig.cap="Disposição das variáveis de contagem nº de grãos e nº de vagens viáveis por parcela observadas no experimento com a cultura de soja">>=
+<<descr-soyaBeans, fig.height=4, fig.width=7.2, fig.cap="Disposição das variáveis número de grãos e número de vagens nos diferentes níveis de adubação potássica e umidade do solo.">>=
 
 cols <- trellis.par.get("superpose.line")$col[1:2]
 key <- list(
@@ -268,18 +283,17 @@ fonte.xy("Fonte: Elaborado pelo autor.")
 
 Na figura \ref{fig:descr-soyaBeans} apresentamos a dispersão das
 contagens nas combinações das covariáveis umidade do solo e adubação
-potássica. Perceba que as duas variáveis de contagem avaliadas no
-experimento apresentam níveis de dispersão distintos, essa
-característica fica explícita na figura \ref{fig:mv-soyaBeans}, em que
-apresentamos as dispersões entre médias e variâncias amostrais para cada
-uma das variáveis de contagem. Para o número de grãos por parcela, com
-contagens mais elevadas, as variâncias amostrais são, quase em sua
-totalidade, superiores as médias caracterizando uma evidência de
-superdispersão. Já para o número de vagens por parcela temos médias e
-variâncias, em média, próximas o que é indícia que a suposição de
-equidispersão é razoável.
+potássica. As duas variáveis de contagem avaliadas no experimento
+apresentam níveis de dispersão distintos, essa característica fica
+explícita na figura \ref{fig:mv-soyaBeans}, em que apresentamos as
+dispersões entre médias e variâncias amostrais para cada uma das
+variáveis. Para o número de grãos por parcela, com contagens mais
+elevadas, as variâncias amostrais são, quase em sua totalidade,
+superiores as médias caracterizando uma evidência de superdispersão. Já
+para o número de vagens por parcela temos médias e variâncias, em média,
+próximas o que é indícia que a suposição de equidispersão é razoável.
 
-<<mv-soyaBeans, fig.height=3.5, fig.width=7, fig.cap="Médias e variâncias amostrais das contagens avaliadas no experimento com cultura de soja sob efeito umidade e adubação potássica">>=
+<<mv-soyaBeans, fig.height=3.5, fig.width=7, fig.cap="Médias e variâncias amostrais das contagens de grão e vagens, avaliadas no experimento com soja sob efeito umidade e adubação potássica.">>=
 
 ##-------------------------------------------
 ## Dados em long
@@ -342,38 +356,43 @@ fonte.xy("Fonte: Elaborado pelo autor.")
 
 @
 
-\subsubsection{Ocorrência de Ninfas de Mosca-Branca em Lavoura de Soja}
+\subsubsection{Ocorrência de ninfas de Mosca-branca em lavoura de soja}
 \label{sec:whiteFly}
 
-<<data-whiteFly, include=FALSE, echo=FALSE>>=
+<<data-whiteFly, include=FALSE, cache=FALSE>>=
 
 data(whiteFly, package = "tccPackage")
 
 ## Somente as cultivares que contém BRS na identificação
 whiteFly <- droplevels(subset(whiteFly, grepl("BRS", x = cult)))
 
+niveis.cult <- paste0(unique(whiteFly$cult), collapse = ", ")
+niveis.data <- paste0(format(unique(whiteFly$data), "%d/%m/%y"),
+                      collapse = ", ")
+
 @
 
 Nesse experimento também envolvendo a cultura de soja e a praga
-Mosca-branca, foram avaliadas plantas de diferentes cultivares de soja
-\texttt{BRS} - Embrapa contabilizando o número de ninfas de mosca-branca
-nos folíolos dos terços superior, médio e inferior das plantas. O
-experimento foi conduzido em casa de vegetação sob o delineamento de
-blocos casualizados e as avaliações ocorreram em 6 datas dentre os 38
-dias do estudo \textbf{citar a dissertação do Renato}.
+Mosca-branca, foram avaliadas plantas de quatro diferentes cultivares de
+soja, \Sexpr{niveis.cult}, contabilizando o número de ninfas de
+mosca-branca nos folíolos dos terços superior, médio e inferior das
+plantas em seis datas, \Sexpr{niveis.data} dentre os 38 dias de estudo
+. O experimento foi conduzido em casa de vegetação sob o delineamento de
+blocos casualizados para controle de variação local \cite{Suekane2011}.
 
-Na figura \ref{fig:descr-ninfas}, à esquerda apresentamos as contagens
-da praga para cada cultivar em cada uma das datas de avaliação. Note que
-as contagens são muito altas e deveras dispersas, principalmente nas
-quatro primeiras avaliações, à direita temos uma descrição no nível de
-dispersão da variável de contagem. Perceba que esse é um conjunto de
-dados extremamente superdisperso, os pontos, que representam em médias e
-variâncias em cada combinação de dias de após a primeira avaliação e
-cultivares de soja, estão todos acima da reta identidade (equidispersão)
-com variâncias em torno de 1.000 vezes maiores que as respectivas
-médias.
+Na figura \ref{fig:descr-ninfas} a esquerda, apresentamos as contagens
+da praga para cada cultivar em cada uma das datas de avaliação,
+representadas pelos dias decorridos após a primeira avaliação, em
+11/12/09. Note que as contagens são muito altas e dispersas,
+principalmente nas quatro primeiras avaliações. A direita temos uma
+descrição no nível de dispersão da variável de contagem. Perceba que
+esse é um conjunto de dados extremamente superdisperso, os pontos, que
+representam em médias e variâncias em cada combinação de dias de após a
+primeira avaliação e cultivares de soja, estão todos acima da reta
+identidade (equidispersão) com variâncias em torno de 1.000 vezes
+maiores que as respectivas médias.
 
-<<descr-ninfas, fig.height=4, fig.width=8, fig.cap="(Esquerda)">>=
+<<descr-ninfas, fig.height=4, fig.width=8, fig.cap="(Esquerda) Dispersão entre o número total de ninfas de Mosca-branca nos folíolos da soja e o número de dias após a primeira avaliação para as quatro diferentes cultivares. (Direita) Relação entre as médias e as variâncias amostrais do número de ninfas nesse experimento.">>=
 
 xy1 <- xyplot(ntot ~ dias | cult,
               data = whiteFly,
@@ -421,28 +440,28 @@ data(fish, package = "tccPackage")
 
 @
 
-Esse, diferentemente dos demais, é um estudo observavional feito por
-biólogos que tem intresse em modelar o número de peixes capturados por
+Diferentemente dos demais, esse é um estudo observavional feito por
+biólogos com intresse em modelar o número de peixes capturados por
 grupos de pescadores visitantes em um Parque Estadual \textbf{citar o
-  livro do J. Scott Long}. Nesse estudo tem-se como informações a
-respeito dos grupos de visitantes o número de pessoas e de crianças no
-grupo e se há ou não a presença de campista. Um fato interesse deste
-dado é que nem todos os grupos de visitantes praticaram pescaria e
-portanto o número de peixes capturado será zero.
+  repositório da UCLA}. Nesse estudo tem-se como informações a respeito
+dos grupos de visitantes, o número de pessoas e de crianças no grupo e
+se há ou não a presença de campista. Um fato interesse deste dado é que
+nem todos os grupos de visitantes praticaram pescaria, portanto, nesses
+grupos o número de peixes capturado será zero.
 
-Na figura \ref{fig:descr-fish} também pode-se notar ser evidente a
-presença excessiva de contagens zero. No gráfico a esquerda apresentamos
-a disposição das contagens, transformadas por $\log(y_i|x_i + 0,5)$, e é
-característica marcante no gráfico a grande quantidade de pontos
-dispostos no primeiro valor do eixo $y$, \Sexpr{log(0.5)} =
-$\log(0.5)$. Embora seja um gráfico marginal, não considerando as
-covariáveis de cada contagem, a direita temos um histograma da variável
-resposta onde percebe-se novamente a grande quantidade de valores nulos,
-ao todo \Sexpr{with(fish, sum(npeixes == 0)/length(npeixes))*100}\% dos
-dados são contagens nulas. Portanto nesse problema claramente modelos
+Na figura \ref{fig:descr-fish} pode-se notar o evidente excesso de
+contagens zero. No gráfico a esquerda apresentamos a disposição das
+contagens, transformadas por $\log(y_i|x_i + 0,5)$. É característica
+marcante no gráfico a grande quantidade de pontos dispostos no primeiro
+valor do eixo $y$, \Sexpr{log(0.5)} = $\log(0.5)$. Embora seja um
+gráfico marginal, não considerando as covariáveis de cada contagem, a
+direita temos um histograma da variável resposta onde percebe-se
+novamente a grande quantidade de valores nulos, ao todo
+\Sexpr{with(fish, sum(npeixes == 0)/length(npeixes))*100}\% dos dados
+são contagens nulas. Portanto nesse problema, claramente modelos
 alternativos que acomodem excesso de zeros se fazem necessários.
 
-<<descr-fish, fig.height=3.5, fig.width=7.5, fig.cap="(Esquerda) Logarítmo neperiano do Número de peixes capturados acrescido de 0,5 para as diferentes formulações dos grupos. (Direita) Histograma da variável de contagem número de peixes capturados por grupo.">>=
+<<descr-fish, fig.height=3.5, fig.width=7.5, fig.cap="(Esquerda) Logarítmo neperiano do número de peixes capturados acrescido de 0,5 para as diferentes composições dos grupos. (Direita) Histograma do número de peixes capturados por grupo.">>=
 
 xy1 <- xyplot(log(npeixes+0.5) ~ npessoas | campista,
               groups = ncriancas, data = fish,
@@ -477,7 +496,7 @@ suppressWarnings({
 
 @
 
-\subsubsection{Número de Nematóides em Raízes de Feijoeiro}
+\subsubsection{Número de nematóides em raízes de feijoeiro}
 \label{sec:nematodes}
 
 <<data-nematodes, include=FALSE, echo=FALSE>>=
@@ -486,18 +505,20 @@ data(nematodes, package = "tccPackage")
 
 @
 
-Este último conjunto de dados explorado no trabalho, são resultados de
-um experimento em casa de vegetação que estudou a reprodução de
-nematóides em cultivares/linhagens de feijoeiro. O solo dos vasos foi
-inicialmente contaminado com namatóides e as parcelas tiveram duas
-plantas. Ao final do experimento, as raízes das duas plantas por parcela
-foram lavadas, trituradas, peneiradas e diluídas e as contagens dos
-nematóides realizadas em alíquotas dessa solução. Perceba que temos,
-incidindo sobre a contagem a quantidade de raízes produzidas por parcela
-e ainda o volume usado para diluir essa quantidade, pois as contagens
-são realizades em alíquotas da solução composta pela razão entre massa
+Esse último conjunto de dados explorado no trabalho, é resultado de um
+experimento em casa de vegetação que estudou a reprodução de nematóides
+em cultivares de feijoeiro. No experimento, o solo de vasos com duas
+plantas de feijão foi inicialmente contaminado com nematóides. Ao final
+do experimento, as raízes das duas plantas por vaso foram lavadas,
+trituradas, peneiradas e diluídas e as contagens dos nematóides
+realizadas em alíquotas dessa solução. Perceba que temos, incidindo
+sobre a contagem a quantidade de raízes produzidas por parcela e ainda o
+volume usado para diluir essa quantidade, pois as contagens são
+realizades em alíquotas da solução composta pela razão entre massa
 fresca de raízes (em gramas) e volume utilizado para diluição (em
-milimetros).
+milimetros)\footnote{Cedido para fins acadêmicos por Andressa Cristina
+  Zamboni Machado, pesquisadora do Instituto Agronômico do Paraná
+  (IAPAR), e pelo técnico agrícola do IAPAR Santino Aleandro da Silva}.
 
 <<descr-nematodes, fig.height=4, fig.width=4, fig.show="hide", results="asis", fig.cap="Dispersão do número de nematóides em uma alíquota de 1ml provida pela solução de 1 g/ml de massa fresca diluída.">>=
 
@@ -548,7 +569,7 @@ O \textit{software} R, versão \Sexpr{with(R.version, paste0(major, ".",
 quanto para ajuste dos modelos e apresentação de resultados. Pacotes
 auxiliares utilizados no trabalho são: \texttt{MASS} (versão
 \Sexpr{packageVersion("MASS")}) para ajuste e inferências dos modelos
-Binomial Negativo,\texttt{bbmle} (versão
+Binomial Negativo, \texttt{bbmle} (versão
 \Sexpr{packageVersion("bbmle")}) para estimação via máxima
 verossimilhança das funções implementadas para o modelo COM-Poisson ,
 \texttt{pscl} (versão \Sexpr{packageVersion("pscl")}) para ajuste dos
@@ -559,10 +580,10 @@ efeitos aleatórios normais. Para apresentação gráfica dos resultados os
 pacotes \texttt{lattice} (versão \Sexpr{packageVersion("lattice")}),
 \texttt{latticeExtra} (versão \Sexpr{packageVersion("latticeExtra")}) e
 \texttt{corrplot} (versão \Sexpr{packageVersion("corrplot")}) são
-intensivamente utilizados e finalmente para elaboração do relatório,
+exaustivamente utilizados. Finalmente, para elaboração do relatório,
 mesclando códigos em R e escrita na liguagem de marcação \LaTeX{}, o
 pacote \texttt{knitr} (versão \Sexpr{packageVersion("knitr")}) é
-requisitado.
+requerido.
 
 Destaca-se nesse trabalho que todas as funções implementadas para ajuste
 e inferência dos modelos de regressão COM-Poisson estão disponíveis, em
