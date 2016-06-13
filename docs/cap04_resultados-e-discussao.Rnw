@@ -2,63 +2,1230 @@
 % CAPÍTULO 4 - RESULTADOS E DISCUSSÃO
 % ------------------------------------------------------------------------
 
-\lipsum[1-3]
+Nesse capítulo são apresentados os modelos de regressão COM-Poisson
+ajustados aos dados apresentados na seção \ref{cap03:materiais-dados}.
 
-<<capdesfo, fig.cap="Experimento sobre capulhos de algodão sob efeito de desfolha">>=
 
-library(MRDCr)
-library(lattice)
+\section{Análise de dados de capulhos de algodão sob efeito de desfolha}
+
+<<ajuste-cottonBolls, include=FALSE, cache=TRUE>>=
+
+## Dados
+library(tccPackage)
+data(cottonBolls)
+
+## Preditores
+f1 <- ncap ~ 1
+f2 <- ncap ~ des
+f3 <- ncap ~ des + I(des^2)
+f4 <- ncap ~ est:des + I(des^2)
+f5 <- ncap ~ est:(des + I(des^2))
+
+## Ajustando os modelos Poisson
+m1P <- glm(f1, data = cottonBolls, family = poisson)
+m2P <- glm(f2, data = cottonBolls, family = poisson)
+m3P <- glm(f3, data = cottonBolls, family = poisson)
+m4P <- glm(f4, data = cottonBolls, family = poisson)
+m5P <- glm(f5, data = cottonBolls, family = poisson)
+
+## Ajustando os modelos quasiPoisson
+m1Q <- glm(f1, data = cottonBolls, family = quasipoisson)
+m2Q <- glm(f2, data = cottonBolls, family = quasipoisson)
+m3Q <- glm(f3, data = cottonBolls, family = quasipoisson)
+m4Q <- glm(f4, data = cottonBolls, family = quasipoisson)
+m5Q <- glm(f5, data = cottonBolls, family = quasipoisson)
+
+## Ajustando os modelos COM-Poisson
+m1C <- cmp(f1, data = cottonBolls, sumto = 30)
+m2C <- cmp(f2, data = cottonBolls, sumto = 30)
+m3C <- cmp(f3, data = cottonBolls, sumto = 30)
+m4C <- cmp(f4, data = cottonBolls, sumto = 30)
+m5C <- cmp(f5, data = cottonBolls, sumto = 30)
+
+##======================================================================
+## Perfil de log-verossimilhanca para o parametro phi
+prof.cottonBolls <- profile(m5C, which = "phi")
+
+@
+
+Diante da estrutura do experimento apresentada na seção
+\ref{sec:cottonBolls} foram propostos, por \citeonline{Zeviani2014},
+cinco preditores crescentes em complexidade que testam aspectos
+interesses sobre os fatores experimentais envolvidos no experimento.
+Abaixo expressamos os cinco preditores considerados.
+
+\noindent
+Preditor 1: $g(\mu) = \beta_0$ \\
+Preditor 2: $g(\mu) = \beta_0 + \beta_1 \textrm{def}$ \\
+Preditor 3: $g(\mu) = \beta_0 + \beta_{1j} \textrm{def} + \beta_2
+\textrm{def}^2$ \\
+Preditor 3: $g(\mu) = \beta_0 + \beta_{1j} \textrm{def} + \beta_{2j}
+\textrm{def}^2$ \\
+
+\noindent
+onde $j$ varia nos níveis de estágio fenológico da planta
+(\Sexpr{niveis.est}). A proposta desses preditores foi realizada de
+forma aninhada a fim de facilitar a condução de testes de hipóteses. O
+modelo 1 contêm apenas o intercepto, e é ajustado apenas como ponto de
+partida para verificar como modelos mais estruturados melhoram o
+ajuste. O modelo 2 apresenta apenas o efeito de desfolha de forma
+linear, o modelo 3 é o modelo 2 somado um efeito de segunda ordem. O
+modelo 4, apresenta o efeito de desfolha linear mudando de acordo com o
+estágio de crescimento, e por fim o modelo 5 diz que não somente o
+efeito de primeira ordem muda com o estágio de crescimento, mais também
+o efeito de segunda ordem.
+
+A seguir ajustamos os modelos Poisson e COM-Poisson como alternativas
+paramétricas à análise de dados e como alternativa semi-paramétrica a
+estimação via quase-verossimilhança Poisson. Na tabela
+\ref{tab:ajuste-cottonBolls} apresentamos os resultados dos três modelos
+ajustados aos cinco preditores considerados. O modelo COM-Poisson
+apresentou melhor desempenho dentre todos os preditores considerados
+quando comparado ao Poisson, indicado pelas maiores log-verossimilhanças
+e menores AIC's.
+
+<<loglik-cottonBolls, include=FALSE>>=
+
+## Análise de desvios dos modelos
+anP <- myanova(m1P, m2P, m3P, m4P, m5P)
+anC <- myanova(m1C, m2C, m3C, m4C, m5C)
+anQ <- myanova(m1Q, m2Q, m3Q, m4Q, m5Q)
+
+## Parâmetros de dispersão
+listQ <- list(m1Q, m2Q, m3Q, m4Q, m5Q)
+sigma <- sapply(listQ, function(x) summary(x)$dispersion)
+phi <- cmptest(m1C, m2C, m3C, m4C, m5C)
+
+## Tabelas com as medidas de ajuste
+tabP <- cbind(anP, matrix(nrow = nrow(anP), ncol = 2))
+tabC <- cbind(anC, phi)
+tabQ <- cbind(anQ, cbind(sigma, NA))
+
+rownames(tabP) <- paste("Preditor", 1:5)
+rownames(tabC) <- paste("Preditor", 1:5)
+rownames(tabQ) <- paste("Preditor", 1:5)
+
+## Empilhando as tabelas de ANODEV
+tab.ajuste <- rbind(tabP, tabC, tabQ)
+
+## ##----------------------------------------------------------------------
+## ## Copiar e colar o corpo do resultado na customização latex abaixo
+## digits <- c(1, 0, 3, 3, 3, 0, -3, 3, -3)
+## print(xtable(tabC, digits = digits), include.rownames = TRUE)
+
+@
+
+\begin{table}[ht]
+\centering
+\small
+\caption{Medidas de ajuste para avaliação e comparação entre preditores
+  e modelos ajustados}
+\label{tab:ajuste-cottonBolls}
+\begin{tabular}{lcccccrcr}
+  \toprule
+ Poisson & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) &  &  \\
+ \midrule
+  Preditor 1 & 1 & -279,933 & 561,866 &  &  &  &  &  \\
+  Preditor 2 & 2 & -272,001 & 548,001 & 15,864 & 1 & 6,805E-05 &  &  \\
+  Preditor 3 & 3 & -271,354 & 548,709 & 1,293 & 1 & 2,556E-01 &  &  \\
+  Preditor 4 & 7 & -258,674 & 531,348 & 25,360 & 4 & 4,258E-05 &  &  \\
+  Preditor 5 & 11 & -255,803 & 533,606 & 5,742 & 4 & 2,193E-01 &  &  \\[0.3cm]
+ COM-Poisson & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) & $\hat{\phi}$ & P($>\rchi^2$) \\
+  \midrule
+Preditor 1 & 2 & -272,479 & 548,959 &  &  &  & 0,551 & 1,130E-04 \\
+  Preditor 2 & 3 & -257,464 & 520,927 & 30,032 & 1 & 4,251E-08 & 0,794 & 6,966E-08 \\
+  Preditor 3 & 4 & -256,089 & 520,179 & 2,749 & 1 & 9,734E-02 & 0,816 & 3,287E-08 \\
+  Preditor 4 & 8 & -220,198 & 456,395 & 71,783 & 4 & 9,537E-15 & 1,392 & 1,751E-18 \\
+  Preditor 5 & 12 & -208,250 & 440,500 & 23,896 & 4 & 8,382E-05 & 1,585 & 1,804E-22 \\[0.3cm]
+  Quase-Poisson & np & deviance & AIC & F & diff np & P(>F) & $\hat{\sigma}^2$ & P($>F$) \\
+  \midrule
+  Preditor 1 & 1 & 75,514 &  &  &  &  & 0,567 &  \\
+  Preditor 2 & 2 & 59,650 &  & 65,820 & 1 & 6,343E-13 & 0,464 &  \\
+  Preditor 3 & 3 & 58,357 &  & 5,363 & 1 & 2,236E-02 & 0,460 &  \\
+  Preditor 4 & 7 & 32,997 &  & 26,305 & 4 & 1,846E-15 & 0,278 &  \\
+  Preditor 5 & 11 & 27,255 &  & 5,956 & 4 & 2,176E-04 & 0,241 &  \\
+ \bottomrule
+\end{tabular}
+\begin{tablenotes}
+  \footnotesize
+\item np, número de parâmetros, diff $\ell$, diferença entre
+  log-verossimilhanças, F, estatística F baseada nas quasi-deviances,
+  diff np, diferença entre o np. \\[0.1cm]
+\item Fonte: Elaborado pelo autor.
+\end{tablenotes}
+\end{table}
+
+As estimativas dos parâmetros extras $phi$ e $sigma^2$ dos modelos
+COM-Poisson e Quasi-Poisson respectivamente, também são apresentadas na
+\ref{tab:ajuste-cottonBolls} e indicam subdispersão ($\phi>0$ e
+$\sigma^2<1$). Note que mesmo quando não consideramos covariáveis,
+preditor 1, a hipótese de equidispersão foi rejeitada pelo modelo
+COM-Poisson.
+
+<<prof-cottonBolls, fig.height=4, fig.width=4, fig.show="hide", results="asis", fig.cap="Perfil de log-verossimilhança para o parâmetro extra da COM-Poisson">>=
+
+myprof(prof.cottonBolls, par.settings = ps.sub)
+fonte.xy("Fonte: Elaborado pelo autor.")
+
+wrapfigure()
+
+@
+
+\lipsum[1]
+
+<<corr-cottonBolls, fig.width=7, fig.height=7, fig.cap="Imagem da matriz de correlação entre os parâmetros do modelo COM-Poisson">>=
+
+Vcov <- vcov(m5C)
+Corr <- cov2cor(Vcov)
+
+## Usando expression não funciona! Estudar a função posteriormente
+pnames <- c("phi", "beta0", paste0("beta1", 1:5),
+            paste0("beta2", 1:5))
+dimnames(Corr) <- list(pnames, pnames)
+
+mycorrplot(Corr)
+fonte("Fonte: Elaborado pelo autor.")
+
+@
+
+\lipsum[1]
+
+<<pred-cottonBolls, fig.height=3.5, fig.width=7, fig.cap="Curva dos valores preditos com intervalo de confiança de (95\\%) como função do nível de desfolha e do estágio fenológico da planta.">>=
+
+## Predição pontual/intervalar
+pred <- with(cottonBolls,
+             expand.grid(
+                 est = levels(est),
+                 des = seq(min(des), max(des), l = 20)
+             ))
+qn <- qnorm(0.975) * c(fit = 0, lwr = -1, upr = 1)
+
+##-------------------------------------------
+## Considerando a Poisson
+aux <- predict(m5P, newdata = pred, se.fit = TRUE)
+aux <- with(aux, exp(fit + outer(se.fit, qn, FUN = "*")))
+aux <- data.frame(modelo = "Poisson", aux)
+predP <- cbind(pred, aux)
+
+##-------------------------------------------
+## Considerando a COM-Poisson
+aux <- predict(m5C, newdata = pred, type = "response",
+               interval = "confidence")
+aux <- data.frame(modelo = "COM-Poisson", aux)
+predC <- cbind(pred, aux)
+
+##-------------------------------------------
+## Considerando a Quasi-Poisson
+aux <- predict(m5Q, newdata = pred, se.fit = TRUE)
+aux <- with(aux, exp(fit + outer(se.fit, qn, FUN = "*")))
+aux <- data.frame(modelo = "Quasi-Poisson", aux)
+predQ <- cbind(pred, aux)
+
+da <- rbind(predP, predC, predQ)
+
+##-------------------------------------------
+## Gráfico dos valores preditos e IC de 95% para média
+cols <- trellis.par.get("superpose.line")$col[1:3]
+
+key <- list(
+    column = 3,
+    lines = list(lty = c(3, 1, 2), lwd = 1, col = cols),
+    text = list(c("Poisson", "COM-Poisson", "Quasi-Poisson")))
 
 xyplot(ncap ~ des | est,
-       data = capdesfo,
-       layout = c(NA, 2),
-       type = c("p", "g", "smooth"),
+       data = cottonBolls,
+       layout = c(NA, 1),
+       as.table = TRUE,
+       alpha = 0.5,
+       type = c("p", "g"),
        xlab = "Níveis de desfolha artificial",
        ylab = "Número de capulhos produzidos",
        xlim = extendrange(c(0:1), f = 0.15),
-       panel = panel.beeswarm, r = 0.05)
+       spread = 0.08,
+       panel = panel.beeswarm,
+       key = key,
+       par.settings = ps.sub) +
+    as.layer(
+        xyplot(fit + lwr + upr ~ des | est, data = predP,
+               type = "l", col = cols[1], lty = c(1, 3, 3), lwd = 1)
+    ) +
+    as.layer(
+        xyplot(fit + lwr + upr ~ des | est, data = predC,
+               type = "l", col = cols[2], lty = c(1, 1, 1), lwd = 1)
+    )  +
+    as.layer(
+        xyplot(fit + lwr + upr ~ des | est, data = predQ,
+               type = "l", col = cols[3], lty = c(1, 2, 2), lwd = 1)
+    )
 
 @
 
-\lipsum[1-2]
+\lipsum[1]
 
-<<capmosca, fig.cap="Experimento sobre capulhos de algodão sob efeito de infestação de mosca-branca">>=
+\section{Análise de dados de capulhos de algodão sob efeito de Mosca-Branca}
 
-# Número de capulhos produzidos por planta
-xyplot(ncap ~ dexp, groups = planta,
-       data = capmosca,
-       xlab = "Dias sob exposição a alta infestação de mosca-branca",
-       ylab = "Número de capulhos produzidos",
-       auto.key = list(column = 2),
-       panel = panel.beeswarm, r = 0.08,
-       type = c("p", "g", "smooth"))
+<<ajuste-cottonBolls2, include=FALSE, cache=TRUE>>=
+
+## Dados
+library(tccPackage)
+data(cottonBolls2)
+
+## Preditores considerados
+f1.ncapu <- ncapu ~ 1
+f2.ncapu <- ncapu ~ dexp
+f3.ncapu <- ncapu ~ dexp + I(dexp^2)
+
+f1.nerep <- nerep ~ 1
+f2.nerep <- nerep ~ dexp
+f3.nerep <- nerep ~ dexp + I(dexp^2)
+
+f1.nnos <- nnos ~ 1
+f2.nnos <- nnos ~ dexp
+f3.nnos <- nnos ~ dexp + I(dexp^2)
+
+## Ajustando os modelos Poisson
+m1P.ncapu <- glm(f1.ncapu, data = cottonBolls2, family = poisson)
+m2P.ncapu <- glm(f2.ncapu, data = cottonBolls2, family = poisson)
+m3P.ncapu <- glm(f3.ncapu, data = cottonBolls2, family = poisson)
+
+m1P.nerep <- glm(f1.nerep, data = cottonBolls2, family = poisson)
+m2P.nerep <- glm(f2.nerep, data = cottonBolls2, family = poisson)
+m3P.nerep <- glm(f3.nerep, data = cottonBolls2, family = poisson)
+
+m1P.nnos <- glm(f1.nnos, data = cottonBolls2, family = poisson)
+m2P.nnos <- glm(f2.nnos, data = cottonBolls2, family = poisson)
+m3P.nnos <- glm(f3.nnos, data = cottonBolls2, family = poisson)
+
+## Ajustando os modelos quasiPoisson
+m1Q.ncapu <- glm(f1.ncapu, data = cottonBolls2, family = quasipoisson)
+m2Q.ncapu <- glm(f2.ncapu, data = cottonBolls2, family = quasipoisson)
+m3Q.ncapu <- glm(f3.ncapu, data = cottonBolls2, family = quasipoisson)
+
+m1Q.nerep <- glm(f1.nerep, data = cottonBolls2, family = quasipoisson)
+m2Q.nerep <- glm(f2.nerep, data = cottonBolls2, family = quasipoisson)
+m3Q.nerep <- glm(f3.nerep, data = cottonBolls2, family = quasipoisson)
+
+m1Q.nnos <- glm(f1.nnos, data = cottonBolls2, family = quasipoisson)
+m2Q.nnos <- glm(f2.nnos, data = cottonBolls2, family = quasipoisson)
+m3Q.nnos <- glm(f3.nnos, data = cottonBolls2, family = quasipoisson)
+
+## Ajustando os modelos COM-Poisson
+m1C.ncapu <- cmp(f1.ncapu, data = cottonBolls2, sumto = 30)
+m2C.ncapu <- cmp(f2.ncapu, data = cottonBolls2, sumto = 30)
+m3C.ncapu <- cmp(f3.ncapu, data = cottonBolls2, sumto = 30)
+
+m1C.nerep <- cmp(f1.nerep, data = cottonBolls2, sumto = 30)
+m2C.nerep <- cmp(f2.nerep, data = cottonBolls2, sumto = 30)
+m3C.nerep <- cmp(f3.nerep, data = cottonBolls2, sumto = 30)
+
+m1C.nnos <- cmp(f1.nnos, data = cottonBolls2, sumto = 30)
+m2C.nnos <- cmp(f2.nnos, data = cottonBolls2, sumto = 30)
+m3C.nnos <- cmp(f3.nnos, data = cottonBolls2, sumto = 30)
+
+##======================================================================
+## Perfil de log-verossimilhanca para o parametro phi
+prof.ncapu <- profile(m3C.ncapu, which = "phi")
+prof.nerep <- profile(m2C.nerep, which = "phi")
+prof.nnos <- profile(m3C.nnos, which = "phi")
+
+@
+
+\lipsum[1]
+
+<<loglik-cottonBolls2, include=FALSE>>=
+
+## Análise de desvios dos modelos
+anP.ncapu <- myanova(m1P.ncapu, m2P.ncapu, m3P.ncapu)
+anC.ncapu <- myanova(m1C.ncapu, m2C.ncapu, m3C.ncapu)
+anQ.ncapu <- myanova(m1Q.ncapu, m2Q.ncapu, m3Q.ncapu)
+
+anP.nerep <- myanova(m1P.nerep, m2P.nerep, m3P.nerep)
+anC.nerep <- myanova(m1C.nerep, m2C.nerep, m3C.nerep)
+anQ.nerep <- myanova(m1Q.nerep, m2Q.nerep, m3Q.nerep)
+
+anP.nnos <- myanova(m1P.nnos, m2P.nnos, m3P.nnos)
+anC.nnos <- myanova(m1C.nnos, m2C.nnos, m3C.nnos)
+anQ.nnos <- myanova(m1Q.nnos, m2Q.nnos, m3Q.nnos)
+
+## Tabela com medidas de ajuste
+tab.ncapu <- data.frame(
+    modelos = paste("Preditor", 1:3),
+    anP.ncapu[, c("np", "ll", "AIC", "P(>Chisq)")],
+    anC.ncapu[, c("ll", "AIC", "P(>Chisq)")],
+    anQ.ncapu[, c("dev", "P(>F)")])
+
+tab.nerep <- data.frame(
+    modelos = paste("Preditor", 1:3),
+    anP.nerep[, c("np", "ll", "AIC", "P(>Chisq)")],
+    anC.nerep[, c("ll", "AIC", "P(>Chisq)")],
+    anQ.nerep[, c("dev", "P(>F)")])
+
+tab.nnos <- data.frame(
+    modelos = paste("Preditor", 1:3),
+    anP.nnos[, c("np", "ll", "AIC", "P(>Chisq)")],
+    anC.nnos[, c("ll", "AIC", "P(>Chisq)")],
+    anQ.nnos[, c("dev", "P(>F)")])
+
+## Empilhando
+tab.ajuste <- rbind(tab.ncapu, tab.nerep, tab.nnos)
+
+## ##----------------------------------------------------------------------
+## ## Copiar e colar o corpo do resultado na customização latex abaixo
+## digits <- c(1, 1, 0, 2, 2, -2, 2, 2, -2, 2, -2)
+## print(xtable(tab.ajuste, digits = digits))
+
+@
+
+\begin{table}[ht]
+\centering
+\small
+\caption{Medidas de ajuste para avaliação e comparação entre preditores
+  e modelos ajustados}
+\label{tab:ajuste-cottonBolls2}
+\begin{tabular}{lccccccccc}
+  \toprule
+  & & \multicolumn{3}{c}{Poisson} & \multicolumn{3}{c}{COM-Poisson} & \multicolumn{2}{c}{Quasi-Poisson} \\
+  \cmidrule{3-5} \cmidrule{6-8} \cmidrule{9-10}
+  & np & $\ell$ & AIC & P($>\rchi^2$) & $\ell$ & AIC & P($>\rchi^2$) & deviance & P($>F$) \\
+  \midrule
+  \multicolumn{10}{l}{{\bfseries \footnotesize Número de capulhos produzidos}} \\[0.0cm]
+  \cline{1-5} \\[-0.2cm]
+   & 1 & -105,27 & 212,55 &  & -92,05 & 188,09 &  & 20,80 &  \\
+   & 2 & -105,03 & 214,05 & 4,83E-01 & -91,31 & 188,62 & 2,25E-01 & 20,31 & 2,23E-01 \\
+   & 3 & -104,44 & 214,88 & 2,78E-01 & -89,47 & 186,95 & 5,52E-02 & 19,13 & 6,16E-02 \\[0.2cm]
+  \multicolumn{10}{l}{{\bfseries \footnotesize Número de estruturas reprodutivas}} \\[0.0cm]
+  \cline{1-5} \\[-0.2cm]
+   & 1 & -104,74 & 211,49 &  & -86,41 & 176,82 &  & 16,23 &  \\
+   & 2 & -104,27 & 212,54 & 3,32E-01 & -84,59 & 175,18 & 5,66E-02 & 15,29 & 6,19E-02 \\
+   & 3 & -104,06 & 214,12 & 5,16E-01 & -83,73 & 175,47 & 1,90E-01 & 14,87 & 2,07E-01 \\[0.2cm]
+  \multicolumn{10}{l}{{\bfseries \footnotesize Número de nós da planta}} \\[0.0cm]
+  \cline{1-5} \\[-0.2cm]
+   & 1 & -143,79 & 289,59 &  & -120,58 & 245,16 &  & 12,69 &  \\
+   & 2 & -143,48 & 290,95 & 4,25E-01 & -119,03 & 244,06 & 7,87E-02 & 12,05 & 7,39E-02 \\
+   & 3 & -142,95 & 291,89 & 3,04E-01 & -116,27 & 240,54 & 1,88E-02 & 11,00 & 2,23E-02 \\
+   \bottomrule
+\end{tabular}
+\begin{tablenotes}
+  \footnotesize
+\item np, número de parâmetros.
+\item Fonte: Elaborado pelo autor.
+\end{tablenotes}
+\end{table}
+
+
+\lipsum[1]
+
+<<prof-cottonBolls2, fig.height=3.5, fig.width=7, fig.cap="Perfis de log-verossimilhança para o parâmetro extra da COM-Poisson nos modelos para número de capulhos produzidos (esquerda), número de estruturas reprodutivas (central) e número de nós (direira).">>=
+
+##======================================================================
+## Causa
+da.ncapu <- as.data.frame(prof.ncapu)
+da.nerep <- as.data.frame(prof.nerep)
+da.nnos <- as.data.frame(prof.nnos)
+##
+levels(da.nerep$param) <- "phi2"
+levels(da.nnos$param) <- "phi3"
+##
+vars <- c("param", "z", "focal")
+da <- rbind(da.ncapu[, vars], da.nerep[, vars], da.nnos[, vars])
+##
+xyplot(abs(z) ~ focal | param, data = da,
+       layout = c(NA, 1),
+       scales = list(x = "free"),
+       subset = abs(z) < 3.5,
+       type = c("l", "g"),
+       strip = strip.custom(
+           factor.levels = c(
+               "Capulhos produzidos",
+               "Estruturas reprodutivas",
+               "Nós da planta"
+           )
+       ),
+       ylab = expression(abs(z)~~(sqrt(~Delta~"deviance"))),
+       xlab = expression(phi),
+       panel = function(x, y, subscripts = subscripts, ...) {
+           mle <- x[y == 0]
+           panel.xyplot(x, y, subscripts = subscripts, ...)
+           panel.abline(h = 0, v = mle, lty = 3)
+       }, sub = "Fonte: Elaborado pelo autor.")
+
+## xy1 <- myprof(prof.ncapu, par.settings = ps.sub)
+## xy2 <- myprof(prof.nerep, par.settings = ps.sub, ylab = "")
+## xy3 <- myprof(prof.nnos, par.settings = ps.sub, ylab = "")
+## print(xy1, split = c(1, 1, 3, 1), more = TRUE)
+## print(xy2, split = c(2, 1, 3, 1), more = TRUE)
+## print(xy3, split = c(3, 1, 3, 1), more = FALSE)
+## fonte.xy("Fonte: Elaborado pelo autor.")
+
+@
+
+\lipsum[1]
+
+<<corr-cottonBolls2a, fig.height=4, fig.width=8, fig.cap="Imagem da matriz de correlação entre os parâmetros do modelo COM-Poisson">>=
+
+pnames <- c("phi", "beta0", "beta1", "beta2")
+
+Vcov <- vcov(m3C.ncapu)
+Corr.ncapu <- cov2cor(Vcov)
+dimnames(Corr.ncapu) <- list(pnames, pnames)
+
+Vcov <- vcov(m3C.nnos)
+Corr.nnos <- cov2cor(Vcov)
+dimnames(Corr.nnos) <- list(pnames, pnames)
+
+par(mfrow = c(1, 2))
+mycorrplot(Corr.ncapu)
+mycorrplot(Corr.nnos)
+
+fonte("Fonte: Elaborado pelo autor.")
+
+@
+
+<<corr-cottonBolls2b, fig.height=4, fig.width=4, results="asis", fig.show="hide", fig.cap="Imagem da matriz de correlação entre os parâmetros do modelo COM-Poisson">>=
+
+pnames <- c("phi", "beta0", "beta1")
+
+Vcov <- vcov(m2C.nerep)
+Corr.nerep <- cov2cor(Vcov)
+dimnames(Corr.nerep) <- list(pnames, pnames)
+
+mycorrplot(Corr.nerep)
+
+fonte("Fonte: Elaborado pelo autor.")
+
+wrapfigure()
 
 @
 
 
-Verificando \textit{outputs} R \textit{inline} \Sexpr{1/3}. A
-referenciação de figuras produzidas em \textit{chunks} R é 
-\texttt{fig: + chunkname}, assim como vemos nas figuras \ref{fig:capmosca}
-e \ref{fig:capdesfo}. Para as tabelas a referenciação também é simples,
-conforme tabela \ref{tab:01}.
+\lipsum[1]
 
-\lipsum[1-2]
+<<pred-cottonBolls2, fig.height=3.5, fig.width=7, fig.cap="Curva dos valores preditos com intervalo de confiança de (95\\%) como função do nível de desfolha e do estágio fenológico da planta.">>=
 
-<<results='asis'>>=
-xtable::xtable(mtcars[, 1:8], caption = "Dados de automóveis", 
-               label = "tab:01")
+qn <- qnorm(0.975) * c(fit = 0, lwr = -1, upr = 1)
 
-## print(head(xt, 1), booktabs = FALSE)
+## Predição pontual/intervalar
+pred <- data.frame(dexp = with(cottonBolls2,
+                               seq(min(dexp), max(dexp), l = 50)))
+
+##======================================================================
+## Considerando a Poisson
+##-------------------------------------------
+## Para nerep
+aux <- predict(m2P.nerep, newdata = pred, se.fit = TRUE)
+aux <- with(aux, exp(fit + outer(se.fit, qn, FUN = "*")))
+aux <- data.frame(modelo = "Poisson", aux)
+predP.nerep <- cbind(var = "nerep", pred, aux)
+##-------------------------------------------
+## Para ncapu
+aux <- predict(m3P.ncapu, newdata = pred, se.fit = TRUE)
+aux <- with(aux, exp(fit + outer(se.fit, qn, FUN = "*")))
+aux <- data.frame(modelo = "Poisson", aux)
+predP.ncapu <- cbind(var = "ncapu", pred, aux)
+##-------------------------------------------
+## Para nnos
+aux <- predict(m3P.nnos, newdata = pred, se.fit = TRUE)
+aux <- with(aux, exp(fit + outer(se.fit, qn, FUN = "*")))
+aux <- data.frame(modelo = "Poisson", aux)
+predP.nnos <- cbind(var = "nnos", pred, aux)
+##
+predP <- rbind(predP.nerep, predP.ncapu, predP.nnos)
+
+##======================================================================
+## Considerando a COM-Poisson
+##-------------------------------------------
+## Para nerep
+aux <- predict(m2C.nerep, newdata = pred, type = "response",
+               interval = "confidence")
+aux <- data.frame(modelo = "COM-Poisson", aux)
+predC.nerep <- cbind(var = "nerep", pred, aux)
+##-------------------------------------------
+## Para ncapu
+aux <- predict(m3C.ncapu, newdata = pred, type = "response",
+               interval = "confidence")
+aux <- data.frame(modelo = "COM-Poisson", aux)
+predC.ncapu <- cbind(var = "ncapu", pred, aux)
+##-------------------------------------------
+## Para nnos
+aux <- predict(m3C.nnos, newdata = pred, type = "response",
+               interval = "confidence")
+aux <- data.frame(modelo = "COM-Poisson", aux)
+predC.nnos <- cbind(var = "nnos", pred, aux)
+##
+predC <- rbind(predC.nerep, predC.ncapu, predC.nnos)
+
+##======================================================================
+## Considerando a Quasi-Poisson
+##-------------------------------------------
+## Para nerep
+aux <- predict(m2Q.nerep, newdata = pred, se.fit = TRUE)
+aux <- with(aux, exp(fit + outer(se.fit, qn, FUN = "*")))
+aux <- data.frame(modelo = "Quasi-Poisson", aux)
+predQ.nerep <- cbind(var = "nerep", pred, aux)
+##-------------------------------------------
+## Para ncapu
+aux <- predict(m3Q.ncapu, newdata = pred, se.fit = TRUE)
+aux <- with(aux, exp(fit + outer(se.fit, qn, FUN = "*")))
+aux <- data.frame(modelo = "Quasi-Poisson", aux)
+predQ.ncapu <- cbind(var = "ncapu", pred, aux)
+##-------------------------------------------
+## Para nnos
+aux <- predict(m3Q.nnos, newdata = pred, se.fit = TRUE)
+aux <- with(aux, exp(fit + outer(se.fit, qn, FUN = "*")))
+aux <- data.frame(modelo = "Quasi-Poisson", aux)
+predQ.nnos <- cbind(var = "nnos", pred, aux)
+##
+predQ <- rbind(predQ.nerep, predQ.ncapu, predQ.nnos)
+
+##======================================================================
+##-------------------------------------------
+## Gráfico com os valores preditos
+data(cottonBolls2)
+vars <- c("dexp", "vaso", "planta", "nerep", "ncapu", "nnos")
+cottonBolls2 <- cottonBolls2[, vars]
+da <- reshape2::melt(cottonBolls2, id = c("dexp", "vaso", "planta"),
+                     variable.name = "va", value.name = "count")
+cols <- trellis.par.get("superpose.line")$col[1:3]
+
+key <- list(
+    column = 3,
+    lines = list(lty = c(3, 1, 2), lwd = 1, col = cols),
+    text = list(c("Poisson", "COM-Poisson", "Quasi-Poisson")))
+
+xyplot(count ~ dexp | va, data = da,
+       key = key,
+       type = c("p", "g"),
+       layout = c(NA, 1),
+       ylab = "Contagens",
+       xlab = "Dias de exposição a alta infestação de Mosca-branca",
+       scales = list(
+           y = list(relation = "free", rot = 0)),
+       strip = strip.custom(
+           factor.levels = c("Estruturas reprodutivas ",
+                             "Capulhos produzidos",
+                             "Nós da planta")),
+       alpha = 0.3,
+       spread = 0.15,
+       panel = panel.beeswarm,
+       par.settings = ps.sub)+
+    as.layer(
+        xyplot(fit + lwr + upr ~ dexp | var, data = predP,
+               layout = c(NA, 1),
+               scales = list(
+                   y = list(relation = "free", rot = 0)),
+               type = "l", col = cols[1], lty = c(1, 3, 3), lwd = 1)
+    ) +
+    as.layer(
+        xyplot(fit + lwr + upr ~ dexp | var, data = predC,
+               layout = c(NA, 1),
+               scales = list(
+                   y = list(relation = "free", rot = 0)),
+               type = "l", col = cols[2], lty = c(1, 1, 1), lwd = 1)
+    ) +
+    as.layer(
+        xyplot(fit + lwr + upr ~ dexp | var, data = predQ,
+               layout = c(NA, 1),
+               scales = list(
+                   y = list(relation = "free", rot = 0)),
+               type = "l", col = cols[3], lty = c(1, 2, 2), lwd = 1)
+    )
+
+fonte.xy("Fonte: Elaborado pelo autor.")
+
 @
 
-Entendendo citações:
-\begin{itemize}
-    \item \citeonline{Zeviani2014}
-    \item \citeonline[p.~281]{Paula2013}
-    \item \cite{Sellers2010}
-    \item \cite[cap.~4]{RibeiroJr2012}
-    \item \apud[p.~2--3]{Zeviani2014}{Park2009}
-    \item \apudonline{Lord2010}{Shmueli2005}
-\end{itemize}
+\lipsum[1]
+
+\section{Análise de produção de soja sob efeito de umidade e adubação
+  potássica}
+
+<<ajuste-soyaBeans, include=FALSE, cache=TRUE>>=
+
+## Dados
+library(tccPackage)
+data(soyaBeans)
+soyaBeans <- soyaBeans[-74, ]
+soyaBeans <- transform(soyaBeans, K = factor(K))
+
+##-------------------------------------------
+## Para o número de vagens viáveis por parcela
+
+## Preditores considerados
+
+f1.nv <- nvag ~ bloc + umid + K
+f2.nv <- nvag ~ bloc + umid * K
+
+f1.ng <- ngra ~ bloc + umid + K
+f2.ng <- ngra ~ bloc + umid * K
+
+## Ajustando os modelos Poisson
+m1P.nv <- glm(f1.nv, data = soyaBeans, family = poisson)
+m2P.nv <- glm(f2.nv, data = soyaBeans, family = poisson)
+
+m1P.ng <- glm(f1.ng, data = soyaBeans, family = poisson)
+m2P.ng <- glm(f2.ng, data = soyaBeans, family = poisson)
+
+## Ajustando os modelos COM-Poisson
+m1C.nv <- cmp(f1.nv, data = soyaBeans, sumto = 300)
+m2C.nv <- cmp(f2.nv, data = soyaBeans, sumto = 300)
+
+m1C.ng <- cmp(f1.ng, data = soyaBeans, sumto = 700)
+m2C.ng <- cmp(f2.ng, data = soyaBeans, sumto = 700)
+
+## Ajustando os modelos Binomial Negativo
+library(MASS)
+m1B.nv <- glm.nb(f1.nv, data = soyaBeans)
+m2B.nv <- glm.nb(f2.nv, data = soyaBeans)
+
+m1B.ng <- glm.nb(f1.ng, data = soyaBeans)
+m2B.ng <- glm.nb(f2.ng, data = soyaBeans)
+
+## Ajustando os modelos Quasi-Poisson
+m1Q.nv <- glm(f1.nv, data = soyaBeans, family = quasipoisson)
+m2Q.nv <- glm(f2.nv, data = soyaBeans, family = quasipoisson)
+
+m1Q.ng <- glm(f1.ng, data = soyaBeans, family = quasipoisson)
+m2Q.ng <- glm(f2.ng, data = soyaBeans, family = quasipoisson)
+
+##======================================================================
+## Perfil de log-verossimilhanca para o parametro phi
+prof.nv <- profile(m2C.nv, which = "phi")
+prof.ng <- profile(m2C.ng, which = "phi")
+
+@
+
+\lipsum[1]
+
+<<loglik-soyaBeans, include=FALSE>>=
+
+## Análise de desvios dos modelos
+anP.nv <- myanova(m1P.nv, m2P.nv)
+anC.nv <- myanova(m1C.nv, m2C.nv)
+anB.nv <- myanova(m1B.nv, m2B.nv)
+anQ.nv <- myanova(m1Q.nv, m2Q.nv)
+
+anP.ng <- myanova(m1P.ng, m2P.ng)
+anC.ng <- myanova(m1C.ng, m2C.ng)
+anB.ng <- myanova(m1B.ng, m2B.ng)
+anQ.ng <- myanova(m1Q.ng, m2Q.ng)
+
+## Tabelas com medidas de ajuste
+tab.nv <- rbind(
+    anP.nv[, c("np", "ll", "AIC", "P(>Chisq)")],
+    anC.nv[, c("np", "ll", "AIC", "P(>Chisq)")],
+    anB.nv[, c("np", "ll", "AIC", "P(>Chisq)")],
+    anQ.nv[, c("np", "dev", "AIC", "P(>F)")])
+
+tab.ng <- rbind(
+    anP.ng[, c("ll", "AIC", "P(>Chisq)")],
+    anC.ng[, c("ll", "AIC", "P(>Chisq)")],
+    anB.ng[, c("ll", "AIC", "P(>Chisq)")],
+    anQ.ng[, c("dev", "AIC", "P(>F)")])
+
+## Obtem as estimativas dos parâmetros de dispersão/precisão
+dispersions.nv <- c(
+    c(rep(NA, 2)),
+    sapply(list(m1C.nv, m2C.nv), function(m) coef(m)[1]),
+    sapply(list(m1B.nv, m2B.nv), function(m) m$theta),
+    sapply(list(m1Q.nv, m2Q.nv), function(m) summary(m)$dispersion))
+
+dispersions.ng <- c(
+    c(rep(NA, 2)),
+    sapply(list(m1C.ng, m2C.ng), function(m) coef(m)[1]),
+    sapply(list(m1B.ng, m2B.ng), function(m) m$theta),
+    sapply(list(m1Q.ng, m2Q.ng), function(m) summary(m)$dispersion))
+
+## Adicionando os parametros de dispersão à tabela
+tab.nv <- cbind(tab.nv, dispersions.nv)
+tab.ng <- cbind(tab.ng, dispersions.ng)
+
+## Juntando as tabelas
+## tab.ajuste <- data.frame(pred = rep(paste0("$\\eta_", 1:2, "$"), 4))
+## tab.ajuste <- cbind(tab.ajuste, as.data.frame(cbind(tab.nv, tab.ng)))
+## tab.ajuste <- as.data.frame(cbind(tab.nv, tab.ng))
+
+## ##----------------------------------------------------------------------
+## ## Copiar e colar o corpo do resultado na customização latex abaixo
+## digits <- c(1, 0, 2, 2, -2, -2,  2, 2, -2, -2)
+## print(xtable(tab.ajuste, digits = digits))
+
+@
+
+\begin{table}[ht]
+\centering
+\small
+\caption{Medidas de ajuste para avaliação e comparação entre preditores
+  e modelos ajustados}
+\label{tab:ajuste-soyaBeans}
+\begin{tabular}{lcccrcccrc}
+  \toprule
+  & & \multicolumn{4}{c}{{\bfseries Número de vagens}} & \multicolumn{4}{c}{{\bfseries Número de grãos}} \\
+  \cmidrule{3-6} \cmidrule{7-10}
+{\footnotesize Poisson} & np & $\ell$ & AIC & P($>\rchi^2$) &  & $\ell$ & AIC & P($>\rchi^2$) & \\
+  \midrule
+  $\eta_1$ & 11 & -266,69 & 555,38 &  &  & -343,16 & 708,33 &  &  \\
+  $\eta_2$ & 19 & -259,62 & 557,23 & 7,79E-02 &  & -321,67 & 681,34 & 8,83E-07 &  \\[0.3cm]
+{\footnotesize COM-Poisson} & np & $\ell$ & AIC & P($>\rchi^2$) & $\hat{\phi}$ & $\ell$ & AIC & P($>\rchi^2$) & $\hat{\phi}$ \\
+  \midrule
+  $\eta_1$ & 12 & -266,60 & 557,20 &  & -6,75E-02 & -326,61 & 677,21 &  & -8,17E-01 \\
+  $\eta_2$ & 20 & -259,33 & 558,65 & 6,85E-02 & 1,29E-01 & -315,64 & 671,29 & 5,06E-03 & -5,18E-01 \\[0.3cm]
+{\footnotesize Binomial-Neg.} & np & $\ell$ & AIC & P($>\rchi^2$) & $\hat{\phi}$ & $\ell$ & AIC & P($>\rchi^2$) & $\hat{\phi}$ \\
+  \midrule
+  $\eta_1$ & 12 & -266,69 & 557,37 &  & 4,59E+03 & -326,54 & 677,07 &  & 1,42E+02 \\
+  $\eta_2$ & 20 & -259,62 & 559,23 & 7,82E-02 & 1,03E+06 & -315,39 & 670,77 & 4,39E-03 & 2,61E+02 \\[0.3cm]
+{\footnotesize Quasi-Poisson} & np & $\ell$ & AIC & P($>\rchi^2$) & $\hat{\phi}$ & $\ell$ & AIC & P($>\rchi^2$) & $\hat{\phi}$ \\
+  \midrule
+  $\eta_1$ & 11 & 79,43 &  &  & 1,28E+00 & 167,71 &  &  & 2,71E+00 \\
+  $\eta_2$ & 19 & 65,28 &  & 1,87E-01 & 1,20E+00 & 124,72 &  & 3,00E-02 & 2,29E+00 \\
+   \bottomrule
+\end{tabular}
+\begin{tablenotes}
+  \footnotesize
+\item np, número de parâmetros.
+\item Fonte: Elaborado pelo autor.
+\end{tablenotes}
+\end{table}
+
+\lipsum[1]
+
+<<prof-soyaBeans, fig.height=3.5, fig.width=7, fig.cap="Perfis de log-verossimilhança para o parâmetro extra da COM-Poisson nos modelos para número de vagens viáveis por parcela (esquerda) e número grãos de soja por parcela (direira).">>=
+
+xy1 <- myprof(prof.nv, par.settings = ps.sub,
+              namestrip = "Número de vagens")
+xy2 <- myprof(prof.ng, par.settings = ps.sub,
+              namestrip = "Número de grãos")
+print(xy1, split = c(1, 1, 2, 1), more = TRUE)
+print(xy2, split = c(2, 1, 2, 1), more = TRUE)
+fonte.xy("Fonte: Elaborado pelo autor.")
+
+@
+
+<<corr-soyaBeansa, fig.height=7, fig.width=7, fig.cap="Imagem da matriz de correlação entre os parâmetros do modelo COM-Poisson ajustados ao número de vagens por parcela.">>=
+
+pnames <- c("phi", "beta0",
+            paste0("tau", 1:4),
+            paste0("gama", 1:2),
+            paste0("delta", 1:4),
+            paste0("alpha", 1:8))
+
+Vcov <- vcov(m2C.nv)
+Corr.nv <- cov2cor(Vcov)
+dimnames(Corr.nv) <- list(pnames, pnames)
+mycorrplot(Corr.nv)
+
+fonte("Fonte: Elaborado pelo autor.")
+
+@
+
+<<corr-soyaBeansb, fig.height=7, fig.width=7, fig.cap="Imagem da matriz de correlação entre os parâmetros do modelo COM-Poisson ajustados ao número de grãos por parcela.">>=
+
+pnames <- c("phi", "beta0",
+            paste0("tau", 1:4),
+            paste0("gama", 1:2),
+            paste0("delta", 1:4),
+            paste0("alpha", 1:8))
+
+Vcov <- vcov(m2C.ng)
+Corr.ng <- cov2cor(Vcov)
+dimnames(Corr.ng) <- list(pnames, pnames)
+mycorrplot(Corr.ng)
+
+fonte("Fonte: Elaborado pelo autor.")
+
+@
+
+\lipsum[1]
+
+<<pred-soyaBeans, fig.height=5, fig.width=7.5, fig.cap="Valores preditos com intervalos de confiança (95\\%) como função do nível de adubação com potássio e do percentual de umidade do solo para cada variável de interesse mensurada (número de vagens e número de grãos por parcela).">>=
+library(multcomp)
+
+## Predição pontual/intervalar
+pred <- with(soyaBeans,
+             expand.grid(
+                 bloc = factor(levels(bloc)[1], levels = levels(bloc)),
+                 umid = levels(umid),
+                 K = levels(K)
+             ))
+
+## Matrix de delineamento para predição, considera o efeito médio de
+## bloco
+X <- model.matrix(~bloc + umid * K, data = pred)
+bl <- attr(X, "assign") == 1
+X[, bl] <- X[, bl] * 0 + 1/(sum(bl) + 1)
 
 
+##======================================================================
+## Considerando a Poisson
+##-------------------------------------------
+## Para nv
+aux <- exp(confint(glht(m2P.nv, linfct = X),
+               calpha = univariate_calpha())$confint)
+colnames(aux) <- c("fit", "lwr", "upr")
+aux <- data.frame(modelo = "Poisson", aux)
+predP.nv <- cbind(var = "nvag", pred, aux)
+##-------------------------------------------
+## Para ng
+aux <- exp(confint(glht(m2P.ng, linfct = X),
+               calpha = univariate_calpha())$confint)
+colnames(aux) <- c("fit", "lwr", "upr")
+aux <- data.frame(modelo = "Poisson", aux)
+predP.ng <- cbind(var = "ngra", pred, aux)
+##
+predP <- rbind(predP.nv, predP.ng)
+
+##======================================================================
+## Considerando a COM-Poisson
+##-------------------------------------------
+## Para nv
+aux <- predict(m2C.nv, newdata = X, type = "response",
+               interval = "confidence")
+aux <- data.frame(modelo = "COM-Poisson", aux[, c("fit", "lwr", "upr")])
+predC.nv <- cbind(var = "nvag", pred, aux)
+##-------------------------------------------
+## Para ng
+aux <- predict(m2C.ng, newdata = X, type = "response",
+               interval = "confidence")
+aux <- data.frame(modelo = "COM-Poisson", aux[, c("fit", "lwr", "upr")])
+predC.ng <- cbind(var = "ngra", pred, aux)
+##
+predC <- rbind(predC.nv, predC.ng)
+
+##======================================================================
+## Considerando a Binomial Negativa
+##-------------------------------------------
+## Para nv
+aux <- family(m2B.nv)$linkinv(
+                         confint(glht(m2B.nv, linfct = X),
+                                 calpha = univariate_calpha())$confint)
+colnames(aux) <- c("fit", "lwr", "upr")
+aux <- data.frame(modelo = "Binomial Negativa", aux)
+predB.nv <- cbind(var = "nvag", pred, aux)
+##-------------------------------------------
+## Para ng
+aux <- family(m2B.ng)$linkinv(
+                         confint(glht(m2B.ng, linfct = X),
+                                 calpha = univariate_calpha())$confint)
+colnames(aux) <- c("fit", "lwr", "upr")
+aux <- data.frame(modelo = "Binomial Negativa", aux)
+predB.ng <- cbind(var = "ngra", pred, aux)
+##
+predB <- rbind(predB.nv, predB.ng)
+
+##======================================================================
+## Considerando a Quasi-Poisson
+##-------------------------------------------
+## Para nv
+aux <- exp(confint(glht(m2Q.nv, linfct = X),
+                   calpha = univariate_calpha())$confint)
+colnames(aux) <- c("fit", "lwr", "upr")
+aux <- data.frame(modelo = "Quasi-Poisson", aux)
+predQ.nv <- cbind(var = "nvag", pred, aux)
+##-------------------------------------------
+## Para ng
+aux <- exp(confint(glht(m2Q.ng, linfct = X),
+                   calpha = univariate_calpha())$confint)
+colnames(aux) <- c("fit", "lwr", "upr")
+aux <- data.frame(modelo = "Quasi-Poisson", aux)
+predQ.ng <- cbind(var = "ngra", pred, aux)
+##
+predQ <- rbind(predQ.nv, predQ.ng)
+
+##-------------------------------------------
+pred.all <- rbind(predP, predC, predB, predQ)
+pred.all <- pred.all[with(pred.all, order(var, umid, K, modelo)), ]
+
+##======================================================================
+##-------------------------------------------
+## Gráfico com os valores preditos
+data(soyaBeans)
+soyaBeans <- soyaBeans[-74, ] ## outlier identificado
+soyaBeans <- soyaBeans[, c("K", "umid", "bloc", "ngra", "nvag")]
+
+da <- reshape2::melt(
+    soyaBeans, id = c("K", "umid", "bloc"),
+    variable.name = "var", value.name = "count")
+
+key <- list(type = "o", divide = 1,
+            lines = list(pch = 1:nlevels(pred.all$model) + 4),
+            text = list(c("Poisson", "COM-Poisson",
+                          "Binomial Negativa", "Quasi-Poisson"))
+            )
+
+useOuterStrips(
+    segplot(
+        K ~ lwr + upr | umid + var,
+        key = key,
+        ylab = "Contagens",
+        xlab = "Nível de adubação Potássica",
+        centers = fit, groups = modelo, data = pred.all,
+        horizontal = FALSE, draw = FALSE,
+        lwd = 2, pch = 1:nlevels(pred.all$modelo) + 4,
+        panel = panel.groups.segplot, as.table = TRUE,
+        gap = 0.3,
+        scales = list(
+            y = list(relation = "free", rot = 0))
+    ), strip = strip.custom(
+           strip.names = TRUE, var.name = "Umidade"),
+    strip.left = strip.custom(
+        factor.levels = c("Nº de vagens", "Nº de grãos"))
+)
+
+## ## as.layer() não funciona quando usado duas variaveis para strip
+## xyplot(count ~ factor(K) | umid, data = da,
+##        key = key,
+##        type = c("p", "g"),
+##        alpha = 0.3,
+##        scales = list(
+##            y = list(relation = "free", rot = 0))
+##        )
+
+fonte.xy("Fonte: Elaborado pelo autor.")
+
+@
+
+
+\lipsum[1]
+
+\section{Análise de ninfas de mosca-branca em lavoura de soja}
+
+<<ajuste-whiteFly, include=FALSE, cache=TRUE>>=
+
+data(whiteFly)
+whiteFly <- droplevels(subset(whiteFly, grepl("BRS", x = cult)))
+whiteFly$aval <- factor(whiteFly$dias)
+
+## Preditores considerados
+f1 <- ntot ~ bloco + cult + aval
+f2 <- ntot ~ bloco + cult * aval
+
+## Ajustando os modelos Poisson
+m1P.ntot <- glm(f1, data = whiteFly, family = poisson)
+m2P.ntot <- glm(f2, data = whiteFly, family = poisson)
+
+## Ajustando os modelos COM-Poisson
+m1C.ntot <- cmp(f1, data = whiteFly, sumto = 800)
+m2C.ntot <- cmp(f2, data = whiteFly, sumto = 800)
+
+## Ajustando os modelos Binomial Negativo
+library(MASS)
+m1B.ntot <- glm.nb(f1, data = whiteFly)
+m2B.ntot <- glm.nb(f2, data = whiteFly)
+
+## Ajustando os modelos Quasi-Poisson
+m1Q.ntot <- glm(f1, data = whiteFly, family = quasipoisson)
+m2Q.ntot <- glm(f2, data = whiteFly, family = quasipoisson)
+
+##======================================================================
+## Perfil de log-verossimilhanca para o parametro phi
+prof.ntot <- profile(m1C.ntot, which = "phi")
+
+@
+
+\lipsum[1]
+
+<<loglik-whiteFly, include=FALSE>>=
+
+## Análise de desvios dos modelos
+anP.ntot <- myanova(m1P.ntot, m2P.ntot)
+anC.ntot <- myanova(m1C.ntot, m2C.ntot)
+anB.ntot <- myanova(m1B.ntot, m2B.ntot)
+anQ.ntot <- myanova(m1Q.ntot, m2Q.ntot)
+
+## Tabelas com medidas de ajuste
+tab.ntot <- rbind(anP.ntot, anC.ntot, anB.ntot, anQ.ntot)
+
+## Obtem as estimativas dos parâmetros de dispersão/precisão
+dispersions.ntot <- c(
+    c(rep(NA, 2)),
+    sapply(list(m1C.ntot, m2C.ntot), function(m) coef(m)[1]),
+    sapply(list(m1B.ntot, m2B.ntot), function(m) m$theta),
+    sapply(list(m1Q.ntot, m2Q.ntot), function(m) summary(m)$dispersion))
+
+## Teste para o parâmetro de dispersão
+pvs <- rep(NA, 8)
+pvs[3:4] <- cmptest(m1C.ntot, m2C.ntot)[, 2]
+
+## Agrupando
+dispersions.ntot <- cbind(dispersions.ntot, pvs)
+
+## Adicionando os parametros de dispersão à tabela
+tab.ntot <- cbind(tab.ntot, dispersions.ntot)
+rownames(tab.ntot) <- NULL
+
+## Juntando as tabelas
+tab.ajuste <- data.frame(
+    pred = rep(paste("Preditor", 1:2), 4),
+    tab.ntot)
+
+## ##----------------------------------------------------------------------
+## ## Copiar e colar o corpo do resultado na customização latex abaixo
+## digits <- c(1, 1, 0, 2, 2, 2, 0, -2, 2, -2)
+## print(xtable(tab.ajuste, digits = digits))
+@
+
+\begin{table}[ht]
+\small
+\caption{Medidas de ajuste para avaliação e comparação entre preditores
+  e modelos ajustados}
+\label{tab:ajuste-whiteFly}
+\begin{tabular}{lcccccrcr}
+  \toprule
+ Poisson & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) &  &  \\
+  \midrule
+  Preditor 1 & 12 & -922,98 & 1869,96 &  &  &  &  &  \\
+  Preditor 2 & 27 & -879,23 & 1812,46 & 87,50 & 15 & 2,90E-12 &  &  \\[0.3cm]
+ COM-Poisson & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) & $\hat{\phi}$ & P($>\rchi^2$) \\
+  \midrule
+  Preditor 1 & 13 & -410,44 & 846,89 &  &  &  & -3,08 & 6,39E-225 \\
+  Preditor 2 & 28 & -407,15 & 870,30 & 6,59 & 15 & 9,68E-01 & -2,95 & 2,47E-207 \\[0.3cm]
+ Binomial Neg. & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) & $\hat{\theta}$ & P($>F^2$) \\
+  \midrule
+  Preditor 1 & 13 & -406,16 & 838,31 &  &  &  & 3,44 &  \\
+  Preditor 2 & 28 & -400,55 & 857,10 & 11,21 & 15 & 7,38E-01 & 3,99 &  \\[0.3cm]
+ Quase-Poisson & np & deviance & AIC & F & diff np & P(>F) & $\hat{\sigma}^2$ & P($>F$) \\
+  \midrule
+  Preditor 1 & 12 & 1371,32 &  &  &  &  & 17,03 &  \\
+  Preditor 2 & 27 & 1283,82 &  & 0,31 & 15 & 9,93E-01 & 19,03 &  \\
+  \bottomrule
+\end{tabular}
+\begin{tablenotes}
+  \footnotesize
+\item np, número de parâmetros, diff $\ell$, diferença entre
+  log-verossimilhanças, F, estatística F baseada nas quasi-deviances,
+  diff np, diferença entre o np.
+\item Fonte: Elaborado pelo autor.
+\end{tablenotes}
+\end{table}
+
+\lipsum[1]
+
+<<prof-whiteFly, fig.height=4, fig.width=4, fig.show="hide", results="asis", fig.cap="Perfil de log-verossimilhança para o parâmetro extra da COM-Poisson">>=
+
+myprof(prof.ntot, subset = 4, par.settings = ps.sub)
+fonte.xy("Fonte: Elaborado pelo autor.")
+
+wrapfigure()
+
+@
+
+
+\lipsum[1]
+
+<<corr-whiteFly, fig.width=7, fig.height=7, fig.cap="Imagem da matriz de correlação entre os parâmetros do modelo COM-Poisson">>=
+
+pnames <- c("phi", "beta0",
+            paste0("tau", 1:3),
+            paste0("gama", 1:3),
+            paste0("delta", 1:5))
+
+Vcov <- vcov(m1C.ntot)
+Corr <- cov2cor(Vcov)
+dimnames(Corr) <- list(pnames, pnames)
+mycorrplot(Corr)
+
+fonte("Fonte: Elaborado pelo autor.")
+
+@
+
+
+\lipsum[1]
+
+
+<<pred-whiteFly, fig.height=4.5, fig.width=7.5, fig.cap="Valores preditos com intervalos de confiança (95\\%) em função das cultivares de soja e da data de avaliação da planta.">>=
+
+library(multcomp)
+
+## Predição pontual/intervalar
+pred <- with(whiteFly,
+             expand.grid(
+                 bloco = factor(levels(bloco)[1],
+                                levels = levels(bloco)),
+                 cult = levels(cult),
+                 aval = levels(aval)
+             ))
+
+## Matrix de delineamento para predição, considera o efeito médio de
+## bloco
+X <- model.matrix(~bloco + cult + aval, data = pred)
+bl <- attr(X, "assign") == 1
+X[, bl] <- X[, bl] * 0 + 1/(sum(bl) + 1)
+
+##-------------------------------------------
+## Considerando a Poisson
+aux <- exp(confint(glht(m1P.ntot, linfct = X),
+               calpha = univariate_calpha())$confint)
+colnames(aux) <- c("fit", "lwr", "upr")
+aux <- data.frame(modelo = "Poisson", aux)
+predP <- cbind(pred, aux)
+
+##-------------------------------------------
+## Considerando a COM-Poisson
+aux <- predict(m1C.ntot, newdata = X, type = "response",
+               interval = "confidence")
+aux <- data.frame(modelo = "COM-Poisson", aux[, c("fit", "lwr", "upr")])
+predC <- cbind(pred, aux)
+
+##-------------------------------------------
+## Considerando a Binomial Negativa
+aux <- family(m1B.ntot)$linkinv(
+                      confint(glht(m1B.ntot, linfct = X),
+                              calpha = univariate_calpha())$confint)
+colnames(aux) <- c("fit", "lwr", "upr")
+aux <- data.frame(modelo = "Binomial Negativa", aux)
+predB <- cbind(pred, aux)
+
+##-------------------------------------------
+## Considerando a Quasi-Poisson
+aux <- exp(confint(glht(m1Q.ntot, linfct = X),
+                   calpha = univariate_calpha())$confint)
+colnames(aux) <- c("fit", "lwr", "upr")
+aux <- data.frame(modelo = "Quasi-Poisson", aux)
+predQ <- cbind(pred, aux)
+
+##-------------------------------------------
+pred.all <- rbind(predP, predC, predB, predQ)
+pred.all <- pred.all[with(pred.all, order(cult, aval, modelo)), ]
+
+##----------------------------------------------------------------------
+## Gráfico
+
+key <- list(type = "o", divide = 1,
+            lines = list(pch = 1:nlevels(pred.all$model) + 4),
+            text = list(c("Poisson", "COM-Poisson",
+                          "Binomial Negativa", "Quasi-Poisson"))
+            )
+
+xyplot(ntot ~ aval | cult,
+       data = whiteFly,
+       layout = c(NA, 1),
+       as.table = TRUE,
+       key = key,
+       alpha = 0.3,
+       type = c("p", "g"),
+       xlab = "Número de dias após o inicío do experimento",
+       ylab = "Número total de moscas-brancas",
+       par.settings = ps.sub) +
+    as.layer(
+        segplot(
+            aval ~ lwr + upr | cult,
+            layout = c(NA, 1),
+            key = key,
+            centers = fit, groups = modelo, data = pred.all,
+            horizontal = FALSE, draw = FALSE,
+            lwd = 2, pch = 1:nlevels(pred.all$modelo) + 4,
+            panel = panel.groups.segplot, gap = 0.3)
+    )
+
+fonte.xy("Fonte: Elaborado pelo autor.")
+
+@
+
+\lipsum[1]
+
+\section{Análise de captura de peixes em um parque estadual}
+
+
+<<ajuste-fish, include=FALSE, cache=TRUE>>=
+
+
+@
