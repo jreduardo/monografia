@@ -78,6 +78,9 @@
 \DeclareMathOperator{\Ell}{\mathcal{L}}
 \DeclareMathOperator{\R}{\mathbb{R}}
 
+\DeclareRobustCommand{\rchi}{{\mathpalette\irchi\relax}}
+\newcommand{\irchi}[2]{\raisebox{\depth}{$#1\chi$}}
+
 % ---
 % Para tabelas
 % ---
@@ -206,8 +209,9 @@
 % ----
 \begin{document}
 
-<<setup, include=FALSE>>=
+<<setup, include=FALSE, cache=FALSE>>=
 source("_setup.R")
+library(tccPackage)
 @
 
 
@@ -324,7 +328,10 @@ source("_setup.R")
 % inserir lista de símbolos
 % ---
 \begin{simbolos}
-  \item[$ \log $] Logarítmo neperiano (de base $e$)
+  \item[$ \log $] Logarítmo neperiano (de base $e$).
+  \item[$ \ell $] log-verossimilhança maximizada.
+  \item[AIC] Critério de Informação de Akaike, do inglês \textit{Akaike
+      Information Criterion}.
 \end{simbolos}
 % ---
 
