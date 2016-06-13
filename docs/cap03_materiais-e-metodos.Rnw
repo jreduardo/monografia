@@ -595,4 +595,164 @@ na análise de dois conjuntos de dados exibidos no trabalho.
 
 \section{Métodos}
 \label{cap03:metodos}
-\lipsum[1-5]
+
+A estimação dos parâmetros do modelo de regressão COM-Poisson de efeitos
+fixos é realizada maximizando uma forma reparametrizada da
+log-verossimilhança, definida na expressão \ref{eqn:loglik-compoisson},
+via algoritmo numérico de otimização \textit{BFGS}. O parâmetro extra da
+COM-Poisson, $\nu$ tem suporte nos reais positivos, restringindo o
+espaço paramétrico de busca do otimizador, o que é numericamente
+indesejável. Para contornar essa empecilho reparametrizamos o modelo com
+o parâmetro $\phi = \log(\nu)$, assim como $0 < \nu < \infty$, $-\infty
+< \phi < \infty$. Sob a reparametrização a função a ser maximizada é
+
+\begin{equation}
+  \label{loglik-compoissonr}
+  \ell(\phi, \beta \mid \underline{y}) = \sum_i^n y_i \log(\lambda_i) -
+  e^\phi \sum_i^n \log(y!) - \sum_i^n \log(Z(\lambda_i, \phi))
+\end{equation}
+
+O ajuste do modelo é realizado sob $\phi$. Portanto as inferências
+decorrentes do modelo são sobre esse parâmetro, todavia pode retornar
+para parametrização original utilizando a função inversa em valores
+pontuais ou método delta para funções de $\phi$. Nesse trabalho as
+inferências são realizadas sob o parâmetro $\phi$. Para esse parâmetro
+as interpretações são como se segue
+
+$$
+\phi < 0 \Rightarrow \textrm{Superdispersão} \quad
+\phi = 0 \Rightarrow \textrm{Equidispersão} \quad
+\phi > 0 \Rightarrow \textrm{Subdispersão}
+$$
+
+\noindent
+ou seja, possui a interpretação de um parâmetro de precisão.
+
+Note que a partir dessa reparametrização a condução de testes de
+hipóteses é facilitada. Uma vez que $\phi = 0$, representa o caso
+particicular em que a COM-Poisson se reduz a Poisson, a estatística
+
+\begin{equation*}
+    \begin{split}
+        &TRV = 2 \cdot \left ( \ell_{CMP} - \ell_{P} \right )\\
+        & TRV \sim \rchi^2_{1}
+    \end{split}
+\end{equation*}
+
+\noindent
+em que $\ell_{CMP}$ e $\ell_{P}$ são as log-verossimilhanças maximizadas
+dos modelos COM-Poisson e Poisson com mesmo preditor linear
+respectivamente, se refere ao teste de razão de verossimilhanças para
+$H_0: \phi = 0$, ou de forma mais apelativa, se refere ao teste sobre a
+equivalência dos modelos COM-Poisson e Poisson.
+
+Para incluir um componente de barreira no modelo COM-Poisson, acomodando
+excesso de zeros, partimos da definição em \ref{eqn:pmf-hurdle} adotando
+para $Pr(Z = z \mid \Theta_c)$ a distribuição COM-Poisson
+(\ref{eqn:pmf-compoisson}) resultando em
+
+\begin{equation}
+  \label{eqn:pmf-hurdlecmp}
+  Pr(Y = y \mid \pi, \phi, \lambda) =
+    \begin{dcases*}
+      \pi & \text{se } y = 0,\\
+      (1 - \pi) \frac{\lambda^y}{(y!)^{e^\phi}Z(\lambda,
+          \phi)}\left (1 - \frac{1}{Z(\lambda, \phi)} \right )^{-1} &
+      \text{se } y = 1, 2, \dots
+    \end{dcases*}
+\end{equation}
+
+Para modelos de regressão com componente de barreira, incluímos
+preditores lineares em $\pi$,
+$\underline{\pi}=\frac{\exp(G\gamma)}{1+\exp(G\gamma)}$ e $\lambda$,
+$\underline{\lambda}=\exp(X\beta)$ e a verossimilhança desse modelo toma
+a forma
+
+\begin{equation}
+  \label{eqn:loglik-hurdlecmp}
+  \Ell(\phi, \beta, \gamma \mid \underline{y}) =
+  \ind [\underline{\pi}] \cdot (1-\ind) \left [
+    (1-\underline{\pi})\left (
+    \frac{\underline{\lambda}^y}{(y!)^{e^\phi}
+      Z(\underline{\lambda}, \phi)}
+  \right ) \left (
+    1-\frac{1}{Z(\underline{\lambda}, \phi)}
+  \right ) \right ]
+\end{equation}
+
+\noindent
+em que $\ind$ é uma função indicadora para $y = 0$. Os argumentos
+$\hat{\phi}$, $\hat{\beta}$ e $\hat{\gamma}$, que maximizam o logarítmo
+neperiano da função \ref{eqn:loglik-hurdlecmp} serão as estimativas de
+máxima verossimilhança do modelo COM-Poisson com componente de barreira.
+
+Uma outra extensão proposta para o modelo COM-Poisson é a inclusão de
+efeitos aleatórios a fim de modelar a estrutura experimental ou
+observacional de um conjunto de dados. Nos reestringimos a inclusão de
+efeitos aleatórios Normais, ou seja, $b \sim \textrm{Normal}(0,
+\Sigma)$, que são incorporados sob a forma $\underline{\lambda} = X\beta
++ Z b$ conforme especificação \ref{eqn:reg-misto}. Assim, considerando a
+distribuição COM-Poisson para a variável resposta condicinada as
+covariáveis e os eifetos aletórios, podemos escrever a verossimilhança
+como
+
+\begin{equation}
+  \label{eqn:loglik-mixedcmp}
+  \Ell(\phi, \Sigma, \beta \mid \underline{y}) =
+  \prod_{i=1}^m \int_{\R^q} \left (
+    \prod_{j=1}^{n_i} \frac{\underline{\lambda}^y}{(y!)^{e^\phi}
+      Z(\underline{\lambda}, \phi)}
+  \right ) \cdot
+  (2\pi)^{q/2} |\Sigma| \exp \left (
+    -\frac{1}{2}b^t \Sigma^{-1} b
+  \right ) db_i
+\end{equation}
+
+\noindent
+sendo $m$ o número de grupos que compartilham do mesmo efeito aleatório,
+$q$ o número de efeitos aleatórios (intercepto aleatório, inclinação e
+interecpto aleatórios, etc.) e $n_i$ o número de observações no i-ésimo
+grupo. A integração em \ref{eqn:loglik-mixedcmp}, necessária para a
+avaliação da verossimilhança não tem forma analítica. Utilizamos a
+aproximação de Laplace da forma como apresentada em
+\citeonline[pág. 141]{RibeiroJr2012} para aproximação dessa integral. A
+estimação dos parâmetros é realizada via maximização de $\log(\Ell(\phi,
+\Sigma, \beta \mid \underline{y}))$ com métodos numéricos de
+otimização. Ressalta-se que esse é um procedimento computacionalmente
+intensivo, pois a cada iteração do algoritmo de maximização, $m$
+aproximações de Laplace para integrais de dimensão $q$ são
+realizadas. Ainda, quando considerada a distribuição COM-Poisson para a
+variável resposta condicionalmente independente, temos também o cálculo
+de $n_m$ constantes normalizadoras $Z(\lambda, \phi)$
+(\ref{eqn:constante-z}) para cada $m$ grupo em cada iteração do
+algoritmo de otimazação. Toda essa estrutura hierárquica com
+procedimentos computacionais realizados a cada estágio, são extremamente
+sensíveis a aspectos de programação/implementação.
+
+Para comparação entre os modelos COM-Poisson e demais modelos
+listados no capítulo \ref{cap:modelos-para-dados-de-contagem} utilizamos
+essencialmente o valor maximizado da log-verossimilhança. Critérios
+de informação de Akaike (AIC) e Bayesiano (BIC) definidos como
+
+\begin{equation}
+  \label{eqn:criterios-informacao}
+  \textrm{AIC} = k2 - 2\ell(\Theta_k, \underline{y}) \qquad \qquad
+  \textrm{BIC} = k\log(n) - 2\ell(\Theta_k, \underline{y})
+\end{equation}
+
+\noindent
+sendo $k$ o número de parâmetros, $n$ o número de observações e
+$\ell(\Theta_k, \underline{y})$ a log-verossimilhança maximizada do
+modelo definido pelo conjunto $\Theta_k$ de parâmetros, também são
+utilizados. Nas análises comparamos também os níveis descritivos nos
+testes de razão de verossimilhanças entre modelos encaixados. Nos
+modelos de regressão de efeitos fixos os valores preditos pelos modelos
+COM-Poisson e demais alternativas pertinentes são contrastados
+graficamente com bandas de confiança.
+
+Para maximização númerica das log-verossimilhanças dos modelos de
+regressão COM-Poisson e suas extensões utilizamos um método de
+otimização quasi-Newton bastante popular, denominado \textit{BFGS}. As
+informações do vetor gradiente (derivadas de primeira e matriz hessiana
+(derivadas de segunda ordem) são obtidos numericamente via aproximação
+de diferenças finitas \cite{Nocedal1995}.
