@@ -208,10 +208,11 @@ Assim os problemas com a fuga da suposição de equidispersão podem ser
 superados quando a estimação por máxima quase-verossimilhança é
 adotado. Porém um resultado dessa abordagem é que
 
-$$
--E\left ( \frac{\partial^2 Q(\mu \mid y)}{\partial \mu^2} \right) \leq
--E\left ( \frac{\partial^2 \ell(\mu \mid y)}{\partial \mu^2} \right)
-$$
+\begin{equation}
+  \label{eqn:quasi-informacao}
+  -E\left ( \frac{\partial^2 Q(\mu \mid y)}{\partial \mu^2} \right) \leq
+  -E\left ( \frac{\partial^2 \ell(\mu \mid y)}{\partial \mu^2} \right)
+\end{equation}
 
 \noindent
 ou seja a informação a respeito de $\mu$ quando se conhece apenas $\phi$
