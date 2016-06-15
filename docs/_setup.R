@@ -127,8 +127,9 @@ myanova <- function(...) {
             "P(>Chisq)" = c(NA, pvs))
     }
     if (test == "F") {
-        sigma <- summary(model.list[[which.max(nps)]])$dispersion
-        df.sigma <- model.list[[which.max(nps)]]$df.residual
+        ## ver pág. 187 expresssão 7.10 em Modern Applied, Ripley
+        sigma <- sapply(model.list, function(x) summary(x)$dispersion)
+        df.sigma <- sapply(model.list, function(x) x$df.residual)
         dev <- sapply(model.list, function(x) deviance(x))
         dfs <- c(NA, -diff(dev))
         dnp <- c(NA, diff(nps))
@@ -143,6 +144,24 @@ myanova <- function(...) {
             "P(>F)" = pvs)
     }
     return(tab)
+}
+
+##======================================================================
+## Testa o parametro de dispersão de um modelo quasi poisson
+quasitest <- function(...) {
+    quasi.list <- list(...)
+    cls <- sapply(quasi.list, function(model) model$family$family)
+    if (sum(!cls %in% "quasipoisson") > 0) {
+        stop("O modelo não é quasipoisson")
+    }
+    ##-------------------------------------------
+    dev <- sapply(quasi.list, function(model) deviance(model))
+    dfs <- sapply(quasi.list, function(model) model$df.residual)
+    sig <- sapply(quasi.list, function(model) summary(model)$dispersion)
+    pvs <- pchisq(q = dev, df = dfs)*2
+    out <- cbind("sigma2" = sig, `P(>Chisq)` = pvs)
+    rownames(out) <- rep("sigma == 1", length(quasi.list))
+    return(out)
 }
 
 ##======================================================================
@@ -210,4 +229,56 @@ mycorrplot <- function(Corr, ...) {
         Corr, lower = "number", upper = "ellipse",
         diag = "l", tl.pos = "lt", tl.col = "black",
         tl.cex = 0.8, col = brewer.pal(9, "Greys")[-(1:3)], ...)
+}
+
+##======================================================================
+## Tabela de comparação dos coeficientes dos modelos para dados de
+## contagem
+
+##-------------------------------------------
+## Extrai os coeficientes dos modelos
+getCoefs <- function(model, rownames = NULL) {
+    cls <- class(model)[1]
+    if (!cls %in% c("glm", "negbin", "mle2")) {
+        stop("Classe de modelos não contemplada")
+    }
+    est <- switch(
+        cls,
+        "glm" = {
+            fam <- model$family$family
+            if (!fam %in% c("poisson", "quasipoisson")) {
+                stop("Família de distribuições não contemplada")
+            }
+            switch(
+                fam,
+                "poisson" = {
+                    rbind(c(NA, NA), summary(model)$coef[, c(1, 3)])
+                },
+                "quasipoisson" = {
+                    rbind(c(summary(model)$dispersion, NA),
+                          summary(model)$coef[, c(1, 3)])
+                }
+            )
+        },
+        "negbin" = {
+            rbind(c(model$theta, model$SE.theta),
+                  summary(model)$coef[, c(1, 3)])
+        },
+        "mle2" = {
+            summary(model)@coef[, c(1, 3)]
+        }
+    )
+    colnames <- c("estimate", "est/std.error")
+    if (!is.null(rownames)) {
+        rownames(est) <- rownames
+    }
+    return(est)
+}
+##-------------------------------------------
+## Faz a tabela de comparação
+coeftab <- function(..., rownames = NULL) {
+    model.list <- list(...)
+    coefs <- lapply(model.list, getCoefs, rownames = rownames)
+    tab <- do.call(cbind, coefs)
+    return(tab)
 }
