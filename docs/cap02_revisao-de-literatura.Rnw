@@ -194,15 +194,15 @@ quase-verossimilhança é é expressa como
 
 \begin{equation}
   \label{eqn:quase-verossimilhanca}
-  Q(\mu_i \mid y_i) = \int_y^{\mu_i} \frac{y_i - t}{\phi V(\mu_i)}dt
+  Q(\mu_i \mid y_i) = \int_y^{\mu_i} \frac{y_i - t}{\sigma^2 V(\mu_i)}dt
 \end{equation}
 
-Note na expressão \ref{eqn:quase-verossimilhanca} que a função de
+Na expressão \ref{eqn:quase-verossimilhanca} a função de
 quase-verossimilhança é definida a partir da especificação de $\mu_i$,
-$V(\mu_i)$ e $\phi$. O processo de estimação via maximização dessa
+$V(\mu_i)$ e $\sigma^2$. O processo de estimação via maximização dessa
 função compartilha as mesmas estimativas para $\mu_i$, porém a dispersão
-de $y_i$, $V(y_i) = \phi V(\mu_i)$ é corrigida pelo parâmetro adicional
-$\phi$.
+de $y_i$, $V(y_i) = \theta V(\mu_i)$ é corrigida pelo parâmetro adicional
+$\sigma^2$.
 
 Assim os problemas com a fuga da suposição de equidispersão podem ser
 superados quando a estimação por máxima quase-verossimilhança é
@@ -215,23 +215,25 @@ adotado. Porém um resultado dessa abordagem é que
 \end{equation}
 
 \noindent
-ou seja a informação a respeito de $\mu$ quando se conhece apenas $\phi$
+ou seja a informação a respeito de $\mu$ quando se conhece apenas $\sigma^2$
 e $V(\mu)$, a relação entre média e variância, é menor do que a
 informação quando se conhece a distribuição da variável resposta, dada
 pela log-verossimilhança $\ell(\mu \mid y)$. Além disso ressalta-se que,
 de forma geral, não se recupera a distribuição de $Y$ somente com as
-especificações de $\phi$ e $V(\mu)$.
+especificações de $\sigma^2$ e $V(\mu)$.
 
 Em modelos de regressão, definimos $g(\mu_i) = X\beta$ e $V(\mu_i)$ que
 definem a função de quase-verossimilhança. Nessa abordagem são estimados
-os parâmetros $\beta$ e $\phi$. A estimativa do vetor $\beta$ pode ser
-obtidas pelo algoritmo \textit{IWLS}, usando as funções quase-escore e
-matriz de quase-informação. Para o parâmetro $\phi$ um estimador usual é
-o baseado na estatística $\chi^2$ de Pearson.
+os parâmetros $\beta$ e $\sigma^2$. A estimativa do vetor $\beta$ pode
+ser obtidas pelo algoritmo \textit{IWLS}. Usando as funções quase-escore
+e matriz de quase-informação chega-se ao mesmo algoritmo de estimação
+dado no caso Poisson, que não depende de $\sigma^2$. O parâmetro
+$\sigma^2$ é estimado separadamente, pós estimação dos $\beta$'s. Um
+estimador usual é o baseado na estatística $\chi^2$ de Pearson.
 
 \begin{equation}
-  \label{eqn:estimador-phi}
-  \hat{\phi} = \frac{1}{n-p} \sum_{i=1}^n
+  \label{eqn:estimador-theta}
+  \hat{\sigma^2} = \frac{1}{n-p} \sum_{i=1}^n
                  \frac{(y_i - \hat{\mu_i})^2}{V(\hat{\mu_i})}
 \end{equation}
 
@@ -248,14 +250,14 @@ que
   \label{eqn:proc-binomneg}
   \begin{split}
     Y \mid & b \sim Poisson(b) \\
-    & b \sim Gama(\mu, \phi)
+    & b \sim Gama(\mu, \theta)
   \end{split}
 \end{equation}
 
 \noindent
 A função massa de probabilidade decorrente da estrutura descrita em
-\ref{eqn:proc-binomneg} é deduzida integrando os efeitos aleatórios,
-considere $f(y \mid b)$ como a função massa de probablidade da
+\ref{eqn:proc-binomneg} é deduzida integrando os efeitos aleatórios.
+Considere $f(y \mid b)$ como a função massa de probablidade da
 distribuição Poisson (vide expressão em \ref{eqn:pmf-poisson}) e $g(b
 \mid \mu, \phi)$ a função densidade da distribuição Gama \footnote{O
   desenvolvimento detalhado da integral pode ser visto em
@@ -266,57 +268,57 @@ distribuição Poisson (vide expressão em \ref{eqn:pmf-poisson}) e $g(b
 \begin{equation}
   \label{eqn:proc-binomneg}
   \begin{split}
-    Pr(Y = y \mid \mu,\phi) &= \int_0^\infty f(y \mid b)
-       g(b \mid \mu,\phi) db\\
-    &= \frac{\phi^\phi}{y!\mu^\phi\Gamma(\phi)}
-       \int_0^\infty e^{-b(1 + \phi/\mu)} b^{y+\phi-1}db \\
-    &= \frac{\Gamma(\phi + y)}{\Gamma(y+1)\Gamma(\phi)}
-       \left ( \frac{\mu}{\mu + \phi} \right )^y
-       \left ( \frac{\phi}{\mu + \phi} \right )^\phi
+    Pr(Y = y \mid \mu,\theta) &= \int_0^\infty f(y \mid b)
+       g(b \mid \mu,\theta) db\\
+    &= \frac{\theta^\theta}{y!\mu^\theta\Gamma(\theta)}
+       \int_0^\infty e^{-b(1 + \theta/\mu)} b^{y+\theta-1}db \\
+    &= \frac{\Gamma(\theta + y)}{\Gamma(y+1)\Gamma(\theta)}
+       \left ( \frac{\mu}{\mu + \theta} \right )^y
+       \left ( \frac{\theta}{\mu + \theta} \right )^\theta
        \qquad y = 0, 1, 2, \cdots
   \end{split}
 \end{equation}
 
 \noindent
-com $\mu >0$ e $\phi > 0$. Ressaltamos que esse é um caso particular de
+com $\mu >0$ e $\theta > 0$. Ressaltamos que esse é um caso particular de
 um modelo de efeito aleatório cuja a integral tem solução analítica e
 por consequência o modelo marginal tem forma fechada. Outro caso que se
 baseia no mesmo princípio é o modelo \textit{Inverse Gaussian Poisson},
 que como o nome sugere adota a distribuição Inversa Gaussiana para os
 efeitos aleatórios. Na figura \ref{fig:distr-binomneg} são apresentadas
-as distribuições Binomial Negativa para diferentes parâmetros $\phi$ em
+as distribuições Binomial Negativa para diferentes parâmetros $\theta$ em
 comparação com a distribuição Poisson equivalente em locação. Note que
-quanto menor o parâmetro $\phi$, maior a dispersão da distribuição. Isso
-introduz uma propriedade importante desse modelo, para $\phi \rightarrow
+quanto menor o parâmetro $\theta$, maior a dispersão da distribuição. Isso
+introduz uma propriedade importante desse modelo, para $\theta \rightarrow
 \infty$ a distribuição reduz-se a Poisson.
 
-<<distr-binomneg, fig.cap="Probabilidades pela distribuição Binomial Negativa para diferentes valores de $\\phi$ com $\\mu = 5$", fig.height=3.5, fig.width=7>>=
+<<distr-binomneg, fig.cap="Probabilidades pela distribuição Binomial Negativa para diferentes níveis de dispersão, fixando a média em 5.", fig.height=3.5, fig.width=7>>=
 
 ##-------------------------------------------
 ## Parametros da distribuição
 mu <- 5
-phis <- c("p1" = 1, "p2" = 5, "p3" = 30)
-vars <- mu + (1/phis) * mu^2
+thetas <- c("p1" = 1, "p2" = 5, "p3" = 30)
+vars <- mu + (1/thetas) * mu^2
 
 ##-------------------------------------------
 ## Calculando as probabilidades
 y <- 0:15
 
 ## Binomial Negativa
-py.bn <- sapply(phis, function(p) dnbinom(y, size = p, mu = mu))
+py.bn <- sapply(thetas, function(p) dnbinom(y, size = p, mu = mu))
 da.bn <- as.data.frame(py.bn)
 da.bn <- cbind(y, stack(da.bn))
 
 ## Poisson
-py.po <- sapply(phis, function(p) dpois(y, lambda = mu))
+py.po <- sapply(thetas, function(p) dpois(y, lambda = mu))
 da.po <- as.data.frame(py.po)
 da.po <- cbind(y, stack(da.po))
 
 ##-------------------------------------------
 ## Objetos para grafico da lattice
 fl <- substitute(
-    expression(phi == p1, phi == p2, phi == p3),
-    list(p1 = phis[1], p2 = phis[2], p3 = phis[3]))
+    expression(theta == p1, theta == p2, theta == p3),
+    list(p1 = thetas[1], p2 = thetas[2], p3 = thetas[3]))
 cols <- trellis.par.get("superpose.line")$col[1:2]
 yaxis <- pretty(da.po$values, n = 2)
 ylim <- c(-0.08, max(da.po$values)*1.2)
@@ -359,27 +361,27 @@ trellis.unfocus()
 @
 
 Os momentos média e variância da distribuição Binomial Negativa são
-expressos como $E(Y) = \mu$ e $V(Y) = \mu + \mu^2/\phi$. Note que pelas
-expressões fica evidente a característica da Binomial Negativa de
+expressos como $E(Y) = \mu$ e $V(Y) = \mu + \mu^2/\sigma^2$. Note que
+pelas expressões fica evidente a característica da Binomial Negativa de
 acomodar somente superdispersão, pois $E(Y)$ é menor que $V(Y)$ para
-qualquer $\phi$. Percebemos também quanto maior o parâmetro $\phi$ mais
-$E(Y)$ se aproxima de $V(Y)$, e no limite $\phi \rightarrow \infty$,
-$E(Y) = V(Y)$ fazendo com que a distribuição Binomial Negativa se reduza
-a Poisson.
+qualquer $\sigma^2$. Percebemos também quanto maior o parâmetro
+$\sigma^2$ mais $E(Y)$ se aproxima de $V(Y)$, e no limite, quando
+$\sigma^2 \rightarrow \infty$, $E(Y) = V(Y)$ fazendo com que a
+distribuição Binomial Negativa se reduza a Poisson.
 
 <<mv-binomneg, fig.cap="Relação Média e Variância na distribuição Binomial Negativa", fig.height=4, fig.width=4, fig.show="hide", results="asis">>=
 
 ##-------------------------------------------
 ## Parâmetros considerados
-phi <- seq(0.5, 50, length.out = 50)
+theta <- seq(0.5, 50, length.out = 50)
 col <- rev(brewer.pal(n = 8, name = "RdBu"))
-col <- colorRampPalette(colors = col)(length(phi))
+col <- colorRampPalette(colors = col)(length(theta))
 
 ##-------------------------------------------
 ## Etiquetas da legenda
 labels <- substitute(
-    expression(phi == p1, phi == p2, phi == p3),
-    list(p1 = min(phi), p2 = median(phi), p3 = max(phi)))
+    expression(theta == p1, theta == p2, theta == p3),
+    list(p1 = min(theta), p2 = median(theta), p3 = max(theta)))
 
 ##-------------------------------------------
 ## Gráfico
@@ -388,20 +390,20 @@ labels <- substitute(
 par(mar = c(5.5, 4.2, 3, 3), las = 1)
 curve(mu + 1*0,
       from = 0, to = 10, xname = "mu",
-      ylab = expression(V(Y) == mu + mu^2~"/"~phi),
+      ylab = expression(V(Y) == mu + mu^2~"/"~theta),
       xlab = expression(E(Y) == mu))
 grid()
 ## Curvas da relação média e variância da Binomial Negativa
-for (a in seq_along(phi)) {
-    curve(mu + (mu^2)/phi[a],
+for (a in seq_along(theta)) {
+    curve(mu + (mu^2)/theta[a],
           add = TRUE, xname = "mu", col = col[a], lwd = 2)
 }
 plotrix::color.legend(
     xl = 11, yb = 2.5, xr = 12, yt = 6.5,
     gradient = "y", align = "rb",
-    legend = round(fivenum(phi)[c(1, 3, 5)]),
+    legend = round(fivenum(theta)[c(1, 3, 5)]),
     rect.col = col)
-mtext(text = expression(phi), side = 3, cex = 1.5,
+mtext(text = expression(theta), side = 3, cex = 1.5,
       line = -4, at = 11.5)
 fonte("Fonte: Elaborado pelo autor.")
 
@@ -410,25 +412,25 @@ wrapfigure()
 
 A relação funcional entre média e variância é ilustrada na
 figura \ref{fig:mv-binomneg} onde apesentamos as médias e variâncias
-para $\mu$ entre 0 e 10 e $\phi$ entre 0 e 50. O comportamento dessa
+para $\mu$ entre 0 e 10 e $\theta$ entre 0 e 50. O comportamento dessa
 relação proporciona um mairo flexibilidade à distribuição em acomodar
 superdispersão, uma característica importante exibida nesta figura é que
 para a Binomial Negativa se aproximar a Poisson em contagens altas o
-$\phi$ deve ser extremamente grande.
+$\theta$ deve ser extremamente grande.
 
 O emprego do modelo Binomial Negativo em problemas se regressão ocorre
 de maneira similar aos MLG's, com excessão de que a distribuição só
-pertence a família exponencial de distribuições se o parâmetro $\phi$
+pertence a família exponencial de distribuições se o parâmetro $\theta$
 for conhecido e assim o processo sofre algumas
 alterações. Primeiramente, assim como na Poisson, definimos $g(\mu_i) =
 X\beta$, comumente utiliza-se a função $g(\mu_i) =
 \log(\mu_i)$. Desenvolvendo a log-verossimilhança e suas funções
 derivadas, função escore e matriz de informação de Fisher chegamos que a
 matriz de informação é bloco diagonal caracterizando a ortogonalidade
-dos parâmetros $\beta$ de locação e $\phi$ de dispersão. Deste fato
+dos parâmetros $\beta$ de locação e $\theta$ de dispersão. Deste fato
 decorre que a estimação dos parâmetros pode ser realizada em paralelo,
 ou seja, estima-se o vetor $beta$ pelo método de \textit{IWLS} e
-posteriormente o parâmetro $\phi$ pelo método de Newton-Raphson, faz-se
+posteriormente o parâmetro $\theta$ pelo método de Newton-Raphson, faz-se
 os dois procedimentos simultaneamente até a convengência dos parâmetros.
 
 \section{Modelo COM-Poisson}
