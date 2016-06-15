@@ -499,7 +499,7 @@ suppressWarnings({
 \subsubsection{Número de nematóides em raízes de feijoeiro}
 \label{sec:nematodes}
 
-<<data-nematodes, include=FALSE, echo=FALSE>>=
+<<data-nematodes, include=FALSE, cache=FALSE>>=
 
 data(nematodes, package = "tccPackage")
 
