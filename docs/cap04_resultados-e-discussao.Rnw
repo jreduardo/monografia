@@ -1631,10 +1631,20 @@ seção \ref{sec:fish}). O estudo tem por objetivo a modelagem do número
 de peixes capturados por grupos de visitantes em um Parque Estadual. As
 covariáveis mensuradas foram \texttt{np}, o número de pessoas no grupo,
 \texttt{nc}, o número de crianças e \texttt{ca} variável binária que
-indica a presença ou não de um campista no grupo. Com estrutura dos
-dados vamos modelar o número de peixes capturados em duas partes, as
-contagens nulas e as não nulas, seção \ref{cap02:zeros}. Abaixo
-definimos os preditores considerados para as duas partes
+indica a presença ou não de um campista no grupo.
+
+Como já antecipado pela visualização e apresentação dos dados, modelos
+estruturados de forma convencional, que pressupõe apenas um processo
+estocástico na geração de dados, não se ajustaram adequadamente. A
+seguir apresentamos a alternativa de inclusão de um efeito de barreira
+para acomodar a quantidade excessiva de valores zero. Os modelos
+Poisson, Binomial Negativo e COm-Poisson sob esta estruturação são
+ajustados e comparados.
+
+Com a estrutura dos dados vamos modelar o número de peixes capturados em
+duas partes, as contagens nulas e as não nulas, seção
+\ref{cap02:zeros}. Abaixo definimos os preditores considerados para as
+duas partes
 
 \noindent
 Preditor 1: \quad $
@@ -1649,13 +1659,23 @@ Preditor 1: \quad $
 Preditor 2: \quad $
 \begin{aligned}
   g(\mu)     &= \beta_0 + \beta_1 \textrm{ca} +
-  \beta_2 \textrm{np} + \beta_4 \textrm{nc} +
-  \beta_5 (\textrm{np} \cdot \textrm{nc}) \\
+  \beta_2 \textrm{np} + \beta_3 \textrm{nc} +
+  \beta_4 (\textrm{np} \cdot \textrm{nc}) \\
   logit(\pi) &= \gamma_0 + \gamma_1 \textrm{ca} +
   \gamma_2 \textrm{np} + \gamma_3 \textrm{nc} +
-  \gamma_5 (\textrm{np} \cdot \textrm{nc})
+  \gamma_4 (\textrm{np} \cdot \textrm{nc})
 \end{aligned}$ \\
 
+\noindent
+sendo $g(\mu)$ e $logit(\pi)$ as funções de ligação que relacionam os
+preditores lineares com as médias dos modelos para contagens não nulas e
+contagens zero respectivamente. Os preditores lineares foram propostos
+de forma aninhada. No primeiro temos os efeitos aditivos de todas as
+covariáveis mensuradas para a parte das contagens nulas e efeitos
+aditivos do número de pessoas e de crianças para a parte das contagens
+não nulas. No segundo temos os efeitos aditividos de todas as
+covariáveis acréscido do efeito de interação entre o número de pessoas e
+de crianças para ambas as partes do modelo.
 
 <<logLik-fish, include=FALSE>>=
 
@@ -1667,22 +1687,22 @@ anHB <- myanova(m1HB, m2HB)
 ## Obtem as estimativas dos parametros de dispersao
 dispHC <- sapply(list(m1HC, m2HC), function(m) m@coef[1])
 dispHB <- sapply(list(m1HB, m2HB), function(m) m$theta)
-dispersions <- c(NA, NA, dispHC, dispHB)
+dispersions <- c(NA, NA, dispHB, dispHC)
 
 ## Empilhando
 tab <- data.frame(pred = rep(paste("Preditor", 1:2), 3))
-tab <- cbind(tab, rbind(anHP, anHC, anHB), dispersions)
+tab <- cbind(tab, rbind(anHP, anHB, anHC), dispersions)
 
 ## ## Gerando o código latex
 ## digits <- c(1, 1, 0, 2, 2, 2, 0, -2, 2)
-xtable(tab, digits = digits)
+## xtable(tab, digits = digits)
 
 @
 
 \begin{table}[ht]
 \centering
 \small
-\caption{Medidas de ajuste para avaliação e comparação entre preditores
+\caption{Medidas de ajuste para avaliação e comparação de preditores
   e modelos com componente de barreira ajustados}
 \label{tab:ajuste-fish}
 \begin{tabular}{lcccccrc}
@@ -1691,14 +1711,14 @@ Poisson & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) & \\
   \midrule
   Preditor 1 & 7 & -857,48 & 1728,96 &  &  &  &  \\
   Preditor 2 & 10 & -744,58 & 1509,17 & 225,79 & 3 & 1,12E-48 &  \\[0.3cm]
-COM-Poisson & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) & $\hat{\phi}$ \\
-  \midrule
-  Preditor 1 & 8 & -409,85 & 835,71 &  &  &  & -8,77 \\
-  Preditor 2 & 11 & -402,30 & 826,59 & 15,12 & 3 & 1,72E-03 & -3,77 \\[0.3cm]
 Binomial Negativo & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) & $\hat{\theta}$ \\
   \midrule
   Preditor 1 & 8 & -399,79 & 815,58 &  &  &  & 0,20 \\
-  Preditor 2 & 11 & -393,72 & 809,44 & 12,14 & 3 & 6,91E-03 & 0,37 \\
+  Preditor 2 & 11 & -393,72 & 809,44 & 12,14 & 3 & 6,91E-03 & 0,37 \\[0.3cm]
+COM-Poisson & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) & $\hat{\phi}$ \\
+  \midrule
+  Preditor 1 & 8 & -409,85 & 835,71 &  &  &  & -8,77 \\
+  Preditor 2 & 11 & -402,30 & 826,59 & 15,12 & 3 & 1,72E-03 & -3,77 \\
   \bottomrule
 \end{tabular}
 \begin{tablenotes}
@@ -1709,3 +1729,211 @@ Binomial Negativo & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$)
 \item Fonte: Elaborado pelo autor.
 \end{tablenotes}
 \end{table}
+
+Na tabela \ref{tab:ajuste-fish} as medidas de ajuste dos modelos
+Poisson, Binomial Negativo e COM-Poisson são apresentadas para
+comparação dos resultados. Observa-se pelas log-verossimilhanças
+maximimizadas que o modelo Poisson não se ajustou adequadamente quando
+comparado aos demais. Isso se deve ao fato discutido na seção
+\ref{cap02:zeros}, que mesmo modelando os zeros podemos ter diferentes
+níveis de dispersão para as contagens nulas. Nesse exemplo as contagens
+não nulas são superdispersas, conforme visto pelas estimativas dos
+parâmetros extras do modelo Binomial Negativo e COM-Poisson. Conforme
+indicado pelos níveis descritivos dos TRV's aplicados nos modelos
+encaixados temos a indicação de que o modelo com efeitos de interação é
+distinto do modelo com efeitos aditivos definidos no preditor 1.
+
+
+<<coef-fish, results="asis">>=
+
+##======================================================================
+## Estimativas dos parâmetros
+
+coHP <- rbind(
+    c(NA, NA),
+    do.call(rbind, summary(m2HP)$coef)[, c(1, 3)]
+)
+##
+coHB <- with(summary(m2HB)$coef, {
+    last <- nrow(count)
+    rbind(
+        c(exp(count[last, 1]), count[last, 3]),
+        rbind(count[-last, c(1, 3)], zero[, c(1, 3)])
+    )
+})
+##
+coHC <- summary(m2HC)@coef[, c(1, 3)]
+
+## Empilha
+pnames <- c("phi", paste("beta", 0:4, sep = "_"),
+            paste("gamma", 0:4, sep = "_"))
+tab <- data.frame(pnames, cbind(coHP, coHB, coHC))
+
+## xtable(tab)
+
+@
+
+As estimativas dos parâmetros para cada especificação de modelos são
+exibidas na tabela \ref{tab:coef-fish}. Observe primeiramente que as
+estimativas dos parâmetros $\gamma_i$, $i = 0, 1, 2, 3, 4$ são
+idênticas, independentemente do modelo adotado. Esse resultado é
+esperado, pois na construção dos modelos com componente de barreira, a
+modelagem da parte que contempla os valores zero é realizada via
+distribuição Bernoulli com parâmetro $\pi = logit(Z\gamma)$. As
+diferenças entre os modelos ocorre na distribuição considerada para a
+parte das contagens não nulas.
+
+\begin{table}[ht]
+\centering
+\caption{Estimativas dos parâmetros e razões entre as estimativa e erro
+  padrão para os três modelos em estudo}
+\label{tab:coef-fish}
+\begin{tabular}{lcccccc}
+  \toprule
+  & \multicolumn{2}{c}{Poisson} & \multicolumn{2}{c}{Binomial Negativo} &  \multicolumn{2}{c}{COM-Poisson} \\
+  \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}
+  Parâmetro  & Estimativa & Est/EP & Estimativa & Est/EP & Estimativa & Est/EP \\
+  \midrule
+  Extra ($\phi$, $\theta$) &  &  & 0,37 & -2,08 & -3,77 & -9,52 \\
+  $\beta_0$ & -1,01 & -5,44 & -1,75 & -2,90 & -0,62 & -29,74 \\
+  $\beta_1$ & 0,74 & 7,88 & 0,41 & 1,23 & 0,10 & 29,20 \\
+  $\beta_2$ & 0,89 & 18,55 & 1,05 & 6,41 & 0,14 & 21,86 \\
+  $\beta_3$ & 0,49 & 1,11 & -0,06 & -0,05 & -0,33 & -17,53 \\
+  $\beta_4$ & -0,45 & -3,69 & -0,32 & -0,90 & 0,04 & 33,41 \\
+  $\gamma_0$ & -2,58 & -5,08 & -2,58 & -5,08 & -2,59 & -5,09 \\
+  $\gamma_1$ & 0,98 & 3,00 & 0,98 & 3,00 & 1,00 & 3,04 \\
+  $\gamma_2$ & 1,25 & 5,60 & 1,25 & 5,60 & 1,26 & 5,61 \\
+  $\gamma_3$ & -0,93 & -1,05 & -0,93 & -1,05 & -0,93 & -1,06 \\
+  $\gamma_4$ & -0,41 & -1,41 & -0,41 & -1,41 & -0,41 & -1,41 \\
+   \bottomrule
+\end{tabular}
+\begin{tablenotes}
+  \small
+\item Fonte: Elaborado pelo autor.
+\end{tablenotes}
+\end{table}
+
+Nos efeitos estimados para a parte da modelagem dos valores não nulos
+têm-se algumas diferenças consideráveis. Destaca-se que o valor das
+estimativas dos modelos Poisson e Binomial Negativo são comparáveis
+entre si, pois modelam a média da distribuição, mas não comparáveis com
+as estimativas do modelo COM-Poisson, pois este modelo um parâmetro que
+não representa, unicamente, a média. Contudo, independente da
+distribuição o sinal dos efeitos deve ser o mesmo. Isso não ocorre nas
+estimativas dos parâmetros $\beta_3$, positiva no modelo Poisson e
+negativa nos demais e $\beta_4$, positiva no modelo COM-Poisson e
+negativa nos demais. Porém esses efeitos não tem impacto significativo
+para definição dos parâmetros das distribuições, conforme podemos ver na
+figura \ref{fig:pref-fish} que mostra as médias calculadas com base nas
+três formulações. A seguir discutimos sobre os valores apresentados dos
+erros padrão dessas estimativas.
+
+Calculando a magnitude desses efeitos quando escalonados pelo seu erro
+padrão, calculado pelo negativo do inverso da matriz hessiana, temos
+diferenças substanciais. O modelo COM-Poisson indica erros padrões das
+estimativas muito menores que os apresentados no modelo Binomial
+Negativo. Sob investigações do problema, encontramos que este resultdo
+se deve por inconsistências no procedimento numérico para determinação
+da matriz hessiana por diferenças finitas no modelo
+COM-Poisson. Portanto, os erros padrão sob o modelo COM-Poisson
+apresentados não são confiáveis.
+
+<<pred-fish, fig.height=4.5, fig.width=7, fig.cap="Valores preditos do número de peixes capturados considerando o número de crianças e pessoas no grupo e a presença de um campista">>=
+
+##======================================================================
+## Preditos
+
+## Região para predição
+pred <- expand.grid(campista = c("Não", "Sim"),
+                    ncriancas = 0:3, npessoas = 1:4)
+
+##-------------------------------------------
+## Estimando as médias
+
+## Pelo Hurdle Poisson
+aux <- predict(m2HP, newdata = pred, type = "response")
+predHP <- cbind(pred, fit = aux, model = "HP")
+
+## Pelo Hurdle Binomial Negativo
+aux <- predict(m2HB, newdata = pred, type = "response")
+predHB <- cbind(pred, fit = aux, model = "HB")
+
+## Pelo Hurdle COM-Poisson
+aux <- predict(m2HC, newdata = pred, type = "response")
+predHC <- cbind(pred, fit = aux, model = "HC")
+
+##
+pred.all <- rbind(predHP, predHB, predHC)
+
+##-------------------------------------------
+## Gráfico final
+
+key <- list(
+    lines = list(lty = 1:3),
+    text = list(
+        paste("Hurdle", c("Poisson", "COM-Poisson",
+                          "Binomial Negativo")))
+)
+
+xyplot(npeixes ~ npessoas | campista,
+       groups = ncriancas, data = subset(fish, npeixes < 50),
+       jitter.x = TRUE,
+       jitter.y = TRUE,
+       type = c("p", "g"),
+       xlab = "Número de pessoas no grupo",
+       ylab = "Número de peixes capturados",
+       key = key,
+       alpha = 0.3,
+       strip = strip.custom(
+           strip.names = TRUE, var.name = "campista"
+       )) +
+    as.layer(
+        xyplot(fit ~ npessoas | campista,
+               groups = ncriancas, data = predHP,
+               type = "l",
+               lty = 1)
+    ) +
+    as.layer(
+        xyplot(fit ~ npessoas | campista,
+               groups = ncriancas, data = predHC,
+               type = "l",
+               lty = 2)
+    ) +
+    as.layer(
+        xyplot(fit ~ npessoas | campista,
+               groups = ncriancas, data = predHB,
+               type = "l",
+               lty = 3)
+    )
+##-------------------------------------------
+## Legenda
+cols <- trellis.par.get("superpose.line")$col[1:4]
+draw.key(
+    key = list(
+        cex = 0.9,
+        columns = 1,
+        lines = list(
+            lty = 1, lwd = 2, col = cols),
+        text = list(
+            as.character(paste(unique(fish$ncriancas), "crianças")))
+    ), draw = TRUE,
+    vp = grid::viewport(
+        x = grid::unit(0.22, "npc"), y = grid::unit(0.6, "npc")))
+
+@
+
+Embora tenhamos constatado problemas nos algoritmos numéricos para
+determinar a curvatura da log-verossimilhança, temos que as estimativas
+pontuais são coerentes com os demais modelos, conforme visto no figura
+\ref{fig:pred-fish} onde temos apresentadas as médias calculadas com
+base nos três modelos estudados. Observa-se em todos os modelos a
+mesma tendência.
+
+Com esse ilustramos a extensão do modelo COM-Poisson para acomodar
+excesso de zeros e ressaltamos que nesse exemplo tivemos contagens não
+nulas superdispersas e para esses casos temos a distribuição Binomial
+Negativa sendo a principal alternativa. Porém em casos que as contagens
+não nulas se apresentam de forma subdispersa não temos opções
+prontamente disponíveis para análise e o modelo COM-Poisson com
+componente de barreira, conforme apresentado, se torna uma abordagem
+atrativa.

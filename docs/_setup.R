@@ -34,6 +34,7 @@ opts_chunk$set(
     echo = FALSE,
     tidy = TRUE,
     cache = TRUE,
+    results = "hide",
     ## dev = "tikz",
     fig.width = 7,
     fig.height = 5,
