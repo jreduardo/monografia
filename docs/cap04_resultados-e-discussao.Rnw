@@ -593,6 +593,7 @@ levels(da.nnos$param) <- "phi3"
 vars <- c("param", "z", "focal")
 da <- rbind(da.ncapu[, vars], da.nerep[, vars], da.nnos[, vars])
 ##
+cols <- trellis.par.get("superpose.line")$col[1:2]
 xyplot(abs(z) ~ focal | param, data = da,
        layout = c(NA, 1),
        scales = list(x = "free"),
@@ -607,19 +608,32 @@ xyplot(abs(z) ~ focal | param, data = da,
        ),
        ylab = expression(abs(z)~~(sqrt(~Delta~"deviance"))),
        xlab = expression(phi),
-       panel = function(x, y, subscripts = subscripts, ...) {
+       panel = function(x, y, subscripts, ...) {
+           conf <- c(0.9, 0.95, 0.99)
+           hl <- sqrt(qchisq(conf, 1))
+           ##-------------------------------------------
            mle <- x[y == 0]
-           panel.xyplot(x, y, subscripts = subscripts, ...)
+           xl <- x[x < mle]; yl <- y[x < mle]
+           xr <- x[x > mle]; yr <- y[x > mle]
+           ##-------------------------------------------
+           funleft <- approxfun(x = yl, y = xl)
+           funright <- approxfun(x = yr, y = xr)
+           vxl <- funleft(hl)
+           vxr <- funright(hl)
+           vz <- c(hl, hl)
+           ##-------------------------------------------
+           panel.xyplot(x, y, ...)
+           panel.arrows(c(vxl, vxr), 0, c(vxl, vxr), vz,
+                        code = 1, length = 0.1, lty = 2,
+                        col = "gray40")
+           panel.segments(vxl, vz, vxr, vz, lty = 2,
+                          col = "gray40")
            panel.abline(h = 0, v = mle, lty = 3)
+           panel.text(x = rep(mle, 2), y = vz+0.1,
+                      labels = paste(conf*100, "%"),
+                      col = "gray20")
+           panel.abline(v = 0, col = cols[2])
        }, sub = "Fonte: Elaborado pelo autor.")
-
-## xy1 <- myprof(prof.ncapu, par.settings = ps.sub)
-## xy2 <- myprof(prof.nerep, par.settings = ps.sub, ylab = "")
-## xy3 <- myprof(prof.nnos, par.settings = ps.sub, ylab = "")
-## print(xy1, split = c(1, 1, 3, 1), more = TRUE)
-## print(xy2, split = c(2, 1, 3, 1), more = TRUE)
-## print(xy3, split = c(3, 1, 3, 1), more = FALSE)
-## fonte.xy("Fonte: Elaborado pelo autor.")
 
 @
 
@@ -1046,13 +1060,55 @@ contemplam o zero.
 
 <<prof-soyaBeans, fig.height=3.5, fig.width=7, fig.cap="Perfis de log-verossimilhança para o parâmetro extra da COM-Poisson nos modelos para número de vagens viáveis por parcela (esquerda) e número grãos de soja por parcela (direira).">>=
 
-xy1 <- myprof(prof.nv, par.settings = ps.sub,
-              namestrip = "Número de vagens")
-xy2 <- myprof(prof.ng, par.settings = ps.sub,
-              namestrip = "Número de grãos")
-print(xy1, split = c(1, 1, 2, 1), more = TRUE)
-print(xy2, split = c(2, 1, 2, 1), more = TRUE)
-fonte.xy("Fonte: Elaborado pelo autor.")
+##======================================================================
+## Causa
+da.nv <- as.data.frame(prof.nv)
+da.ng <- as.data.frame(prof.ng)
+##
+levels(da.nv$param) <- "phi2"
+levels(da.ng$param) <- "phi3"
+##
+vars <- c("param", "z", "focal")
+da.soya <- rbind(da.nv[, vars], da.ng[, vars])
+##
+cols <- trellis.par.get("superpose.line")$col[1:2]
+xyplot(abs(z) ~ focal | param, data = da.soya,
+       layout = c(NA, 1),
+       scales = list(x = "free"),
+       subset = abs(z) < 3.5,
+       type = c("l", "g"),
+       strip = strip.custom(
+           factor.levels = c(
+               "Nº de vagens",
+               "Nº de grãos")),
+       ylab = expression(abs(z)~~(sqrt(~Delta~"deviance"))),
+       xlab = expression(phi),
+       panel = function(x, y, subscripts, ...) {
+           conf <- c(0.9, 0.95, 0.99)
+           hl <- sqrt(qchisq(conf, 1))
+           ##-------------------------------------------
+           mle <- x[y == 0]
+           xl <- x[x < mle]; yl <- y[x < mle]
+           xr <- x[x > mle]; yr <- y[x > mle]
+           ##-------------------------------------------
+           funleft <- approxfun(x = yl, y = xl)
+           funright <- approxfun(x = yr, y = xr)
+           vxl <- funleft(hl)
+           vxr <- funright(hl)
+           vz <- c(hl, hl)
+           ##-------------------------------------------
+           panel.xyplot(x, y, ...)
+           panel.arrows(c(vxl, vxr), 0, c(vxl, vxr), vz,
+                        code = 1, length = 0.1, lty = 2,
+                        col = "gray40")
+           panel.segments(vxl, vz, vxr, vz, lty = 2,
+                          col = "gray40")
+           panel.abline(h = 0, v = mle, lty = 3)
+           panel.text(x = rep(mle, 2), y = vz+0.1,
+                      labels = paste(conf*100, "%"),
+                      col = "gray20")
+           panel.abline(v = 0, col = cols[2])
+       }, sub = "Fonte: Elaborado pelo autor.")
 
 @
 
@@ -1937,3 +1993,338 @@ não nulas se apresentam de forma subdispersa não temos opções
 prontamente disponíveis para análise e o modelo COM-Poisson com
 componente de barreira, conforme apresentado, se torna uma abordagem
 atrativa.
+
+\section{Análise de dados de reprodução de nematóides em cultivares de
+  feijoeiro}
+\label{sec:analise-nematodes}
+
+<<ajuste-nematodes, include=FALSE, cache=TRUE>>=
+
+library(tccPackage)
+library(lme4)
+data(nematodes)
+
+## Preditores
+f1 <- nema ~ (1|cult)
+f2 <- nema ~ off + (1|cult)
+
+## Ajuste dos mixed Poisson
+m1PM <- glmer(f1, data = nematodes, family = poisson)
+m2PM <- glmer(f2, data = nematodes, family = poisson)
+
+## ## Ajuste dos mixed COM-Poisson
+## m1CM <- mixedcmp(f1, data = nematodes, sumto = 50)
+## m2CM <- mixedcmp(f2, data = nematodes, sumto = 50)
+load("mixedcmp_models.rda")
+
+@
+
+Nessa última aplicação apresentada no trabalho ilustramos a extensão dos
+modelos de contagem para inclusão de efeitos aleatórios. Os modelos em
+competição são o Poisson e o COM-Poisson com efeitos aleatórios. O
+conjunto de dados se refere ao número de nematóides em cultivares
+medidas em soluções \texttt{sol} compostas da massa fresca de raízes
+diluídas em água, mensuradas em gramas$ \cdot$ ml$^{-1}$ conforme
+apresentado na seção \ref{sec:nematodes}. Consideramos para os modelos
+em competição, os seguintes preditores:
+
+\noindent
+Preditor 2: $g(\mu) = \beta_0 + b_j$ \\
+Preditor 2: $g(\mu) = \beta_0 + \beta_1 \textrm{sol}_i + b_j$
+
+\noindent
+em que $i = 1, 2, \cdots, \Sexpr{nrow(nematodes)}$ (número de
+observações) e $j$ varia nos níveis da cultivar de feijão ($j =$ A, B,
+C, $\cdots$, S representando o efeito aleatório, realização de uma
+variável aleatória Normal de média 0 e variância $\sigma^2$. Assim, nos
+modelos propostos têm-se a variabilidade intra-cultivares explicada por
+uma distribuição Normal e a variabilidade extra-cultivares explicada
+pela relação média variância descrita pelo modelo considerado, Poisson
+ou COM-Poisson.
+
+<<logLik-nematodes, include=FALSE>>=
+
+## Anova
+anP <- myanova(m1PM, m2PM)
+anC <- myanova(m1CM, m2CM)
+
+## TRV entre Mixed-Poisson e Mixed-COMPoisson
+trv <- 2 * (anC[, 2] - anP[, 2])
+pvs <- pchisq(q = trv, df = 1, lower.tail = FALSE)
+phi <- sapply(list(m1CM, m2CM), function(model) model@fullcoef[1])
+
+## Empilha na tabela
+tab <- data.frame(
+    preditor = rep(paste("Preditor", 1:2), 2),
+    rbind(cbind(anP, cbind(c(NA, NA)), c(NA, NA)),
+          cbind(anC, phi, pvs)))
+
+## digits <- c(1, 1, 0, 2, 2, 2, 0, -2, 2, -2)
+## xtable(tab, digits = digits)
+
+@
+
+O ajuste de modelos com a inclusão de efeitos aleatórios requer a
+solução de uma integral que, em geral, é resolvida numericamente. Isso
+torna o procedimento de ajuste computacionalmente intensivo e muito
+sensível a problemas numéricos. Para o ajuste dos modelos COM-Poisson de
+efeitos mistos algumas iterações do algoritmo de estimação propuseram
+valores para os parâmetros que resultaram em somas $Z(\lambda_i, \phi)$
+não puderam ser representados pela máquina, \textit{overflow}. Porém o
+algoritmo é equipado com procedimentos para esquivar-se desse problema
+propondo novos valores mesmo quando a função objetivo não puder ser
+calculada, alcançando o máximo da log-verossimilahnça. Para o modelo
+Poisson de efeito aleatório utilizou-se das programações em R providas
+pelo pacote \texttt{lme4} \cite{Bates2015}, que trabalham com matrizes
+esparsas para os efeitos aleatórios e otimização em linguagem de baixo
+nível, minimizando os problemas numéricos.
+
+Os resultados do ajuste para avaliação e comparação dos modelos são
+apresentados na tabela \ref{tab:ajuste-nematodes}. Os valores na tabela
+indicam que os modelos Poisson e COM-Poisson se ajustaram de forma
+equivalente, os valores da log-verossimilhança foram muito
+próximos. Essa equivalência também é apontanda pelos AIC's que foram
+maiores para nos modelos COM-Poisson e pelos níveis descritivos dos
+TRV's realizados sob a hipótese $H_0: \phi = 0$, indicando que a adoção
+de um modelo com um parâmetro adicional não é justificado pelo pequeno
+acréscimo na log-verossimilhança. Com relação ao efeito da solução de
+massa fresca de raíz, temos evidências apontando um efeito significativo
+para explicação do número de nematóides.
+
+\begin{table}[ht]
+\centering
+\caption{Medidas de ajuste para avaliação e comparação entre preditores
+  e modelos ajustados}
+\label{tab:ajuste-nematodes}
+\begin{tabular}{lcccccrcr}
+  \toprule
+ Poisson & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) &  \\
+  \midrule
+  Preditor 1 & 2 & -237,20 & 478,40 &  &  &  &  &  \\
+  Preditor 2 & 3 & -234,66 & 475,32 & 5,07 & 1 & 2,43E-02 &  &  \\[0.3cm]
+ COM-Poisson & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) & $\hat{\phi}$ & P($>\rchi^2$) \\
+  \midrule
+  Preditor 1 & 3 & -236,85 & 479,71 &  &  &  & 0,15 & 4,06E-01 \\
+  Preditor 2 & 4 & -233,86 & 475,72 & 5,99 & 1 & 1,44E-02 & 0,23 & 2,05E-01 \\
+   \bottomrule
+\end{tabular}
+\begin{tablenotes}
+  \footnotesize
+\item np, número de parâmetros, diff $\ell$, diferença entre
+  log-verossimilhanças,
+  diff np, diferença entre o np.
+\item Fonte: Elaborado pelo autor.
+\end{tablenotes}
+\end{table}
+
+Permanecendo com o segundo preditor, com o efeito da solução, temos as
+estimativas dos parâmetros do modelo apresentadas na tabela
+\ref{tab:coef-nematodes} em conjunto com seu erro padrão, calculado sob
+aproximação quadrática da verossimilhança, ou seja via inversão da
+matriz hessiana. Novamente temos os resultados similares entre os
+modelos. Lembre-se que, desta tabela o único resultado comparável
+diretamente é a razão entre estimativa e erro padrão do parâmetro
+$\beta_1$. O parâmetro $\sigma$ é o responsável por estabelecer a
+distribuição dos efeitos aleatórios, que no modelo Poisson são somado
+para composição de $\mu$ e na COM-Poisson para composição de
+$\lambda$. Outro resultado interessante dessa tabela é a estimativa do
+parâmetro $\phi$ da COM-Poisson, a estimativa positiva indica uma
+subdispersão moderada nesse conjunto de dados. Uma vantagem do
+modelo misto COM-Poisson é que podemos distinguir a variabilidade da
+contagem com a variabilidade dos grupos aleatórios no experimento. Nesse
+exemplo tivemos uma variabilidade do efeito aleatório maior, $\sigma$
+estimado no caso COM-Poisson maior que no caso Poisson, porém essa
+varibilidade extra capturada pelo efeito aleatório é compensada pela
+subdispersão capturada pelo parâmetro $\phi$.
+
+
+<<coef-nematodes, include=FALSE>>=
+
+tabMP <- rbind(lsigma = c(sqrt(VarCorr(m2PM)$cult), NA, NA),
+               summary(m2PM)$coef[, -4],
+               phi = c(NA, NA, NA))
+
+tabMC <- rbind(lsigma = c(exp(m2CM@coef[2]), NA, NA),
+               summary(m2CM)@coef[-(1:2) ,-4],
+               summary(m2CM)@coef[1 ,-4])
+
+## print(xtable(cbind(tabMP, tabMC), digits = 2),
+##       include.rownames = TRUE)
+
+@
+
+\begin{table}[ht]
+\centering
+\caption{Estimativas dos parâmetros e razões entre as estimativa e erro
+  padrão para os três modelos em estudo}
+\label{tab:coef-nematodes}
+\begin{tabular}{lcccccc}
+  \toprule
+  & \multicolumn{3}{c}{Poisson} & \multicolumn{3}{c}{COM-Poisson} \\
+  \cmidrule(lr){2-4} \cmidrule(lr){5-7}
+Parâmetro & Estimativa & E. Padrão & Est/EP & Estimativa & E. Padrão & Est/EP \\
+  \midrule
+  $\sigma$   & 0,75 &  &  & 0,93 &  &  \\
+  $\beta_0$  & 1,62 & 0,19 & 8,50 & 2,08 & 0,45 & 4,59 \\
+  $\beta_1$  & 1,27 & 0,56 & 2,29 & 1,58 & 0,68 & 2,33 \\
+  $\phi$     &  &  &  & 0,23 & 0,18 & 1,33 \\
+  \bottomrule
+\end{tabular}
+\end{table}
+
+Como resultados complementares a tabela \ref{tab:coef-nematodes} temos
+os perfis de verossimilhança com intervalos de confianças de níveis 90,
+95 e 99\% apresentados na figura \ref{fig:prof-nematodes}. Observa-se um
+comportamento razoavelmente simétrico para todos os parâmetros, apenas
+com uma assimetria levemente destacada para o parâmetro $\beta_0$, o que
+nos dá mais segurança para interpretarmos resultados baseados na
+aproximação quadrática da verossimilhança, que são de fácil obtenção
+pois só envolvem inversão de matrizes. No perfil de verossimilhança para
+o parâmetro $\phi$, temos mais uma evidência da equivalência entre os
+modelos Poisson e COM-Poisson, pois note que o valor 0 é contido pelos
+intervalos.
+
+<<prof-nematodes, fig.height=3, fig.width=7.2, fig.cap="Perfis de verossimilhança dos parâmetros estimados no modelo COM-Poisson Misto">>=
+
+fl <- expression(phi, log(sigma), beta[0], beta[1])
+myprof(profCM, subset = 3.5,
+       namestrip = fl, xlab = "Parâmetros do modelo",
+       par.settings = ps.sub)
+
+fonte.xy("Fonte: Elaborado pelo autor.")
+@
+
+<<corr-nematodes, fig.width=3.5, fig.height=3.5, fig.show="hide", results="asis", fig.cap="Imagem da matriz de correlação entre os parâmetros do modelo COM-Poisson">>=
+
+pnames <- c("phi", "lsigma0", paste0("beta", 0:1))
+
+Vcov <- vcov(m2CM)
+Corr <- cov2cor(Vcov)
+dimnames(Corr) <- list(pnames, pnames)
+mycorrplot(Corr)
+
+wrapfigure()
+fonte("Fonte: Elaborado pelo autor.")
+
+@
+
+Conforme já observado anteriormente, no modelo COM-Poisson misto temos
+que os parâmetros $\phi$, da distribuição considerada para a variável de
+contagem condicional aos efeitos aleatórios e as covariáveis e $\sigma$,
+da distribuição considerada para os efeitos aleatórios são conjuntamente
+responsáveis pela explicação da varibilidade do processo em estudo. Na
+figura \ref{fig:corr-nematodes} apresentados as covariâncias entre os
+parâmetros do modelo, na escala de correlação, a fim de verificar,
+principalmente, a correlação entre $\sigma$ e $\phi$. Observa-se que,
+conforme esperado, estes parâmetros apresentam uma forte covariância e
+ainda que esta é positiva, pois estamos no caso de subdispersão, ainda
+que não de forma acentuada. Nota-se também que a característica de não
+ortogonalidade entre os parâmetros de locação e $\phi$ se mantém com a
+inclusão de efeitos aleatórios.
+
+<<pred-nematodes, fig.height=4.2, fig.width=7.3, fig.cap="Perfis de verossimilhança dos parâmetros estimados no modelo COM-Poisson Misto">>=
+
+##-------------------------------------------
+## Obtendo os efeitos aleatórios
+ranefP <- ranef(m2PM)$cult[, 1]
+ranefC <- mixedcmp.ranef(m2CM)
+ranef.all <- rbind(
+    data.frame(model = "PM", ranef = ranefP),
+    data.frame(model = "CM", ranef = ranefC))
+
+xy1 <- densityplot(
+    ~ranef, groups =  model,
+    auto.key = list(
+        column = 1,
+        text = c("Poisson", "COM-Poisson")
+    ),
+    xlab = "Predição dos efeitos\n aleatórios",
+    ylab = "Densidade",
+    data = ranef.all,
+    grid = TRUE,
+    par.settings = ps.sub)
+
+##-------------------------------------------
+## Valores preditos
+pred <- with(
+    nematodes,
+    expand.grid(off = seq(min(off), max(off), length.out = 20),
+               cult = levels(cult))
+    )
+X <- model.matrix(~off, data = pred)
+
+## Pelo Poisson Mixed
+aux <- predict(m2PM, newdata = pred, type = "link")
+predPM <- data.frame(pred, y = exp(aux), model = "MP")
+muPM <- data.frame(pred, mu = exp(X %*% fixef(m2PM)), model = "MP")
+
+## Pelo COM-Poisson Mixed
+aux <- predict(m2CM, newdata = pred, type = "link")
+predCM <- data.frame(pred, y = calc_mean_cmp(aux, phi = m2CM@coef[1]),
+                     model = "MC")
+muCM <- data.frame(pred, mu = calc_mean_cmp(X %*% m2CM@coef[-(1:2)],
+                                            phi = m2CM@coef[1]),
+                   model = "MC")
+
+## Agrupa as predições
+pred.all <- rbind(predPM, predCM)
+mu.all <- rbind(muPM, muCM)
+
+key <- list(
+    column = 1,
+    lines = list(lty = c(1, 2), lwd = c(3, 1)),
+    text = list(c("Perfil Médio", "Perfil por cultivar")))
+
+## Faz o gráfico
+nematodes2 <- rbind(nematodes, nematodes)
+nematodes2$model <- rep(c("MP", "MC"), each = nrow(nematodes))
+xy2 <- xyplot(nema ~ off | model,
+              groups = cult,
+              data = nematodes2,
+              type = c("p", "g"),
+              alpha = 0.4,
+              key = key,
+              xlab = paste("Solução de massa fresca de raízes\n",
+                           "pelo volume de água"),
+              ylab = "Contagem de Nematóides",
+              strip = strip.custom(
+                  factor.levels = c("Poisson", "COM-Poisson")
+              ),
+              par.settings = ps.sub) +
+    as.layer(
+        xyplot(y ~ off | model, groups = cult, data = pred.all,
+               type = "l", lty = 2)
+    ) +
+    as.layer(
+        xyplot(mu ~ off | model, groups = cult, data = mu.all,
+               type = "l", col = 1, lwd = 3)
+    )
+
+## Organiza layout
+print(xy2, position = c(0, 0, 0.6, 1), more = TRUE)
+print(xy1, position = c(0.57, 0, 1, 1), more = FALSE)
+
+fonte.xy("Fonte: Elaborado pelo autor.")
+
+@
+
+Na figura \ref{fig:pred-nematodes} são apresentados as predições do
+efeito aleatório em cada modelo, à direita e as contagem preditas para
+cada cultivar e para o comportamento médio, à esquerda. A distribuição
+empírica dos efeitos aleatórios, gráfico à direita, está de acordo com
+os parâmetros estimados para $\sigma$, vistos na tabela
+\ref{tab:coef-nematodes}. Têm-se a ordenação dos efeitos aleatórios
+idêntica em ambos os modelos, porém valores mais dispersos no caso
+COM-Poisson. Devido ao parâmetro adicional $\phi$ do modelo COM-Poisson,
+que indica subdispersão, temos os valores preditos por esse modelo muito
+similares aos preditos pelo modelo Poisson, conforme observa-se no
+gráfico à direita da figura \ref{fig:pred-nematodes}. A soma das
+diferenças ao quadrado, entre valores preditos pelos dois modelos foi de
+\Sexpr{sum((predCM$y - predPM$y)^2)}, o que mostra que ambos os modelos
+levam ao mesmo resultado.
+
+Com essa aplicação ilustramos a extensão do modelo COM-Poisson para
+inclusão de efeitos aleatórios. Nesse caso tivemos um experimento em que
+as contagens, condicionadas aos efeitos aleatórios, se apresentaram de
+forma equidispersa, indicada pelo modelo COM-Poisson, e os resultados
+entre os modelos COM-Poisson e Poisson foram equivalentes.
