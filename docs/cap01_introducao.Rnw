@@ -33,7 +33,7 @@ predições negativas para o número de eventos \cite{King1989}. Uma
 alternativa adotada durante muitos anos, e ainda aplicada, é encontrar
 alguma forma de transformação da variável resposta a fim de atender aos
 pressupostos do modelo de regressão normal. Contudo essa abordagem
-dispõe de resultados insatisfatórios, pois i) dificulta a intepretação
+dispõe de resultados insatisfatórios, pois i) dificulta a interpretação
 dos resultados, ii) não contempla a natureza da variável (ainda serão
 valores pontuais, só que em outra escala) iii) não contempla a relação
 média e variância, característica de dados de contagem e iv) no uso da
@@ -62,7 +62,7 @@ identidade ($\lambda = E[Y] = V[Y]$). Essa propriedade, chamada de
 equidispersão, é uma particularidade do modelo Poisson que pode não ser
 adequada a diversas situações. Quando aplicado sob negligência desta
 suposição, o modelo Poisson apresenta erros padrões inconsistentes para
-as estimativas dos parâmentros e por consequência, para toda função
+as estimativas dos parâmetros e por consequência, para toda função
 desses parâmetros \cite{Winkelmann1995, Winkelmann1994}.
 
 O caso de superdispersão, quando a variância é maior que a média, é o
@@ -80,7 +80,7 @@ forma Binomial Negativa.
 
 Outra manifestação de fuga da suposição de equidispersão é a
 subdispersão, situação menos comum na literatura. Os processos que
-reduzem a variabilidade das contagens, abaixo do estabalecido pela
+reduzem a variabilidade das contagens, abaixo do estabelecido pela
 Poisson, não são tão conhecidos quanto os que produzem variabilidade
 extra. Pela mesma razão, são poucas as abordagens descritas na
 literatura que capazes de tratar a subdispersão, uma vez que efeitos
@@ -140,7 +140,7 @@ contagem equidispersos, neste cenário temos que as ocorrências da
 variável aleatória se dispõem aleatoriamente. No painel central o padrão
 já se altera, temos a representação do caso de superdispersão. Note que
 neste cenário formam-se aglomerados que deixam parcelas co contagens
-mutio elevadas e parcelas com contagens baixas. Uma possível causa deste
+muito elevadas e parcelas com contagens baixas. Uma possível causa deste
 padrão se dá pelo processo de contágio (e.g. contagem de casos de uma
 doença contagiosa, contagem de frutos apodrecidos). Na terceiro e último
 painel temos o caso de subdispersão, em que as ocorrências se dispõe
@@ -158,7 +158,7 @@ surgiu anteriormente à formalização dos MLG's, proposta por
 autores Richard W. Conway, William L. Maxwell,
 \textbf{Co}nway-\textbf{M}axwell-Poisson) generaliza a distribuição
 Poisson com a adição de mais uma parâmetro, denotado por $\nu$, que
-torna a razão de probabilidades sussecivas não linear contemplando os
+torna a razão de probabilidades sucessivas não linear contemplando os
 casos de sub e superdispersão \cite{Shmueli2005}.
 
 Uma característica bastante relevante é que a COM-Poisson possui como
@@ -208,7 +208,7 @@ dedicado a revisão bibliográfica dos modelos estatísticos empregados a
 análise de dados de contagem, nesse capítulo os modelos Poisson,
 Binomial Negativo, as abordagens para excesso de zeros, a estrutura dos
 modelos de efeitos aleatórios e o modelo COM-Poisson são
-apresentados. No capítulo \ref{cap:material-e-metodos} apresentammos os
+apresentados. No capítulo \ref{cap:material-e-metodos} apresentamos os
 conjuntos de dados a serem analisados e os métodos para ajuste e
 comparação dos modelos. O capítulo \ref{cap:resultados-e-discussao} traz
 os os principais resultados da aplicação e comparação dos modelos

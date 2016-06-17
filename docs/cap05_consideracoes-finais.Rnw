@@ -19,7 +19,7 @@ bandas de confiança. Porém ressalta-se que na abordagem por
 quasi-verossimilhança, com a especificação de apenas dois momentos, i)
 não recupera-se a distribuição de probabilidades da variável em estudo,
 ii) a informação a respeito da média é igual ou inferior a uma abordagem
-totalmente parâmetrica e iii) extensões como a modelagem de excesso de
+totalmente paramétrica e iii) extensões como a modelagem de excesso de
 zeros e modelagem do parâmetro de dispersão não são imediatas. Nos casos
 de superdispersão exploramos também os resultados dos modelos baseados
 na distribuição Binomial Negativa e nessa abordagem temos o
@@ -41,7 +41,7 @@ equivalentes ao modelo Hurdle Binomial Negativo assim como as
 estimativas pontuais dos valores preditos. Na aplicação do modelo Hurdle
 COM-Poisson não foi possível a obtenção dos erros padrão das estimativas
 dos efeitos devido a problemas numéricos na determinação da matriz
-hessiano. Para o caso extendido do modelo COM-Poisson em que acomodamos
+hessiano. Para o caso estendido do modelo COM-Poisson em que acomodamos
 efeitos aleatórios, destacamos os procedimentos computacionalmente
 intensivos que são empregados no algoritmo de estimação. A aplicação se
 deu a um experimento que apresentou contagens com um grau não
@@ -55,7 +55,7 @@ os modelos baseados na distribuição COM-Poisson. A primeira delas, e
 talvez a mais difícil de se contornar, é a determinação da constante de
 normalização, pois essa depende do parâmetro em que associamos a um
 preditor linear assim temos que calcular $n$ constantes a cada iteração
-do algortimo de estimação. Em casos de contagens altas e superdispersão
+do algoritmo de estimação. Em casos de contagens altas e superdispersão
 dessa constante é extremamente demorado. Outra característica que se
 manisfestou em todas as aplicações foi a não ortogonalidade entre os
 parâmetros de regressão e o parâmetro adicional $\phi$, observada pelas
@@ -64,13 +64,13 @@ inferências dependentes. Em pesquisas não relatadas nesse trabalho
 verificamos que a reparametrização do parâmetro $\lambda$, adotando a
 aproximação para média contorna essa característica com o preço de se
 ter uma distribuição aproximada. Nas aplicações exploramos também os
-prfis de verossimilhança para o parâmetro $\phi$ da COM-Poisson e o
+perfis de verossimilhança para o parâmetro $\phi$ da COM-Poisson e o
 comportamento aproximadamente simétrico em todos casos induz que
 aproximações quadráticas da verossimilhança podem ter desempenhos
 satisfatórios.
 
 Em geral, destaca-se o modelo Poisson, largamente utilizado na
-estatística aplicada, como uma alternativa reestritiva devido a sua
+estatística aplicada, como uma alternativa restritiva devido a sua
 suposição de equidispersão (relação média igual a variância), que leva a
 resultados incorretos quando essa suposição não é atendida. Como
 alternativa sugere-se o modelo COM-Poisson que se apresenta como uma
