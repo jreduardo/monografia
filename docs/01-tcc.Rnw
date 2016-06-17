@@ -98,8 +98,6 @@
 \usepackage{pdflscape}			% para ambiente landscape
 \usepackage{pgfgantt}			% cronograma estilo gráfico de gantt
 \usetikzlibrary{backgrounds}
-\definecolor{done}{RGB}{120, 180, 120}
-\definecolor{do}{RGB}{180, 120, 120}
 
 % ---
 % Fontes matemáticas
@@ -200,6 +198,21 @@
 
 % Controle do espaçamento entre um parágrafo e outro:
 \setlength{\parskip}{0.2cm}  % tente também \onelineskip
+
+% ---
+% Highlight knitr code (pode-usar usar os varios highligths já definidos
+% com thm = knit_theme$get("nuvola"); knit_theme$set(thm))
+% ---
+
+\renewcommand{\hlnum}[1]{\textcolor[rgb]{0.733,0,1}{#1}}%
+\renewcommand{\hlstr}[1]{\textcolor[rgb]{0,0.533,0}{#1}}%
+\renewcommand{\hlcom}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\renewcommand{\hlopt}[1]{\textcolor[rgb]{0.412,0.412,0.412}{#1}}%
+\renewcommand{\hlstd}[1]{\textcolor[rgb]{0.2,0.2,0.2}{{#1}}}%
+\renewcommand{\hlkwa}[1]{\textcolor[rgb]{0.2,0.2,0.2}{{#1}}}%
+\renewcommand{\hlkwb}[1]{\textcolor[rgb]{0.4,0,0}{\textbf{#1}}}%
+\renewcommand{\hlkwc}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}%
+\renewcommand{\hlkwd}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}%
 
 % ---
 % compila o indice
@@ -405,9 +418,12 @@ library(tccPackage)
 % Imprime uma página indicando o início dos apêndices
 \partapendices
 
-\chapter{Lipsum}
-\label{ap:tccPackage}
-\lipsum[20]
+\chapter{Programas R}
+\label{capA:codigostcc}
+
+<<capA, child = "capA_codigostcc.Rnw">>=
+@
+
 
 \end{apendicesenv}
 % ---
@@ -416,18 +432,15 @@ library(tccPackage)
 % Anexos
 % ----------------------------------------------------------
 
-% ---
-% Inicia os anexos
-% ---
-\begin{anexosenv}
-
-% Imprime uma página indicando o início dos anexos
-\partanexos
-
-\chapter{Lipsum}
-\lipsum[30]
-
-\end{anexosenv}
+%% % ---
+%% % Inicia os anexos
+%% % ---
+%% \begin{anexosenv}
+%% % Imprime uma página indicando o início dos anexos
+%% \partanexos
+%% \chapter{Lipsum}
+%% \lipsum[30]
+%% \end{anexosenv}
 
 %---------------------------------------------------------------------
 % INDICE REMISSIVO

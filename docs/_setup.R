@@ -32,7 +32,7 @@ opts_chunk$set(
     warning = FALSE,
     message = FALSE,
     echo = FALSE,
-    tidy = TRUE,
+    tidy = FALSE,
     cache = TRUE,
     results = "hide",
     ## dev = "tikz",
