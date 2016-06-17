@@ -1,0 +1,98 @@
+% ------------------------------------------------------------------------
+% APÊNDICE A - CÓDIGOS TCC
+% ------------------------------------------------------------------------
+
+Todos os resultados apresentados são realizados com o \textit{software}
+R, cujo códigos para ajuste dos modelos COM-Poisson de efeito fixo,
+aleatório e com componente de barreira foram disponibilizados em formato
+de pacote no endereço \url{github.com/jreduardo/tccPackage}. Nesse
+apêndice apresentamos os códigos, que utilizam as funções do pacote,
+para produzir os resultados da seção \ref{sec:analise-cottonBolls2}
+(modelos de regressão de efeitos fixos). Todavia, os códigos que
+produzem os demais resultados apresentados no trabalho podem ser
+visualizados no complemento online
+
+<<code-cottonBolls2, echo=TRUE, eval=FALSE>>=
+
+##----------------------------------------------------------------------
+## Instalando o pacote tccPackage, elaborado no trabalho
+library(devtools)
+install_git("git@github.com:JrEduardo/tccPackage.git")
+
+##----------------------------------------------------------------------
+## Análise de dados apresentados na seção ... (v.a. número de nós)
+
+## Carrega o pacote no workspace
+library(tccPackage)
+
+## Dados
+data(cottonBolls2)
+help(cottonBolls2)
+
+## Preditores considerados
+f1 <- nnos ~ 1
+f2 <- nnos ~ dexp
+f3 <- nnos ~ dexp + I(dexp^2)
+
+## Ajustando os modelos Poisson
+m1P.nnos <- glm(f1, data = cottonBolls2, family = poisson)
+m2P.nnos <- glm(f2, data = cottonBolls2, family = poisson)
+m3P.nnos <- glm(f3, data = cottonBolls2, family = poisson)
+
+## Ajustando os modelos Quasi-Poisson
+m1Q.nnos <- glm(f1, data = cottonBolls2, family = quasipoisson)
+m2Q.nnos <- glm(f2, data = cottonBolls2, family = quasipoisson)
+m3Q.nnos <- glm(f3, data = cottonBolls2, family = quasipoisson)
+
+## Ajustando os modelos COM-Poisson
+m1C.nnos <- cmp(f1, data = cottonBolls2, sumto = 30)
+m2C.nnos <- cmp(f2, data = cottonBolls2, sumto = 30)
+m3C.nnos <- cmp(f3, data = cottonBolls2, sumto = 30)
+
+##-------------------------------------------
+## TRV's entre modelos encaixados
+anova(m1P.nnos, m2P.nnos, m3P.nnos, test = "Chisq")
+anova(m1Q.nnos, m2Q.nnos, m3Q.nnos, test = "F")
+anova(m1C.nnos, m2C.nnos, m3C.nnos)
+
+##-------------------------------------------
+## Estimativas e testes de Wald
+summary(m3P.nnos)
+summary(m3Q.nnos)
+summary(m3C.nnos)
+
+##-------------------------------------------
+## Testando H0: phi = 0
+cmptest(m1C.nnos, m2C.nnos, m3C.nnos)
+
+##-------------------------------------------
+## Matrix de variância e covariância da COM-Poisson
+V <- vcov(m3C.nnos); V
+cov2cor(V)
+
+##-------------------------------------------
+## Perfis de versossimilhança
+prof <- profile(m3C.nnos)
+plot(prof); confint(prof)
+
+##-------------------------------------------
+## Valores preditos
+da <- data.frame(dexp = 0:5)
+predict(m3C.nnos, da)
+predict(m3C.nnos, da, interval = "confidence")
+predict(m3C.nnos, da, interval = "confidence", type = "response")
+predict(m3C.nnos, da, interval = "confidence", type = "response",
+        level = 0.9)
+
+##-------------------------------------------
+## Análise de resíduos
+fitted <- predict(m3C.nnos, type = "response")
+rcru <- residuals(m3C.nnos)
+rpea <- residuals(m3C.nnos, type = "pearson")
+
+plot(rcru ~ fitted)
+lines(smooth.spline(fitted, rcru), col = 2)
+plot(rpea ~ fitted)
+lines(smooth.spline(fitted, rcru), col = 2)
+
+@

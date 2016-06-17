@@ -590,7 +590,7 @@ e inferência dos modelos de regressão COM-Poisson estão disponíveis, em
 formato de um pacote R \texttt{tccPackage}, no endereço
 \url{https://github.com/jreduardo/tccPackage}. No capítulo
 \ref{cap:resultados-e-discussao} destacamos as chamadas de algumas
-funções e no apêndice \ref{ap:tccPackage} mostramos o emprego do pacote
+funções e no apêndice \ref{capA:codigostcc} mostramos o emprego do pacote
 na análise de dois conjuntos de dados exibidos no trabalho.
 
 \section{Métodos}
