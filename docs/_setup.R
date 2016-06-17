@@ -181,45 +181,60 @@ myplot <- function(perfil) {
     invisible()
 }
 
+
 myprof <- function(prof, conf = c(0.9, 0.95, 0.99),
+                   namestrip = NULL,
+                   subset = 4,
                    ylab = expression(abs(z)~~(sqrt(~Delta~"deviance"))),
                    xlab = expression(phi),
-                   namestrip = expression("Perfil para"~phi),
-                   subset = 3.8,
                    ...) {
     ##-------------------------------------------
     conf <- conf[order(conf, decreasing = TRUE)]
-    vx <- sapply(conf, function(x) confint(prof, level = x))
-    vz <- sqrt(qchisq(pmax(0, pmin(1, conf)), 1))
-    ##-------------------------------------------
-    ylab <- ylab
-    xlab <- xlab
-    ##-------------------------------------------
-    mle <- prof@summary@coef["phi", 1]
-    ##-------------------------------------------
     da <- as.data.frame(prof)
-    xyplot(abs(z) ~ focal | param, data = da,
-           subset = abs(z) < subset,
+    if (!is.null(subset)) {
+        da <- subset(da, abs(z) <= subset)
+    }
+    ##-------------------------------------------
+    fl <- levels(da$param)
+    if (!is.null(namestrip)) {
+        fl <- expression(phi, log(sigma), beta[0], beta[1])
+    }
+    xyplot(abs(z) ~ focal | param,
+           data = da,
+           layout = c(NA, 1),
+           xlab = xlab,
+           ylab = ylab,
+           scales = list(x = "free"),
            type = c("l", "g"),
            strip = strip.custom(
-               factor.levels = namestrip
-           ),
-           xlab = xlab, ylab = ylab,
-           ..., panel = function(x, y, ...) {
+               factor.levels = fl),
+           panel = function(x, y, subscripts, ...) {
+               conf <- c(0.9, 0.95, 0.99)
+               hl <- sqrt(qchisq(conf, 1))
+               ##-------------------------------------------
+               mle <- x[y == 0]
+               xl <- x[x < mle]; yl <- y[x < mle]
+               xr <- x[x > mle]; yr <- y[x > mle]
+               ##-------------------------------------------
+               funleft <- approxfun(x = yl, y = xl)
+               funright <- approxfun(x = yr, y = xr)
+               vxl <- funleft(hl)
+               vxr <- funright(hl)
+               vz <- c(hl, hl)
+               ##-------------------------------------------
                panel.xyplot(x, y, ...)
-               panel.arrows(c(vx), 0, c(vx), rep(vz, each = 2),
+               panel.arrows(c(vxl, vxr), 0, c(vxl, vxr), vz,
                             code = 1, length = 0.1, lty = 2,
                             col = "gray40")
-               panel.segments(vx[1, ], vz, vx[2, ], vz, lty = 2,
+               panel.segments(vxl, vz, vxr, vz, lty = 2,
                               col = "gray40")
                panel.abline(h = 0, v = mle, lty = 3)
                panel.text(x = rep(mle, 2), y = vz+0.1,
                           labels = paste(conf*100, "%"),
                           col = "gray20")
-               panel.abline(v = 0, col = cols[2])
            })
-    ##-------------------------------------------
 }
+
 
 ##======================================================================
 ## Gráfico de correlação entre os parâmetros
