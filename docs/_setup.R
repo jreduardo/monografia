@@ -39,7 +39,7 @@ opts_chunk$set(
     fig.width = 7,
     fig.height = 5,
     fig.align = "center",
-    fig.pos = "!htb",
+    fig.pos = "h",
     dev.args = list(family = "Palatino"))
 
 ##======================================================================
@@ -94,8 +94,8 @@ fonte.xy <- function(texto, ...) {
 
 ## da graphics (use fonte("texto") após os gráficos)
 fonte <- function(texto, side = 1, line = -1, adj = 0,
-                  outer = TRUE, ...) {
-    mtext("Fonte: Elaborado pelo autor.", cex = 0.9,
+                  cex = 0.9, outer = TRUE, ...) {
+    mtext(texto, cex = cex,
           side = side, line = line, adj = adj, outer = outer, ...)
     invisible()
 }
@@ -197,7 +197,7 @@ myprof <- function(prof, conf = c(0.9, 0.95, 0.99),
     ##-------------------------------------------
     fl <- levels(da$param)
     if (!is.null(namestrip)) {
-        fl <- expression(phi, log(sigma), beta[0], beta[1])
+        fl <- namestrip
     }
     xyplot(abs(z) ~ focal | param,
            data = da,
@@ -232,7 +232,7 @@ myprof <- function(prof, conf = c(0.9, 0.95, 0.99),
                panel.text(x = rep(mle, 2), y = vz+0.1,
                           labels = paste(conf*100, "%"),
                           col = "gray20")
-           })
+           }, ...)
 }
 
 
