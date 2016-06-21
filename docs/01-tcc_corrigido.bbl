@@ -1,0 +1,200 @@
+\providecommand{\abntreprintinfo}[1]{%
+ \citeonline{#1}}
+\setlength{\labelsep}{0pt}\begin{thebibliography}{}
+\providecommand{\abntrefinfo}[3]{}
+\providecommand{\abntbstabout}[1]{}
+\abntbstabout{v-1.9.2 }
+
+\bibitem[Bates et al. 2015]{Bates2015}
+\abntrefinfo{Bates et al.}{BATES et al.}{2015}
+{BATES, D.~M. et al. {Fitting linear mixed-effects models using lme4}.
+\emph{Journal of Statistical Software}, v.~67, p. 1--48, 2015.
+Dispon{\'\i}vel em: \url{http://lme4.r-forge.r-project.org/lMMwR/lrgprt.pdf}.}
+
+\bibitem[Borges 2012]{Borges2012}
+\abntrefinfo{Borges}{BORGES}{2012}
+{BORGES, P.
+\emph{{Novos modelos de sobreviv{\^{e}}ncia com fra{\c{c}}{\~{a}}o de cura
+  baseados no processo da carcinog{\^{e}}nese}}.
+Tese (Doutorado) -- Universidade Federal de S{\~{a}}o Carlos, 2012.}
+
+\bibitem[Conway e Maxwell 1962]{Conway1962}
+\abntrefinfo{Conway e Maxwell}{CONWAY; MAXWELL}{1962}
+{CONWAY, R.~W.; MAXWELL, W.~L. {A queuing model with state dependent service
+  rates}.
+\emph{Journal of Industrial Engineering}, v.~12, p. 132--136, 1962.}
+
+\bibitem[Ferreira 2011]{Ferreira2011}
+\abntrefinfo{Ferreira}{FERREIRA}{2011}
+{FERREIRA, D.~F. \emph{{Estat{\'{i}}stica Multivariada}}. Editora UFLA,
+  2011.}
+
+\bibitem[Hilbe 2014]{Hilbe2014}
+\abntrefinfo{Hilbe}{HILBE}{2014}
+{HILBE, J.~M. \emph{{Modeling Count Data}}., 2014. 300~p.}
+
+\bibitem[King 1989]{King1989}
+\abntrefinfo{King}{KING}{1989}
+{KING, G. {Variance specification in event count models: from restrictive
+  assumptions to a generalized estimator}.
+\emph{American Journal of Political Science}, v.~33, n.~3, p. 762--784,
+Dispon{\'\i}vel em: \url{http://www.jstor.org/stable/2111071}.}
+
+\bibitem[Kokonendji 2014]{Kokonendji2014}
+\abntrefinfo{Kokonendji}{KOKONENDJI}{2014}
+{KOKONENDJI, C.~C. {Over- and Underdisperson Models}. In:  \emph{Methods and
+  Applications of Statistics in Clinical Trials: Planning, Analysis, and
+  Inferential Methods}., 2014. p. 506--526.
+Dispon{\'\i}vel em:
+  \url{https://lmb.univ-fcomte.fr/IMG/pdf/ch30{\\_}kokonendji2014.}}
+
+\bibitem[Lambert 1992]{Lambert1992}
+\abntrefinfo{Lambert}{LAMBERT}{1992}
+{LAMBERT, D. {Zero-Inflated Poisson Regression, with an Application to Defects
+  in Manufacturing}.
+\emph{Technometrics}, v.~34, n.~1, p.~1, feb 1992.
+Dispon{\'\i}vel em: \url{http://www.jstor.org/stable/1269547?origin=crossref}.}
+
+\bibitem[Lord, Geedipally e Guikema 2010]{Lord2010}
+\abntrefinfo{Lord, Geedipally e Guikema}{LORD; GEEDIPALLY; GUIKEMA}{2010}
+{LORD, D.; GEEDIPALLY, S.~R.; GUIKEMA, S.~D. {Extension of the application of
+  conway-maxwell-poisson models: Analyzing traffic crash data exhibiting
+  underdispersion}.
+\emph{Risk Analysis}, v.~30, n.~8, p. 1268--1276, 2010.}
+
+\bibitem[Martelli et al. 2008]{Martelli2008}
+\abntrefinfo{Martelli et al.}{MARTELLI et al.}{2008}
+{MARTELLI, T. et al. \emph{{Influ{\^{e}}ncia do ataque de mosca-branca Bemisia
+  tabaci Biotipo B, nos {\'{i}}ndices de produtividade do algodoeiro}}.
+  Uberl{\^{a}}ndia- MG: XXII Congresso Brasileiro de Entomologia, 2008.}
+
+\bibitem[Nelder e Wedderburn 1972]{Nelder1972}
+\abntrefinfo{Nelder e Wedderburn}{NELDER; WEDDERBURN}{1972}
+{NELDER, J.~A.; WEDDERBURN, R. W.~M. {Generalized Linear Models}.
+\emph{Journal of the Royal Statistical Society. Series A (General)}, v.~135, p.
+  370--384, 1972.}
+
+\bibitem[Nocedal e Wright 1995]{Nocedal1995}
+\abntrefinfo{Nocedal e Wright}{NOCEDAL; WRIGHT}{1995}
+{NOCEDAL, J.; WRIGHT, S.~J. \emph{{Numerical optimization}}. Springer, 1995.
+  636~p. Dispon{\'\i}vel em:
+  \url{https://books.google.com/books?id=epc5fX0lqRIC{\&}pgi}.}
+
+\bibitem[Paula 2013]{Paula2013}
+\abntrefinfo{Paula}{PAULA}{2013}
+{PAULA, G.~A. \emph{{Modelos de regress{\~{a}}o com apoio computacional}}.
+  IME-USP S{\~{a}}o Paulo, 2013. Dispon{\'\i}vel em:
+  \url{https://www.ime.usp.br/{~}giapaula/textoregressao.h}.}
+
+\bibitem[Ribeiro 2012]{Ribeiro2012}
+\abntrefinfo{Ribeiro}{RIBEIRO}{2012}
+{RIBEIRO, A. M.~T.
+\emph{{Distribui{\c{c}}{\~{a}}o COM-Poisson na an{\'{a}}lise de dados de
+  experimentos de quimiopreven{\c{c}}{\~{a}}o do c{\^{a}}ncer em animais}}.
+Dissertação (Mestrado) --- Universidade Federal de S{\~{a}}o Carlos, 2012.}
+
+\bibitem[{Ribeiro Jr} et al. 2012]{RibeiroJr2012}
+\abntrefinfo{{Ribeiro Jr} et al.}{{RIBEIRO JR} et al.}{2012}
+{{RIBEIRO JR}, P.~J. et al. {M{\'{e}}todos computacionais para infer{\^{e}}ncia
+  com aplica{\c{c}}{\~{o}}es em R}. In:  \emph{20{\textordmasculine}
+  Simp{\'{o}}sio Nacional de Probabilidade e Estat{\'{i}}stica}., 2012.
+  p.~282. Dispon{\'\i}vel em: \url{http://leg.ufpr.br/doku.php/cursos:mcie}.}
+
+\bibitem[Ridout, Demetrio e Hinde 1998]{Ridout1998}
+\abntrefinfo{Ridout, Demetrio e Hinde}{RIDOUT; DEMETRIO; HINDE}{1998}
+{RIDOUT, M.; DEMETRIO, C.~G.; HINDE, J. {Models for count data with many
+  zeros}.
+\emph{International Biometric Conference}, n. December, p. 1--13, 1998.}
+
+\bibitem[Sellers e Raim 2016]{Sellers2016}
+\abntrefinfo{Sellers e Raim}{SELLERS; RAIM}{2016}
+{SELLERS, K.~F.; RAIM, A. {A flexible zero-inflated model to address data
+  dispersion}.
+\emph{Computational Statistics {\&} Data Analysis}, Elsevier B.V., v.~99, p.
+  68--80, jul 2016.
+Dispon{\'\i}vel em: \url{http://dx.doi.org/10.1016/j.csda.2016.01.007
+  http://linkinghub.elsevier.com/retrieve/pii/S0167947316000165}.}
+
+\bibitem[Sellers e Shmueli 2010]{Sellers2010}
+\abntrefinfo{Sellers e Shmueli}{SELLERS; SHMUELI}{2010}
+{SELLERS, K.~F.; SHMUELI, G. {A flexible regression model for count data}.
+\emph{Annals of Applied Statistics}, v.~4, n.~2, p. 943--961, 2010.}
+
+\bibitem[Serafim et al. 2012]{Serafim2012}
+\abntrefinfo{Serafim et al.}{SERAFIM et al.}{2012}
+{SERAFIM, M.~E. et al. {Umidade do solo e doses de pot{\'{a}}ssio na cultura da
+  soja}.
+\emph{Revista Ci{\^{e}}ncia Agron{\^{o}}mica}, v.~43, n.~2, p. 222--227, jun
+  2012.
+Dispon{\'\i}vel em:
+  \url{http://www.scielo.br/scielo.php?script=sci{\\_}arttext{\&}pid=S1806-66902012000200003{\&}lng=pt{\&}nrm}.}
+
+\bibitem[Shmueli et al. 2005]{Shmueli2005}
+\abntrefinfo{Shmueli et al.}{SHMUELI et al.}{2005}
+{SHMUELI, G. et al. {A useful distribution for fitting discrete data: Revival
+  of the Conway-Maxwell-Poisson distribution}.
+\emph{Journal of the Royal Statistical Society. Series C: Applied Statistics},
+  v.~54, n.~1, p. 127--142, 2005.}
+
+\bibitem[Silva et al. 2012]{Silva2012}
+\abntrefinfo{Silva et al.}{SILVA et al.}{2012}
+{SILVA, A.~M. et al. {Impacto de diferentes n{\'{i}}veis de desfolha artificial
+  nos est{\'{a}}dios fenol{\'{o}}gicos do algodoeiro}.
+\emph{Revista de Ci{\^{e}}ncias Agr{\'{a}}rias}, v.~35, n.~1, p. 163--172,
+  2012.
+Dispon{\'\i}vel em:
+  \url{http://www.cabdirect.org/abstracts/20123299470.html;jsessionid=CF06663390A3A4463413D3018ECAACD6}.}
+
+\bibitem[Suekane 2011]{Suekane2011}
+\abntrefinfo{Suekane}{SUEKANE}{2011}
+{SUEKANE, R.
+\emph{{DISTRIBUI{\c{C}}{\~{A}}O ESPACIAL E DANO DE MOSCA-BRANCA Bemisia tabaci
+  (GENNADIUS, 1889) BI{\'{O}}TIPO B NA SOJA}}.
+Dissertação (Mestrado) -- Universidade Federal da Grande Dourados, 2011.}
+
+\bibitem[UCLA 2015]{UCLA}
+\abntrefinfo{UCLA}{UCLA}{2015}
+{UCLA, S. C.~G. \emph{{Data Analysis Examples}}. 2015.
+Dispon{\'\i}vel em: \url{http://www.ats.ucla.edu/stat/dae/}.}
+
+\bibitem[Wedderburn 1974]{Wedderburn1974}
+\abntrefinfo{Wedderburn}{WEDDERBURN}{1974}
+{WEDDERBURN, R. W.~M. {Quasi-Likelihood Functions, Generalized Linear Models,
+  and the Gauss-Newton Method}.
+\emph{Biometrika}, v.~61, n.~3, p.~439, 1974.
+Dispon{\'\i}vel em: \url{http://www.jstor.org/stable/2334725?origin=crossref}.}
+
+\bibitem[Winkelmann 1995]{Winkelmann1995}
+\abntrefinfo{Winkelmann}{WINKELMANN}{1995}
+{WINKELMANN, R. {Duration Dependence and Dispersion in Count-Data Models}.
+\emph{Journal of Business {\&} Economic Statistics}, v.~13, n.~4, p. 467--474,
+  oct 1995.
+Dispon{\'\i}vel em:
+  \url{http://www.tandfonline.com/doi/abs/10.1080/07350015.1995.10524620}.}
+
+\bibitem[Winkelmann 2008]{Winkelmann2008}
+\abntrefinfo{Winkelmann}{WINKELMANN}{2008}
+{WINKELMANN, R. \emph{{Econometric Analysis of Count Data}}. Berlin,
+  Heidelberg: Springer Berlin Heidelberg, 2008. 342~p. Dispon{\'\i}vel em:
+  \url{http://medcontent.metapress.com/index/A65RM03P4874243N.pdf
+  http://link.springer.com/10.1007/978-3-540-78389-3}.}
+
+\bibitem[Winkelmann e Zimmermann 1994]{Winkelmann1994}
+\abntrefinfo{Winkelmann e Zimmermann}{WINKELMANN; ZIMMERMANN}{1994}
+{WINKELMANN, R.; ZIMMERMANN, K.~F. \emph{{Count data models for demographic
+  data}}. 1994. 205--221, 223~p.}
+
+\bibitem[Zeileis, Kleiber e Jackman 2007]{Zeileis2007}
+\abntrefinfo{Zeileis, Kleiber e Jackman}{ZEILEIS; KLEIBER; JACKMAN}{2007}
+{ZEILEIS, A.; KLEIBER, C.; JACKMAN, S. {Regression Models for Count Data in R}.
+\emph{Journal Of Statistical Software}, v.~27, n.~8, p. 1076--84, 2007.
+Dispon{\'\i}vel em: \url{http://www.ncbi.nlm.nih.gov/pubmed/21518631}.}
+
+\bibitem[Zeviani et al. 2014]{Zeviani2014}
+\abntrefinfo{Zeviani et al.}{ZEVIANI et al.}{2014}
+{ZEVIANI, W.~M. et al. {The Gamma-count distribution in the analysis of
+  experimental underdispersed data}.
+\emph{Journal of Applied Statistics}, n. October, p. 1--11, 2014.
+Dispon{\'\i}vel em: \url{http://dx.doi.org/10.1080/02664763.2014.922168}.}
+
+\end{thebibliography}

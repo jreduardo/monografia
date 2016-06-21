@@ -432,7 +432,18 @@ library(tccPackage)
 % ----------------------------------------------------------
 % Referências bibliográficas
 % ----------------------------------------------------------
-\bibliography{compois}
+
+%% Utilize este na elaboração do documento
+%% \bibliography{compois}
+
+%% Utilize este apenas ao final, quando não forem mais realizadas
+%% alterações
+\begin{flushleft}
+  \small
+\renewcommand\refname{}
+\vspace*{-1.5cm}
+\input{01-tcc_corrigido.bbl}
+\end{flushleft}
 
 % ----------------------------------------------------------
 % Apêndices
