@@ -2307,7 +2307,7 @@ myprof(profCM, subset = 3.5,
 fonte.xy("Fonte: Elaborado pelo autor.")
 @
 
-<<corr-nematodes, fig.width=3.5, fig.height=3.5, fig.show="hide", results="asis", fig.cap="Imagem da matriz de correlação entre os parâmetros do modelo COM-Poisson.">>=
+<<corr-nematodes, fig.width=3.5, fig.height=3.5, fig.cap="Imagem da matriz de correlação entre os parâmetros do modelo COM-Poisson.">>=
 
 pnames <- c("phi", "lsigma0", paste0("beta", 0:1))
 
@@ -2316,8 +2316,7 @@ Corr <- cov2cor(Vcov)
 dimnames(Corr) <- list(pnames, pnames)
 mycorrplot(Corr)
 
-wrapfigure()
-fonte("Fonte: Elaborado pelo autor.")
+fonte()
 
 @
 
@@ -2444,3 +2443,61 @@ entre os modelos COM-Poisson e Poisson foram equivalentes.
 
 \section{Discussões}
 \label{cap04:discussao}
+
+Nos quatro primeiros conjuntos de dados, em que modelou-se as contagens
+via modelos de regressão de efeitos fixos, tivemos os resultados dos
+modelos COM-Poisson equivalentes a abordagem semi-paramétrica via
+quasi-verossimilhança, quanto a significância dos efeitos e predição com
+bandas de confiança. Porém ressalta-se que na abordagem por
+quasi-verossimilhança, com a especificação de apenas dois momentos, i)
+não se pode representar a distribuição de probabilidades da variável em
+estudo, ii) a informação a respeito da média é igual ou inferior a uma
+abordagem totalmente paramétrica e iii) extensões como a modelagem de
+excesso de zeros e modelagem do parâmetro de dispersão não são
+imediatas. Nos casos de superdispersão exploramos também os resultados
+dos modelos baseados na distribuição Binomial Negativa e nessa abordagem
+temos o inconveniente de somente a característica de superdispersão ser
+contemplada. Nos estudos de caso os modelos Binomial Negativo
+proporcionaram resultados, com relação a significância dos efeitos,
+equivalentes ao COM-Poisson e Quasi-Poisson. Porém, em um dos estudos de
+caso com acentuada superdispersão, os valores preditos pontuais e
+intervalares nessa abordagem diferiram dos modelos COM-Poisson e
+Quasi-Poisson, isso devido a forma da relação média e variância dessa
+distribuição, figura \ref{fig:mv-binomneg}.
+
+Nas extensões propostas para o modelo COM-Poisson obteve-se resultados
+satisfatórios. No caso da inclusão de um componente de barreira para
+modelagem de excesso de zeros, cujo denominamos como modelo Hurdle
+COM-Poisson, os resultados dos testes de razão de verossimilhanças para
+testar a significância dos efeitos foram equivalentes ao modelo Hurdle
+Binomial Negativo assim como as estimativas pontuais dos valores
+preditos. Ainda nessa aplicação, não foi possível a obtenção dos erros
+padrão das estimativas dos efeitos, baseados na matriz hessiana, devido
+a problemas numéricos na determinação dessa matriz. Para o caso
+estendido do modelo COM-Poisson em que acomoda-se efeitos aleatórios, os
+procedimentos computacionalmente intensivos que são empregados no
+algoritmo de estimação ganham destaque. A aplicação se deu a um
+experimento que apresentou contagens com um grau não significativo de
+subdispersão. Nessa aplicação os modelos em competição foram o Poisson e
+o COM-Poisson de efeitos mistos e todos os resultados em questões
+inferenciais foram equivalentes em ambos os modelos, com poder de teste
+maior para o modelo COM-Poisson.
+
+Nas aplicações, em geral, tivemos características que permearam a todos
+os modelos baseados na distribuição COM-Poisson. A primeira delas, e
+talvez a mais difícil de se contornar, é a determinação da constante de
+normalização, pois essa depende do parâmetro que associamos a um
+preditor linear assim temos que calcular $n$ constantes a cada iteração
+do algoritmo de estimação. Em casos de contagens altas e superdispersão
+o cálculo dessa constante é extremamente demorado. Outra característica
+que se manisfestou em todas as aplicações foi a não ortogonalidade entre
+os parâmetros de regressão e o parâmetro adicional $\phi$, observada
+pelas correlações calculadas a partir da matriz hessiana. O que torna as
+inferências dependentes. Em pesquisas não relatadas nesse trabalho
+verificamos que a reparametrização do parâmetro $\lambda$, adotando a
+aproximação para média contorna essa característica com o preço de se
+ter uma distribuição aproximada. Nas aplicações exploramos também os
+perfis de verossimilhança para o parâmetro $\phi$ da COM-Poisson e o
+comportamento aproximadamente simétrico em todos casos induz que
+aproximações quadráticas da verossimilhança podem ter desempenhos
+satisfatórios.
