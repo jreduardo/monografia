@@ -375,7 +375,7 @@ library(tccPackage)
 @
 
 \chapter{Material e Métodos}
-\label{cap:materiais-e-metodos}
+\label{cap:material-e-metodos}
 <<cap03, child = "cap03_materiais-e-metodos.Rnw">>=
 @
 
