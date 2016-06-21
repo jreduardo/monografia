@@ -485,7 +485,7 @@ $\nu = 1$ (painel central).
 
 <<distr-compoisson, fig.height=3.4, fig.width=6.7, fig.cap="Probabilidades pela distribuição COM-Poisson para diferentes parâmetros.">>=
 
-library(tccPackage)
+library(cmpreg)
 ##-------------------------------------------
 ## Parametros da distribuição
 pars <- list("p1" = log(c(1.362, 0.4)),
@@ -577,7 +577,7 @@ foram escolhidos conforme restrições para redução da distribuição.
 
 <<casos-particulares, fig.height=3, fig.width=7, fig.cap="Exemplos de casos particulares da distribuição COM-Poisson.">>=
 
-library(tccPackage)
+library(cmpreg)
 ##-------------------------------------------
 ## Parametros da distribuição
 pars <- list("p1" = log(c(5, 1)),
@@ -869,7 +869,7 @@ y2 <- sapply(rbinom(n, 1, pi), function(x) {
 
 ##-------------------------------------------
 ## Estimando as probabilidades
-library(tccPackage)
+library(cmpreg)
 
 sim <- list("s1" = as.integer(y1), "s2" = as.integer(y2))
 probs <- sapply(sim, function(y) {

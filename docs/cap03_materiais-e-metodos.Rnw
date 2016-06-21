@@ -34,7 +34,7 @@ potencialmente contempladas por modelos alternativos ao Poisson.
 
 <<data-cottonBolls, include=FALSE, echo=FALSE>>=
 
-data(cottonBolls, package = "tccPackage")
+data(cottonBolls, package = "cmpreg")
 
 niveis.des <- paste0(paste(unique(cottonBolls$des) * 100,
                            collapse = ", "), "\\%")
@@ -69,7 +69,7 @@ subdispersão.
 
 <<descr-cottonBolls, fig.height=4.2, fig.width=7, fig.cap="Número de capulhos produzidos para cada nível de desfolha e estágio fenológico (esquerda) e médias e variâncias das cinco repetições em cada combinação de nível de desfolha e estágio fenológico (direita).">>=
 
-library(tccPackage)
+library(cmpreg)
 xy1 <- xyplot(ncap ~ des | est,
               data = cottonBolls,
               layout = c(NA, 3),
@@ -113,7 +113,7 @@ fonte.xy("Fonte: Traduzido de Zeviani et al. (Figura 2)")
 
 <<data-cottonBolls2, include=FALSE, echo=FALSE>>=
 
-data(cottonBolls2, package = "tccPackage")
+data(cottonBolls2, package = "cmpreg")
 
 niveis.dexp <- paste0(paste(unique(cottonBolls2$dexp),
                            collapse = ", "), " dias")
@@ -229,7 +229,7 @@ mv <- cbind(mvr[1:6, 1], mv[1:6, ], mv[7:12, ], mv[13:18, ])
 
 <<data-soyaBeans, include=FALSE, echo=FALSE>>=
 
-data(soyaBeans, package = "tccPackage")
+data(soyaBeans, package = "cmpreg")
 soyaBeans <- soyaBeans[-74, ] ## outlier identificado
 soyaBeans <- soyaBeans[, c("K", "umid", "bloc", "ngra", "nvag")]
 
@@ -360,7 +360,7 @@ fonte.xy("Fonte: Elaborado pelo autor.")
 
 <<data-whiteFly, include=FALSE, cache=FALSE>>=
 
-data(whiteFly, package = "tccPackage")
+data(whiteFly, package = "cmpreg")
 
 ## Somente as cultivares que contém BRS na identificação
 whiteFly <- droplevels(subset(whiteFly, grepl("BRS", x = cult)))
@@ -435,7 +435,7 @@ fonte.xy("Fonte: Elaborado pelo autor")
 
 <<data-fish, include=FALSE, echo=FALSE>>=
 
-data(fish, package = "tccPackage")
+data(fish, package = "cmpreg")
 
 @
 
@@ -502,7 +502,7 @@ acomodem excesso de zeros se fazem necessários.
 
 <<data-nematodes, include=FALSE, cache=FALSE>>=
 
-data(nematodes, package = "tccPackage")
+data(nematodes, package = "cmpreg")
 
 @
 
@@ -587,8 +587,8 @@ requerido.
 
 Destaca-se nesse trabalho que todas as funções implementadas para ajuste
 e inferência dos modelos de regressão COM-Poisson estão disponíveis, em
-formato de um pacote R, \texttt{tccPackage}, no endereço
-\url{https://github.com/JrEduardo/tccPackage}. No apêndice
+formato de um pacote R, \texttt{cmpreg}, no endereço
+\url{https://github.com/JrEduardo/cmpreg}. No apêndice
 \ref{capA:codigostcc} o emprego do pacote na análise de um conjunto de
 dados exibido no trabalho é ilustrado com códigos R.
 

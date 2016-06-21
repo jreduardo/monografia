@@ -17,7 +17,7 @@ realizadas.
 <<ajuste-cottonBolls, include=FALSE, cache=TRUE>>=
 
 ## Dados
-library(tccPackage)
+library(cmpreg)
 data(cottonBolls)
 
 ## Preditores
@@ -383,7 +383,7 @@ seriam incorretas.
 <<ajuste-cottonBolls2, include=FALSE, cache=TRUE>>=
 
 ## Dados
-library(tccPackage)
+library(cmpreg)
 data(cottonBolls2)
 
 ## Preditores considerados
@@ -831,7 +831,7 @@ abordagem semi-paramétrica.
 <<ajuste-soyaBeans, include=FALSE, cache=TRUE>>=
 
 ## Dados
-library(tccPackage)
+library(cmpreg)
 data(soyaBeans)
 soyaBeans <- soyaBeans[-74, ]
 soyaBeans <- transform(soyaBeans, K = factor(K))
@@ -1758,7 +1758,7 @@ Poisson.
 <<ajuste-fish, include=FALSE, cache=TRUE>>=
 
 ## Dados
-data(fish, package = "tccPackage")
+data(fish, package = "cmpreg")
 
 ## Preditores
 f1 <- npeixes ~  campista + npessoas |
@@ -2100,7 +2100,7 @@ barreira, conforme apresentado, se torna uma abordagem atrativa.
 
 <<ajuste-nematodes, include=FALSE, cache=FALSE>>=
 
-library(tccPackage)
+library(cmpreg)
 library(lme4)
 data(nematodes)
 
