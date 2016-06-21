@@ -2,95 +2,47 @@
 % CAPÍTULO 5 - CONSIDERAÇÕES FINAIS
 % ------------------------------------------------------------------------
 
-O objetivo nesse trabalho foi a exploração, extensão e aplicação da
-distribuição COM-Poisson na análise de dados de contagem cujo atendemos
-com a apresentação de seis aplicações dos modelos COM-Poisson à
-conjuntos de dados reais que percorreram características de
-equidispersão, subdispersão, superdispersão, contagens altas, excesso de
-zeros e medidas repetidas mostrou-se a flexibilidade do modelo
-COM-Poisson quando comparado às demais abordagens comuns para tais
-características.
+Os objetivos nesse trabalho foram a exploração, extensão e aplicação da
+distribuição COM-Poisson na análise de dados de contagem cujo foram
+atendidos com a apresentação de seis aplicações dos modelos COM-Poisson
+à conjuntos de dados reais que exibem equidispersão, subdispersão,
+superdispersão, contagens altas, excesso de zeros e efeito aleatório,
+mostrando a flexibilidade do modelo COM-Poisson.
 
-Nos quatro primeiro conjuntos de dados, em que modelou-se as contagens
-via modelos de regressão de efeitos fixos, tivemos os resultados dos
-modelos COM-Poisson equivalentes a abordagem semi-paramétrica via
-quasi-verossimilhança, quanto a significância dos efeitos e predição com
-bandas de confiança. Porém ressalta-se que na abordagem por
-quasi-verossimilhança, com a especificação de apenas dois momentos, i)
-não recupera-se a distribuição de probabilidades da variável em estudo,
-ii) a informação a respeito da média é igual ou inferior a uma abordagem
-totalmente paramétrica e iii) extensões como a modelagem de excesso de
-zeros e modelagem do parâmetro de dispersão não são imediatas. Nos casos
-de superdispersão exploramos também os resultados dos modelos baseados
-na distribuição Binomial Negativa e nessa abordagem temos o
-inconveniente de somente a característica de superdispersão ser
-contemplada. Nos estudos de caso os modelos Binomial Negativo
-proporcionaram resultados, com relação a significância dos efeitos,
-equivalentes ao COM-Poisson e Quasi-Poisson. Porém em um dos estudos de
-caso com acentuada superdispersão, os valores preditos pontuais e
-intervalares nessa abordagem diferiram dos modelos COM-Poisson e
-Quasi-Poisson, isso devido a forma da relação média e variância dessa
-distribuição, figura \ref{fig:mv-binomneg}.
+Das análises realizadas destaca-se a característica restritiva do modelo
+Poisson, que na maioria dos casos não se ajustou adequadamente devido a
+suposição de equidispersão. Para os modelos de regressão de efeitos
+fixos, os resultados obtidos com as abordagens via modelo COM-Poisson,
+Quasi-Poisson e Binomial Negativo (para os casos de superdispersão)
+foram bastante similares quanto a significância dos efeitos e predição
+com bandas de confiança. Resultados satisfatórios também foram obtidos
+para nos modelos COM-Poisson para modelagem de excesso de zeros e
+inclusão de efeitos aleatórios. Nessas extensões, há dificuldade
+computacional de ajuste dos modelos, principalmente devido ao cálculo
+das constantes de normalização, que mesmo nos modelos de efeitos fixos
+ainda são problemáticas.
 
-Nas extensões propostas tivemos resultados satisfatórios do desempenho a
-distribuição COM-Poisson. No caso da inclusão de um componente de
-barreira para modelagem de excesso de zeros, cujo denominamos como
-modelo Hurdle COM-Poisson, os resultados dos testes de razão de
-verossimilhanças para testar a significância dos efeitos foram
-equivalentes ao modelo Hurdle Binomial Negativo assim como as
-estimativas pontuais dos valores preditos. Na aplicação do modelo Hurdle
-COM-Poisson não foi possível a obtenção dos erros padrão das estimativas
-dos efeitos devido a problemas numéricos na determinação da matriz
-hessiano. Para o caso estendido do modelo COM-Poisson em que acomodamos
-efeitos aleatórios, destacamos os procedimentos computacionalmente
-intensivos que são empregados no algoritmo de estimação. A aplicação se
-deu a um experimento que apresentou contagens com um grau não
-significativo de subdispersão. Nessa aplicação os modelos em competição
-foram o Poisson e o COM-Poisson de efeitos mistos. Dessa aplicação todos
-os resultados em questões inferenciais foram equivalentes em ambos os
-modelos, com poder de teste maior para o modelo COM-Poisson.
+Em todas as aplicações observou-se a não ortonalidade empírica na matriz
+hessiana, o que se mostra como característica da distribuição. Outra
+característica observada na análise de dados é a simetria nos perfis de
+verossimilhança para o parâmetro $\phi$, indicando que aproximações
+quadráticas da verossimilhança podem ter bons desempenhos.
 
-Nas aplicações, em geral, tivemos características que permearam a todos
-os modelos baseados na distribuição COM-Poisson. A primeira delas, e
-talvez a mais difícil de se contornar, é a determinação da constante de
-normalização, pois essa depende do parâmetro em que associamos a um
-preditor linear assim temos que calcular $n$ constantes a cada iteração
-do algoritmo de estimação. Em casos de contagens altas e superdispersão
-dessa constante é extremamente demorado. Outra característica que se
-manisfestou em todas as aplicações foi a não ortogonalidade entre os
-parâmetros de regressão e o parâmetro adicional $\phi$, observada pelas
-correlações calculadas a partir da matriz hessiano. O que torna as
-inferências dependentes. Em pesquisas não relatadas nesse trabalho
-verificamos que a reparametrização do parâmetro $\lambda$, adotando a
-aproximação para média contorna essa característica com o preço de se
-ter uma distribuição aproximada. Nas aplicações exploramos também os
-perfis de verossimilhança para o parâmetro $\phi$ da COM-Poisson e o
-comportamento aproximadamente simétrico em todos casos induz que
-aproximações quadráticas da verossimilhança podem ter desempenhos
-satisfatórios.
-
-Em geral, destaca-se o modelo Poisson, largamente utilizado na
-estatística aplicada, como uma alternativa restritiva devido a sua
-suposição de equidispersão (relação média igual a variância), que leva a
-resultados incorretos quando essa suposição não é atendida. Como
-alternativa sugere-se o modelo COM-Poisson que se apresenta como uma
-alternativa paramétrica tão flexível quanto a abordagem por
-quasi-verossimilhança e que apresenta a distribuição Poisson como caso
-particular facilitando a condução de testes de razão de verossimilhanças
-para verificar a necessidade deste modelo mais flexível. Em favor do
-modelo COM-Poisson apresentamos extensões para modelagem de excesso de
-zeros e inclusão de efeitos efeitos aleatórios mostrando que extensões
-nesse modelo são feitas de maneira simples.
+De forma geral, sugere-se a aplicação dos modelos COM-Poisson na análise
+de dados de contagem, pois devido a sua flexibilidade, seus resultados
+se equivalem a abordagem semi-paramétrica via quasi-verossimilhança,
+porém com todos os benefícios da inferência totalmente paramétrica.
 
 Dado o escopo do trabalho foram vários os tópicos levantados para
 pesquisas futuras. Estudo de reparametrizações que tornem os parâmetros
 $\lambda$ e $\nu$ ortogonais no modelo COM-Poisson podem ser de grande
-valia, pois tornaram as inferências entre eles independentes. Para
-acelerar o algoritmo de estimação aproximações da constante normalização
-podem resultar em ajustes satisfatórios. Estudos de simulação para
-verificar a robustez do modelo a má especificação da distribuição da
-variável resposta. Implementação da modelagem de excesso de zeros via
-mistura de distribuições. Inclusão de efeitos aleatórios dependentes no
-modelo misto COM-Poisson. São algumas das muitas possibilidades para
-pesquisa envolvendo dados de contagem subdispersos ou superdispersos
-modelados com a distribuição COM-Poisson.
+valia, pois tornaram as inferências entre eles independentes, além de
+possivelmente permitir a fatoração da verossimilhança com estimação
+concentrada. Para acelerar o algoritmo de estimação aproximações da
+constante normalização podem resultar em ajustes satisfatórios. Estudos
+de simulação para verificar a robustez do modelo à má especificação da
+distribuição da variável resposta. Implementação da modelagem de excesso
+de zeros via mistura de distribuições. Inclusão de efeitos aleatórios
+dependentes no modelo misto COM-Poisson. São algumas das muitas
+possibilidades para pesquisa envolvendo dados de contagem subdispersos
+ou superdispersos modelados com a distribuição COM-Poisson.

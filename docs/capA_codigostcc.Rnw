@@ -6,7 +6,7 @@ Todos os resultados apresentados são realizados com o \textit{software}
 R, cujo códigos para ajuste dos modelos COM-Poisson de efeito fixo,
 aleatório e com componente de barreira foram disponibilizados em formato
 de pacote no endereço \url{github.com/jreduardo/tccPackage}. Nesse
-apêndice apresentamos os códigos, que utilizam as funções do pacote,
+apêndice são apresentados os códigos, que utilizam as funções do pacote,
 para produzir os resultados da seção \ref{sec:analise-cottonBolls2}
 (modelos de regressão de efeitos fixos). Todavia, os códigos que
 produzem os demais resultados apresentados no trabalho podem ser
