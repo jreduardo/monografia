@@ -2307,6 +2307,44 @@ fonte("Fonte: Elaborado pelo autor.")
 
 @
 
+<<varspred-nematodes, include=FALSE>>=
+
+##-------------------------------------------
+## Obtendo os efeitos aleatórios
+ranefP <- ranef(m2PM)$cult[, 1]
+ranefC <- mixedcmp.ranef(m2CM)
+ranef.all <- rbind(
+    data.frame(model = "PM", ranef = ranefP),
+    data.frame(model = "CM", ranef = ranefC))
+
+##-------------------------------------------
+## Valores preditos
+pred <- with(
+    nematodes,
+    expand.grid(off = seq(min(off), max(off), length.out = 20),
+                cult = levels(cult))
+    )
+X <- model.matrix(~log(off), data = pred)
+
+## Pelo Poisson Mixed
+aux <- predict(m2PM, newdata = pred, type = "link")
+predPM <- data.frame(pred, y = exp(aux), model = "MP")
+muPM <- data.frame(pred, mu = exp(X %*% fixef(m2PM)), model = "MP")
+
+## Pelo COM-Poisson Mixed
+aux <- predict(m2CM, newdata = pred, type = "link")
+predCM <- data.frame(pred, y = calc_mean_cmp(aux, phi = m2CM@coef[1]),
+                     model = "MC")
+muCM <- data.frame(pred, mu = calc_mean_cmp(X %*% m2CM@coef[-(1:2)],
+                                            phi = m2CM@coef[1]),
+                   model = "MC")
+
+## Agrupa as predições
+pred.all <- rbind(predPM, predCM)
+mu.all <- rbind(muPM, muCM)
+
+@
+
 Conforme já observado anteriormente, no modelo COM-Poisson misto os
 parâmetros $\phi$, da distribuição considerada para a variável de
 contagem condicional aos efeitos aleatórios e as covariáveis e $\sigma$,
@@ -2338,14 +2376,6 @@ levam ao mesmo resultado.
 
 <<pred-nematodes, fig.height=4.2, fig.width=7.4, fig.cap="Perfis de verossimilhança dos parâmetros estimados no modelo COM-Poisson Misto.">>=
 
-##-------------------------------------------
-## Obtendo os efeitos aleatórios
-ranefP <- ranef(m2PM)$cult[, 1]
-ranefC <- mixedcmp.ranef(m2CM)
-ranef.all <- rbind(
-    data.frame(model = "PM", ranef = ranefP),
-    data.frame(model = "CM", ranef = ranefC))
-
 xy1 <- densityplot(
     ~ranef, groups =  model,
     auto.key = list(
@@ -2357,32 +2387,6 @@ xy1 <- densityplot(
     data = ranef.all,
     grid = TRUE,
     par.settings = ps.sub)
-
-##-------------------------------------------
-## Valores preditos
-pred <- with(
-    nematodes,
-    expand.grid(off = seq(min(off), max(off), length.out = 20),
-                cult = levels(cult))
-    )
-X <- model.matrix(~log(off), data = pred)
-
-## Pelo Poisson Mixed
-aux <- predict(m2PM, newdata = pred, type = "link")
-predPM <- data.frame(pred, y = exp(aux), model = "MP")
-muPM <- data.frame(pred, mu = exp(X %*% fixef(m2PM)), model = "MP")
-
-## Pelo COM-Poisson Mixed
-aux <- predict(m2CM, newdata = pred, type = "link")
-predCM <- data.frame(pred, y = calc_mean_cmp(aux, phi = m2CM@coef[1]),
-                     model = "MC")
-muCM <- data.frame(pred, mu = calc_mean_cmp(X %*% m2CM@coef[-(1:2)],
-                                            phi = m2CM@coef[1]),
-                   model = "MC")
-
-## Agrupa as predições
-pred.all <- rbind(predPM, predCM)
-mu.all <- rbind(muPM, muCM)
 
 key <- list(
     column = 1,
