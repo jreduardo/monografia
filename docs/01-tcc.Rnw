@@ -281,10 +281,9 @@ library(tccPackage)
 % ---
 % Agradecimentos
 % ---
-\begin{agradecimentos}
-\lipsum[1]
-
-\end{agradecimentos}
+% \begin{agradecimentos}
+%   \lipsum[1]
+% \end{agradecimentos}
 % ---
 
 % ---
@@ -311,8 +310,37 @@ library(tccPackage)
 % resumo em português
 \setlength{\absparsep}{18pt} % ajusta o espaçamento dos parágrafos do resumo
 \begin{resumo}
-    \lipsum[1]
-    \textbf{Palavras-chave}: COM-Poisson. Dados de contagem.
+  Variáveis aleatórias de contagem são de natureza discreta e
+  representam o número de ocorrências de um evento em um domínio
+  discreto ou contínuo.  Para análise estatística dessas variáveis, o
+  modelo de Poisson é amplamente utilizado. Porém, não são raras as
+  situações de sub ou superdispersão, que inviabilizam o emprego deste
+  modelo. Uma alternativa paramétrica é o modelo COM-Poisson que, com a
+  adição de um parâmetro, contempla diferentes níveis de dispersão.
+  Outras características bastantes frequentes em dados de contagem são
+  frequência excessiva de valores zeros e estrutura de correlação entre
+  observações, muitas vezes induzida pelo processo de casualização ou
+  amostragem. Nesses casos os modelos adotados devem ser
+  adaptados. Neste trabalho são exploradas as características da
+  distribuição COM-Poisson e apresentados os modelos de regressão
+  COM-Poisson de efeitos fixos, com modelagem para excesso de zeros e
+  incluindo efeitos aleatórios. O emprego dos modelos COM-Poisson e suas
+  extensões é ilustrado com aplicações onde seus resultados são
+  comparados com as abordagens Poisson, Quasi-Poisson e Binomial
+  Negativa (para casos de superdispersão) via níveis descritivos de
+  testes de razão de verossimilhanças, critério de informação de Akaike
+  e predições pontuais e intervalares. O ajuste dos modelos é feito via
+  maximização da verossimilhança. Os resultados mostram que o modelo
+  Poisson é de fato restritivo, com ajustes inadequados na maioria das
+  aplicações. O modelo COM-Poisson, por sua vez, mostrou-se bastante
+  flexível com resultados similares aos obtidos via abordagem
+  semi-paramétrica Quasi-Poisson. As extensões propostas para o modelo
+  COM-Poisson apresentaram resultados satisfatórios, sendo equivalentes
+  as abordagens já consolidadas na literatura.
+
+  \textbf{Palavras-chave}:
+  COM-Poisson; dados de contagem; subdispersão; superdispersão; excesso
+  de zeros; efeitos aleatórios; Binomial Negativa; Quasi-Poisson
 \end{resumo}
 
 % ---
@@ -343,12 +371,12 @@ library(tccPackage)
 % ---
 % inserir lista de símbolos
 % ---
-\begin{simbolos}
-  \item[$ \log $] Logarítmo neperiano (de base $e$).
-  \item[$ \ell $] log-verossimilhança maximizada.
-  \item[AIC] Critério de Informação de Akaike, do inglês \textit{Akaike
-      Information Criterion}.
-\end{simbolos}
+% \begin{simbolos}
+%   \item[$ \log $] Logarítmo neperiano (de base $e$).
+%   \item[$ \ell $] log-verossimilhança maximizada.
+%   \item[AIC] Critério de Informação de Akaike, do inglês \textit{Akaike
+%       Information Criterion}.
+% \end{simbolos}
 % ---
 
 % ---
