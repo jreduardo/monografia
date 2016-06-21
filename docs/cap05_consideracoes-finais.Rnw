@@ -3,9 +3,9 @@
 % ------------------------------------------------------------------------
 
 Os objetivos nesse trabalho foram a exploração, extensão e aplicação da
-distribuição COM-Poisson na análise de dados de contagem cujo atendemos
-com a apresentação de seis aplicações dos modelos COM-Poisson à
-conjuntos de dados reais que exibem equidispersão, subdispersão,
+distribuição COM-Poisson na análise de dados de contagem cujo foram
+atendidos com a apresentação de seis aplicações dos modelos COM-Poisson
+à conjuntos de dados reais que exibem equidispersão, subdispersão,
 superdispersão, contagens altas, excesso de zeros e efeito aleatório,
 mostrando a flexibilidade do modelo COM-Poisson.
 

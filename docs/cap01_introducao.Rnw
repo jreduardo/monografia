@@ -16,7 +16,7 @@ distribuição de probabilidades para a variável resposta condicionada as
 covariáveis cuja média está associada a uma preditor que acomoda os
 efeitos das covariáveis.
 
-Podemos destacar o modelo linear normal como o de uso predominante
+Pode-se destacar o modelo linear normal como o de uso predominante
 dentre os disponíveis para análises estatísticas aplicadas. Esse modelo
 estabelece que a variável resposta condicional as covariáveis tem
 distribuição Normal de média descrita por um preditor linear das
@@ -55,8 +55,8 @@ suporte. Nesse contexto, a análise de variáveis aleatórias de contagem,
 que têm suporte nos conjunto dos números naturais, foi enriquecida
 expressivamente.
 
-Para análise estatística dessas variáveis, temos o modelo probabilístico
-de Poisson, já consolidado na literatura e amplamente utilizado. Este
+Para análise estatística dessas variáveis, o modelo probabilístico de
+Poisson, já consolidado na literatura é amplamente utilizado. Este
 modelo possui apenas um parâmetro, denotado por $\lambda$, que
 representa a média e também a variância, o que implica em uma relação
 identidade ($\lambda = E(Y) = V(Y)$). Essa propriedade, chamada de
@@ -76,8 +76,8 @@ abordagem é a adoção de modelos com efeitos aleatórios que capturam a
 variabilidade extra com a adoção de um ou mais termos de efeito
 aleatório. Um caso particular do modelo Poisson de efeitos aleatórios,
 muito adotado no campo aplicado da Estatística, ocorre quando
-consideramos a distribuição Gama para os efeitos aleatórios, nessa
-situação temos expressão fechada para a função de probabilidade
+considera-se a distribuição Gama para os efeitos aleatórios, nessa
+situação há expressão fechada para a função de probabilidade
 marginal, que assume a forma Binomial Negativa.
 
 Outra manifestação de fuga da suposição de equidispersão é a
@@ -86,13 +86,13 @@ reduzem a variabilidade das contagens, abaixo do estabelecido pela
 Poisson, não são tão conhecidos quanto os que produzem variabilidade
 extra. Pela mesma razão, são poucas as abordagens descritas na
 literatura capazes de tratar subdispersão, uma vez que efeitos
-aleatórios só capturam a variabilidade extra. Podemos citar os modelos
+aleatórios só capturam a variabilidade extra. Cita-se os modelos
 de quasi-verossimilhança como a abordagem mais utilizada. Todavia não é
 possível descrever uma distribuição de probabilidades para a variável
 resposta nessa abordagem, pois a modelagem é baseada apenas nos dois
 primeiros momentos da distribuição condicional \cite{Paula2013}.
 
-<<processo-pontual, fig.cap="Ilustração de diferentes tipos de processos pontuais. Da direita para esquerda temos processos sob padrões aleatório, aglomerado e uniforme.", fig.height=3, fig.width=7>>=
+<<processo-pontual, fig.cap="Ilustração de diferentes tipos de processos pontuais. Da direita para esquerda têm-se processos sob padrões aleatório, aglomerado e uniforme.", fig.height=3, fig.width=7>>=
 
 mygrid <- expand.grid(xc = 1:3, yc = 1:3)
 mygrid <- data.frame(mygrid)
@@ -136,8 +136,8 @@ A figura \ref{fig:processo-pontual} ilustra, em duas dimensões, a
 ocorrência de equi, super e subdispersão respectivamente. Nesta figura
 cada ponto representa a ocorrência de um evento e cada parcela,
 delimitada pelas linhas pontilhadas, representa a unidade (ou domínio)
-na qual tem-se o número de eventos (como variável aleatória). No painel
-da esquerda temos a representação de dados de contagem equidispersos,
+na qual tem-se o número de eventos (como variável aleatória). O painel
+da esquerda representa a situação de dados de contagem equidispersos,
 nesse cenário as ocorrências da variável aleatória se dispõem
 aleatoriamente. No painel central o padrão já se altera, tem-se a
 representação do caso de superdispersão. Nesse cenário formam-se
@@ -150,7 +150,7 @@ no espaço. Agora as contagens de ocorrências nas parcelas variam bem
 pouco. Ao contrário do caso superdisperso uma causa provável seria o
 oposto de contágio, a repulsa, ou seja, uma ocorrência causa a repulsa
 de outras ocorrências em seu redor (e.g. contagem de árvores, contagem
-de animais).
+de animais territoriais ou que disputam por território).
 
 Uma alterativa paramétrica que contempla os casos de equi, super e
 subdispersão é a adoção de uma distribuição mais flexível para a
