@@ -1,0 +1,1341 @@
+---
+date: "`r format(Sys.time(), '%d de %B de %Y')`"
+fontsize: "10pt"
+bibliography: ../docs/compois.bib
+csl: abntcite.csl
+output:
+  beamer_presentation:
+    fig_caption: yes
+    highlight: tango
+    includes:
+      in_header: preambulo-beamer.tex
+    keep_tex: yes
+    slide_level: 3
+---
+
+<!-- Arquivos de estilo de bibliográfica e citação "Citation Style -->
+<!-- Language (CSL)" disponíveis em -->
+<!-- <https://github.com/citation-style-language/styles> -->
+
+```{r, include = FALSE}
+
+source("../docs/_setup.R")
+opts_chunk$set(
+    fig.width = 8,
+    out.width = "1\\textwidth"
+)
+
+library(cmpreg)
+
+```
+
+<!-- ###  ### -->
+
+\titlepage
+
+### Sumário ###
+
+\tableofcontents[hideallsubsections]
+
+<!-- ------------------------------------------- -->
+# Introdução #
+
+### Dados de contagem ###
+
+\begin{figure}[t]
+  \includegraphics[height=1cm]{./images/count}
+\end{figure}
+
+São variáveis aleatórias aleatórias que representam o número de
+ocorrências de um evento em um dominío discreto ou contínuo.
+\vspace{0.5cm}
+
+Se $Y$ é uma v.a. de contagem, $y = 0, 1, 2, \ldots$
+\vspace{0.5cm}
+
+Exemplos:
+
+ * Número de filhos por casal;
+ * Número de indivíduos infectados por uma doença;
+ * Número de acidentes de trânsito em um mês;
+ * Número de _posts_ em uma rede social durante um dia;
+ * Número de frutos produzidos;
+ * ...
+
+### Análise de dados de contagem ###
+
+ * Modelos de regressão Gaussianos com dados transformados
+     - Dificultam a interpretação dos resultados;
+     - Não contemplam a natureza discreta da variável;
+     - Não contemplam a relação média e variância;
+     - Transformação logarítmica é problemática para valores 0.
+
+\vspace{0.5cm}
+
+ * Modelos de regressão Poisson [@Nelder1972]
+     - Fiel a natureza dos dados;
+     - Contempla a relação média e variância;
+     - Suposição de equidispersão.
+
+###  ###
+
+```{r, fig.height = 4, fig.cap = "Ilustração de processos pontuais que levam a contagens com diferentes níveis de dispersão."}
+
+mygrid <- expand.grid(xc = 1:3, yc = 1:3)
+mygrid <- data.frame(mygrid)
+sp::coordinates(mygrid) <- ~xc + yc
+
+set.seed(201246)
+equi <- sp::spsample(mygrid, n = 100, type = "random")
+over <- sp::spsample(mygrid, n = 100, type = "clustered", nclusters = 20)
+## unde <- sp::spsample(mygrid, n = 100, type = "nonaligned")
+unde <- sp::spsample(mygrid, n = 100, type = "stratified")
+
+coords <- sapply(list("equi" = equi, "over" = over, "unde" = unde),
+                 function(x) {
+                     colnames(x@coords) <- c("x", "y")
+                     x@coords
+                 })
+da <- plyr::ldply(coords, .id="caso")
+
+col <- "gray50"
+xyplot(y ~ x | caso, data = da,
+       layout = c(NA, 1),
+       as.table = TRUE,
+       pch = 19,
+       scales = list(draw = FALSE),
+       xlab = "",
+       ylab = "",
+       strip = strip.custom(
+           factor.levels = c("Equidispersão",
+                             "Superdispersão",
+                             "Subdispersão")),
+       panel = function(x, y, subscripts, ...) {
+           l <- seq(min(x), max(x), length.out = 10)
+           panel.abline(h = l, v = l, col = col, lty = 2)
+           panel.xyplot(x, y, ...)
+       })
+
+```
+
+### Distribuições de probabilidades para dados de contagem ###
+
+\begin{table}
+\centering
+\small
+\caption{Distribuições de probabilidades para dados de contagem}
+\only<1>{
+\begin{tabular}{lccc}
+  \toprule
+\multirow{2}{*}{Distribuição}       & \multicolumn{3}{c}{Contempla a característica de} \\
+  \cline{2-4} \\[-0.3cm]
+                                    & Equidispersão     & Superdispersão & Subdispersão \\[0.1cm]
+  \hline
+Poisson                             & \checkmark        &                &              \\
+Binomial Negativa                   & \checkmark        & \checkmark     &              \\
+\textit{Inverse Gaussian Poisson}   & \checkmark        & \checkmark     &              \\
+\textit{Compound Poisson}           & \checkmark        & \checkmark     &              \\
+Poisson Generalizada                & \checkmark        & \checkmark     & \checkmark   \\
+\textit{Gamma-Count}                & \checkmark        & \checkmark     & \checkmark   \\
+COM-Poisson                         & \checkmark        & \checkmark     & \checkmark   \\
+Katz                                & \checkmark        & \checkmark     & \checkmark   \\
+\textit{Poisson Polynomial}         & \checkmark        & \checkmark     & \checkmark   \\
+\textit{Double-Poisson}             & \checkmark        & \checkmark     & \checkmark   \\
+\textit{Lagrangian Poisson}         & \checkmark        & \checkmark     & \checkmark   \\
+  \bottomrule
+\end{tabular}
+}
+\only<2>{
+\begin{tabular}{lccc}
+  \toprule
+\multirow{2}{*}{Distribuição}       & \multicolumn{3}{c}{Contempla a característica de} \\
+  \cline{2-4} \\[-0.3cm]
+                                    & Equidispersão     & Superdispersão & Subdispersão \\[0.1cm]
+  \hline
+  \rowcolor{teal!20}
+\textbf{Poisson}                             & \checkmark        &                &              \\
+  \rowcolor{teal!20}
+\textbf{Binomial Negativa}                   & \checkmark        & \checkmark     &              \\
+\textit{Inverse Gaussian Poisson}   & \checkmark        & \checkmark     &              \\
+\textit{Compound Poisson}           & \checkmark        & \checkmark     &              \\
+Poisson Generalizada                & \checkmark        & \checkmark     & \checkmark   \\
+\textit{Gamma-Count}                & \checkmark        & \checkmark     & \checkmark   \\
+  \rowcolor{teal!20}
+\textbf{COM-Poisson}                         & \checkmark        & \checkmark     & \checkmark   \\
+Katz                                & \checkmark        & \checkmark     & \checkmark   \\
+\textit{Poisson Polynomial}         & \checkmark        & \checkmark     & \checkmark   \\
+\textit{Double-Poisson}             & \checkmark        & \checkmark     & \checkmark   \\
+\textit{Lagrangian Poisson}         & \checkmark        & \checkmark     & \checkmark   \\
+  \bottomrule
+\end{tabular}
+}
+\end{table}
+
+# Objetivos #
+
+### Objetivos gerais ###
+
+Colaborar com a literatura estatística brasileira, no que diz respeito a
+dados de contagem:
+
+* Apresentando e explorando o modelo de regressão COM-Poisson;
+* Estendendo o modelo para modelagem de excesso de zeros e inclusão
+  de efeitos aleatórios;
+* Discutindo o desempenho do modelo via análise de dados reais;
+* Disponibilizando os recursos computacionais para ajuste dos modelos,
+  em formato de pacote R.
+
+
+# Materiais e Métodos #
+
+## Materiais ##
+### Conjuntos de dados ###
+
+Seis conjuntos de dados analisados:
+
+\begin{center}
+\only<1>{
+\begin{itemize}
+  \tightlist
+  \item Capulhos de algodão sob desfolha artificial
+  \item Produtividade de algodão sob infestação de Mosca-branca
+  \item Produtividade de soja sob umidade e adubação potássica
+  \item Ocorrência de ninfas de Mosca-branca em lavoura de soja
+  \item Peixes capturados por visitantes de um parque Estadual
+  \item Número de nematoides em raizes de feijoeiro
+\end{itemize}
+}
+\only<2>{
+\begin{itemize}
+  \tightlist
+  \setbeamercolor{itemize item}{fg=teal!30}
+  \item \textcolor{teal!30}{Capulhos de algodão sob desfolha artificial}
+  \setbeamercolor{itemize item}{fg=teal}
+  \item \textbf{Produtividade de algodão sob infestação de Mosca-branca}
+  \setbeamercolor{itemize item}{fg=teal!30}
+  \item \textcolor{teal!30}{Produtividade de soja sob umidade e adubação potássica}
+  \setbeamercolor{itemize item}{fg=teal}
+  \item \textbf{Ocorrência de ninfas de Mosca-branca em lavoura de soja}
+  \item \textbf{Peixes capturados por visitantes de um parque Estadual}
+  \item \textbf{Número de nematoides em raizes de feijoeiro}
+\end{itemize}
+}
+\end{center}
+
+### Recursos Computacionais ###
+
+Software R versão `r with(R.version, paste0(major, ".",
+minor))`. Principais pacotes:
+
+* `MASS` (modelo binomial negativo)
+* `pscl` (modelagem de excesso de zeros)
+* `lme4` (modelo Poisson com efeito aleatório Normal)
+* `bbmle` (ajuste de modelos via máxima verossimilhança)
+
+## Métodos ##
+### Estimação via máxima verossimilhança ###
+
+1. Escreva a função de verossimilhança -  $\Ell(\Theta \mid \underline{y})$
+2. Tome seu logaritmo - $\ell(\Theta \mid \underline{y})$
+3. As estimativas dos parâmetros são
+$$\hat{\Theta} = \underset{\Theta}{\textrm{arg max }} \ell(\Theta \mid
+\underline{y})$$
+
+* Algoritmo IWLS (_Interactive Weigthed Leasts Squares_) para os modelos
+  Poisson, Binomial Negativo e Quasi-Poisson.
+* Método _BFGS_ para os modelos COM-Poisson.
+
+### Verossimilhança do modelo COM-Poisson ###
+
+* Reparametrizando $\phi = \log(\nu)$
+    - $\phi < 0 \Rightarrow \textrm{Superdispersão}$
+    - $\phi = 0 \Rightarrow \textrm{Equidispersão}$
+    - $\phi > 0 \Rightarrow \textrm{Subdispersão}$
+
+\begin{block}{log-verossimilhança}
+\begin{equation}
+  \label{loglik-compoissonr}
+  \ell(\phi, \beta \mid \underline{y}) = \sum_{i=1}^n y_i \log(\lambda_i) -
+  e^\phi \sum_{i=1}^n \log(y!) - \sum_{i=1}^n \log(Z(\lambda_i, \phi))
+\end{equation}
+
+\noindent
+em que $\lambda_i = e^{X_i\beta}$, com $X_i$ o vetor $(x_{i1}, x_{i2},
+\ldots x_{ip})$ de covariáveis da i-ésima observação, e $(\beta, \phi)
+\in \R^{p+1}$.
+\end{block}
+
+### Verossimilhança do modelo Hurdle COM-Poisson ###
+
+* $\underline{\pi}=\frac{\exp(G\gamma)}{1+\exp(G\gamma)}$ a
+  probabilidade de contagem nula.
+* $\underline{\lambda}=\exp(X\beta)$ o parâmetro de locação da
+  distribuição COM-Poisson truncada.
+
+\begin{block}{verossimilhança}
+\begin{equation}
+  \label{eqn:loglik-hurdlecmp}
+  \Ell(\phi, \beta, \gamma \mid \underline{y}) =
+  \ind [\underline{\pi}] \cdot (1-\ind) \left [
+    (1-\underline{\pi})\left (
+    \frac{\underline{\lambda}^y}{(y!)^{e^\phi}
+      Z(\underline{\lambda}, \phi)}
+  \right ) \left (
+    1-\frac{1}{Z(\underline{\lambda}, \phi)}
+  \right ) \right ]
+\end{equation}
+
+\noindent
+em que $\ind$ é uma função indicadora para $y = 0$
+\end{block}
+
+### Verossimilhança do modelo misto COM-Poisson ###
+
+$$\begin{aligned}
+  Y_{ij} \mid b_{i},& X_{ij} \sim \textrm{COM-Poisson}(\mu_{ij}, \phi) \\
+  g(&\mu_{ij}) =  X_{ij}\beta + Z_ib_i \\
+  & b \sim \textrm{Normal}(0, \Sigma)
+\end{aligned}$$
+
+\begin{block}{Verossimilhança}
+\begin{equation}
+  \label{eqn:loglik-mixedcmp}
+  \Ell(\phi, \Sigma, \beta \mid \underline{y}) =
+  \prod_{i=1}^m \int_{\R^q} \left (
+    \prod_{j=1}^{n_i} \frac{\underline{\lambda}^y}{(y!)^{e^\phi}
+      Z(\underline{\lambda}, \phi)}
+  \right ) \cdot
+  (2\pi)^{q/2} |\Sigma| \exp \left (
+    -\frac{1}{2}b^t \Sigma^{-1} b
+  \right ) db_i
+\end{equation}
+
+\noindent
+sendo $m$ o número de grupos que compartilham do mesmo efeito aleatório,
+$q$ o número de efeitos aleatórios (intercepto aleatório, inclinação e
+intercepto aleatórios, etc.) e $n_i$ o número de observações no i-ésimo
+grupo.
+\end{block}
+
+# Resultados #
+
+<!--------------------------------------------- -->
+## Pacote R ##
+
+### `cmpreg`: Ajuste de Modelos de Regressões COM-Poisson ###
+
+Implementação em R de um _framework_ para ajuste dos modelos de
+regressão COM-Poisson, pacote `cmpreg`
+
+```{r pacote, echo=TRUE, eval=FALSE}
+
+## Pode ser instalado do GitHub
+devtools::install_git("https://github.com/JrEduardo/cmpreg.git")
+library(cmpreg)
+
+## Regressão (efeitos fixos)
+cmp(y ~ preditor, data = data)
+
+## Regressão com componente de barreira
+hurdlecmp(y ~ count_pred | zero_pred, data = data)
+
+## Regressão (efeitos aleatórios)
+mixedcmp(y ~ count_pred + (1 | ind.ranef), data = data)
+
+```
+
+<!--------------------------------------------- -->
+## Produtividade de algodão ##
+
+```{r ajuste-cottonBolls2, include=FALSE, cache=TRUE}
+
+## Dados
+data(cottonBolls2)
+
+## Preditores considerados
+f1.ncapu <- ncapu ~ 1
+f2.ncapu <- ncapu ~ dexp
+f3.ncapu <- ncapu ~ dexp + I(dexp^2)
+
+f1.nerep <- nerep ~ 1
+f2.nerep <- nerep ~ dexp
+f3.nerep <- nerep ~ dexp + I(dexp^2)
+
+f1.nnos <- nnos ~ 1
+f2.nnos <- nnos ~ dexp
+f3.nnos <- nnos ~ dexp + I(dexp^2)
+
+## Ajustando os modelos Poisson
+m1P.ncapu <- glm(f1.ncapu, data = cottonBolls2, family = poisson)
+m2P.ncapu <- glm(f2.ncapu, data = cottonBolls2, family = poisson)
+m3P.ncapu <- glm(f3.ncapu, data = cottonBolls2, family = poisson)
+
+m1P.nerep <- glm(f1.nerep, data = cottonBolls2, family = poisson)
+m2P.nerep <- glm(f2.nerep, data = cottonBolls2, family = poisson)
+m3P.nerep <- glm(f3.nerep, data = cottonBolls2, family = poisson)
+
+m1P.nnos <- glm(f1.nnos, data = cottonBolls2, family = poisson)
+m2P.nnos <- glm(f2.nnos, data = cottonBolls2, family = poisson)
+m3P.nnos <- glm(f3.nnos, data = cottonBolls2, family = poisson)
+
+## Ajustando os modelos quasiPoisson
+m1Q.ncapu <- glm(f1.ncapu, data = cottonBolls2, family = quasipoisson)
+m2Q.ncapu <- glm(f2.ncapu, data = cottonBolls2, family = quasipoisson)
+m3Q.ncapu <- glm(f3.ncapu, data = cottonBolls2, family = quasipoisson)
+
+m1Q.nerep <- glm(f1.nerep, data = cottonBolls2, family = quasipoisson)
+m2Q.nerep <- glm(f2.nerep, data = cottonBolls2, family = quasipoisson)
+m3Q.nerep <- glm(f3.nerep, data = cottonBolls2, family = quasipoisson)
+
+m1Q.nnos <- glm(f1.nnos, data = cottonBolls2, family = quasipoisson)
+m2Q.nnos <- glm(f2.nnos, data = cottonBolls2, family = quasipoisson)
+m3Q.nnos <- glm(f3.nnos, data = cottonBolls2, family = quasipoisson)
+
+## Ajustando os modelos COM-Poisson
+m1C.ncapu <- cmp(f1.ncapu, data = cottonBolls2, sumto = 30)
+m2C.ncapu <- cmp(f2.ncapu, data = cottonBolls2, sumto = 30)
+m3C.ncapu <- cmp(f3.ncapu, data = cottonBolls2, sumto = 30)
+
+m1C.nerep <- cmp(f1.nerep, data = cottonBolls2, sumto = 30)
+m2C.nerep <- cmp(f2.nerep, data = cottonBolls2, sumto = 30)
+m3C.nerep <- cmp(f3.nerep, data = cottonBolls2, sumto = 30)
+
+m1C.nnos <- cmp(f1.nnos, data = cottonBolls2, sumto = 30)
+m2C.nnos <- cmp(f2.nnos, data = cottonBolls2, sumto = 30)
+m3C.nnos <- cmp(f3.nnos, data = cottonBolls2, sumto = 30)
+
+##======================================================================
+## Perfil de log-verossimilhanca para o parametro phi
+prof.ncapu <- profile(m3C.ncapu, which = "phi")
+prof.nerep <- profile(m2C.nerep, which = "phi")
+prof.nnos <- profile(m3C.nnos, which = "phi")
+
+```
+
+### Experimento ###
+
+Conduzido na UFGD em casa de vegetação [@Martelli2008].
+
+* Delineamento: inteiramente casualizado com cinco repetições
+* Objetivo: avaliar o impacto da praga Mosca-branca na produção de
+  algodão.
+* Unidade amostral: vaso com duas plantas.
+* Covariável experimental:
+    - Tempo de exposição das plantas à praga, em dias. (`dexp`)
+* Variáveis resposta:
+    - Número de capulhos produzidos
+    - Número de estruturas reprodutivas
+    - Número de nós
+
+### Modelagem ###
+
+Preditores considerados:
+
+* Preditor 1: $g(\mu_i) = \beta_0$
+* Preditor 2: $g(\mu_i) = \beta_0 + \beta_1 \textrm{dexp}_i$
+* Preditor 3: $g(\mu_i) = \beta_0 + \beta_1 \textrm{dexp}_i + \beta_2
+\textrm{dexp}_i^2$
+\vspace{0.5cm}
+
+Modelos concorrentes:
+
+* Poisson($\mu_i$)
+* COM-Poisson($\lambda_i,\, \phi$)
+* Quasi-Poisson($\mu_i,\, \sigma^2$)
+
+### Medidas de ajuste ###
+
+```{r loglik-cottonBolls2, include=FALSE}
+
+## Análise de desvios dos modelos
+anP.ncapu <- myanova(m1P.ncapu, m2P.ncapu, m3P.ncapu)
+anC.ncapu <- myanova(m1C.ncapu, m2C.ncapu, m3C.ncapu)
+anQ.ncapu <- myanova(m1Q.ncapu, m2Q.ncapu, m3Q.ncapu)
+
+anP.nerep <- myanova(m1P.nerep, m2P.nerep, m3P.nerep)
+anC.nerep <- myanova(m1C.nerep, m2C.nerep, m3C.nerep)
+anQ.nerep <- myanova(m1Q.nerep, m2Q.nerep, m3Q.nerep)
+
+anP.nnos <- myanova(m1P.nnos, m2P.nnos, m3P.nnos)
+anC.nnos <- myanova(m1C.nnos, m2C.nnos, m3C.nnos)
+anQ.nnos <- myanova(m1Q.nnos, m2Q.nnos, m3Q.nnos)
+
+## Tabela com medidas de ajuste
+tab.ncapu <- data.frame(
+    modelos = paste("Preditor", 1:3),
+    anP.ncapu[, c("np", "ll", "AIC", "P(>Chisq)")],
+    anC.ncapu[, c("ll", "AIC", "P(>Chisq)")],
+    anQ.ncapu[, c("dev", "P(>F)")])
+
+tab.nerep <- data.frame(
+    modelos = paste("Preditor", 1:3),
+    anP.nerep[, c("np", "ll", "AIC", "P(>Chisq)")],
+    anC.nerep[, c("ll", "AIC", "P(>Chisq)")],
+    anQ.nerep[, c("dev", "P(>F)")])
+
+tab.nnos <- data.frame(
+    modelos = paste("Preditor", 1:3),
+    anP.nnos[, c("np", "ll", "AIC", "P(>Chisq)")],
+    anC.nnos[, c("ll", "AIC", "P(>Chisq)")],
+    anQ.nnos[, c("dev", "P(>F)")])
+
+## Empilhando
+tab.ajuste <- rbind(tab.ncapu, tab.nerep, tab.nnos)
+
+##-------------------------------------------
+## Estimativas e testes para o parametro phi
+phis <- cmptest(m3C.ncapu, m2C.nerep, m3C.nnos)
+
+## ##----------------------------------------------------------------------
+## ## Copiar e colar o corpo do resultado na customização latex abaixo
+## digits <- c(1, 1, 0, 2, 2, -2, 2, 2, -2, 2, -2)
+## print(xtable(tab.ajuste, digits = digits))
+
+```
+
+\begin{table}[ht]
+\footnotesize
+\centering
+\caption{Medidas de ajuste para avaliação e comparação}
+\begin{tabular}{lccccccccc}
+  \toprule
+  & & \multicolumn{3}{c}{Poisson} & \multicolumn{3}{c}{COM-Poisson} & \multicolumn{2}{c}{Quasi-Poisson} \\
+  \cmidrule(lr){3-5} \cmidrule(lr){6-8} \cmidrule(lr){9-10}
+  & np & $\ell$ & AIC & P($>\rchi^2$) & $\ell$ & AIC & P($>\rchi^2$) & deviance & P($>F$) \\
+  \midrule
+  \multicolumn{10}{l}{{\bfseries \footnotesize Número de capulhos produzidos}} \\[0.0cm]
+  \cline{1-5} \\[-0.2cm]
+   & 1 & -105,27 & 212,55 & --- & -92,05 & 188,09 & --- & 20,80 & --- \\
+   & 2 & -105,03 & 214,05 & 4,83E-01 & -91,31 & 188,62 & 2,25E-01 & 20,31 & 2,23E-01 \\
+   & 3 & -104,44 & 214,88 & 2,78E-01 & -89,47 & 186,95 & 5,52E-02 & 19,13 & 6,16E-02 \\[0.2cm]
+  \multicolumn{10}{l}{{\bfseries \footnotesize Número de estruturas reprodutivas}} \\[0.0cm]
+  \cline{1-5} \\[-0.2cm]
+   & 1 & -104,74 & 211,49 & --- & -86,41 & 176,82 & --- & 16,23 & --- \\
+   & 2 & -104,27 & 212,54 & 3,32E-01 & -84,59 & 175,18 & 5,66E-02 & 15,29 & 6,19E-02 \\
+   & 3 & -104,06 & 214,12 & 5,16E-01 & -83,73 & 175,47 & 1,90E-01 & 14,87 & 2,07E-01 \\[0.2cm]
+  \multicolumn{10}{l}{{\bfseries \footnotesize Número de nós da planta}} \\[0.0cm]
+  \cline{1-5} \\[-0.2cm]
+   & 1 & -143,79 & 289,59 & --- & -120,58 & 245,16 & --- & 12,69 & --- \\
+   & 2 & -143,48 & 290,95 & 4,25E-01 & -119,03 & 244,06 & 7,87E-02 & 12,05 & 7,39E-02 \\
+   & 3 & -142,95 & 291,89 & 3,04E-01 & -116,27 & 240,54 & 1,88E-02 & 11,00 & 2,23E-02 \\
+   \bottomrule
+\end{tabular}
+\end{table}
+
+### Valores preditos ###
+
+```{r pred-cottonBolls2, fig.height=3.5, fig.width=7, fig.cap="Curva dos valores preditos com intervalo de confiança de (95\\%) como função dos dias de exposição a alta infestação de Mosca-branca."}
+
+data(cottonBolls2)
+qn <- qnorm(0.975) * c(fit = 0, lwr = -1, upr = 1)
+
+## Predição pontual/intervalar
+pred <- data.frame(dexp = with(cottonBolls2,
+                               seq(min(dexp), max(dexp), l = 50)))
+
+##======================================================================
+## Considerando a Poisson
+##-------------------------------------------
+## Para ncapu
+aux <- predict(m3P.ncapu, newdata = pred, se.fit = TRUE)
+aux <- with(aux, exp(fit + outer(se.fit, qn, FUN = "*")))
+aux <- data.frame(modelo = "Poisson", aux)
+predP.ncapu <- cbind(var = "ncapu", pred, aux)
+##-------------------------------------------
+## Para nerep
+aux <- predict(m2P.nerep, newdata = pred, se.fit = TRUE)
+aux <- with(aux, exp(fit + outer(se.fit, qn, FUN = "*")))
+aux <- data.frame(modelo = "Poisson", aux)
+predP.nerep <- cbind(var = "nerep", pred, aux)
+##-------------------------------------------
+## Para nnos
+aux <- predict(m3P.nnos, newdata = pred, se.fit = TRUE)
+aux <- with(aux, exp(fit + outer(se.fit, qn, FUN = "*")))
+aux <- data.frame(modelo = "Poisson", aux)
+predP.nnos <- cbind(var = "nnos", pred, aux)
+##
+predP <- rbind(predP.ncapu, predP.nerep, predP.nnos)
+
+##======================================================================
+## Considerando a COM-Poisson
+##-------------------------------------------
+## Para ncapu
+aux <- predict(m3C.ncapu, newdata = pred, type = "response",
+               interval = "confidence")
+aux <- data.frame(modelo = "COM-Poisson", aux)
+predC.ncapu <- cbind(var = "ncapu", pred, aux)
+##-------------------------------------------
+## Para nerep
+aux <- predict(m2C.nerep, newdata = pred, type = "response",
+               interval = "confidence")
+aux <- data.frame(modelo = "COM-Poisson", aux)
+predC.nerep <- cbind(var = "nerep", pred, aux)
+##-------------------------------------------
+## Para nnos
+aux <- predict(m3C.nnos, newdata = pred, type = "response",
+               interval = "confidence")
+aux <- data.frame(modelo = "COM-Poisson", aux)
+predC.nnos <- cbind(var = "nnos", pred, aux)
+##
+predC <- rbind(predC.ncapu, predC.nerep, predC.nnos)
+
+##======================================================================
+## Considerando a Quasi-Poisson
+##-------------------------------------------
+## Para ncapu
+aux <- predict(m3Q.ncapu, newdata = pred, se.fit = TRUE)
+aux <- with(aux, exp(fit + outer(se.fit, qn, FUN = "*")))
+aux <- data.frame(modelo = "Quasi-Poisson", aux)
+predQ.ncapu <- cbind(var = "ncapu", pred, aux)
+##-------------------------------------------
+## Para nerep
+aux <- predict(m2Q.nerep, newdata = pred, se.fit = TRUE)
+aux <- with(aux, exp(fit + outer(se.fit, qn, FUN = "*")))
+aux <- data.frame(modelo = "Quasi-Poisson", aux)
+predQ.nerep <- cbind(var = "nerep", pred, aux)
+##-------------------------------------------
+## Para nnos
+aux <- predict(m3Q.nnos, newdata = pred, se.fit = TRUE)
+aux <- with(aux, exp(fit + outer(se.fit, qn, FUN = "*")))
+aux <- data.frame(modelo = "Quasi-Poisson", aux)
+predQ.nnos <- cbind(var = "nnos", pred, aux)
+##
+predQ <- rbind(predQ.ncapu, predQ.nerep, predQ.nnos)
+
+##======================================================================
+##-------------------------------------------
+## Gráfico com os valores preditos
+vars <- c("dexp", "vaso", "planta", "nerep", "ncapu", "nnos")
+cottonBolls2 <- cottonBolls2[, vars]
+da <- reshape2::melt(cottonBolls2, id = c("dexp", "vaso", "planta"),
+                     variable.name = "va", value.name = "count")
+cols <- trellis.par.get("superpose.line")$col[1:3]
+
+key <- list(
+    column = 3,
+    lines = list(lty = c(4, 1, 2), lwd = 1, col = cols),
+    text = list(c("Poisson", "COM-Poisson", "Quasi-Poisson")))
+
+xyplot(count ~ dexp | va, data = da,
+       key = key,
+       type = c("p", "g"),
+       layout = c(NA, 1),
+       ylab = "Contagens",
+       xlab = "Dias de exposição a alta infestação de Mosca-branca",
+       scales = list(
+           y = list(relation = "free", rot = 0)),
+       strip = strip.custom(
+           factor.levels = c("Estruturas reprodutivas ",
+                             "Capulhos produzidos",
+                             "Nós da planta")),
+       alpha = 0.3,
+       spread = 0.15,
+       panel = panel.beeswarm,
+       par.settings = ps.sub)+
+    as.layer(
+        xyplot(fit + lwr + upr ~ dexp | var, data = predP,
+               layout = c(NA, 1),
+               scales = list(
+                   y = list(relation = "free", rot = 0)),
+               type = "l", col = cols[1], lty = c(1, 4, 4), lwd = 1)
+    ) +
+    as.layer(
+        xyplot(fit + lwr + upr ~ dexp | var, data = predC,
+               layout = c(NA, 1),
+               scales = list(
+                   y = list(relation = "free", rot = 0)),
+               type = "l", col = cols[2], lty = c(1, 1, 1), lwd = 1)
+    ) +
+    as.layer(
+        xyplot(fit + lwr + upr ~ dexp | var, data = predQ,
+               layout = c(NA, 1),
+               scales = list(
+                   y = list(relation = "free", rot = 0)),
+               type = "l", col = cols[3], lty = c(1, 2, 2), lwd = 1)
+    )
+
+```
+
+<!--------------------------------------------- -->
+## Ocorrência de ninfas de Mosca-branca ##
+
+```{r ajuste-whiteFly, include=FALSE, cache=TRUE}
+
+data(whiteFly)
+whiteFly <- droplevels(subset(whiteFly, grepl("BRS", x = cult)))
+whiteFly$aval <- factor(whiteFly$dias)
+
+## Preditores considerados
+f1 <- ntot ~ bloco + cult + aval
+f2 <- ntot ~ bloco + cult * aval
+
+## Ajustando os modelos Poisson
+m1P.ntot <- glm(f1, data = whiteFly, family = poisson)
+m2P.ntot <- glm(f2, data = whiteFly, family = poisson)
+
+## Ajustando os modelos COM-Poisson
+m1C.ntot <- cmp(f1, data = whiteFly, sumto = 800)
+m2C.ntot <- cmp(f2, data = whiteFly, sumto = 800)
+
+## Ajustando os modelos Binomial Negativo
+library(MASS)
+m1B.ntot <- glm.nb(f1, data = whiteFly)
+m2B.ntot <- glm.nb(f2, data = whiteFly)
+
+## Ajustando os modelos Quasi-Poisson
+m1Q.ntot <- glm(f1, data = whiteFly, family = quasipoisson)
+m2Q.ntot <- glm(f2, data = whiteFly, family = quasipoisson)
+
+##======================================================================
+## Perfil de log-verossimilhanca para o parametro phi
+prof.ntot <- profile(m1C.ntot, which = "phi")
+
+```
+
+### Experimento ###
+
+Conduzido na UFGD em casa de vegetação [@Suekane2011].
+
+* Delineamento: blocos casualizados com quatro blocos.
+* Objetivo: avaliar a propensão de cultivares de soja à praga
+  Mosca-branca.
+* Unidade experimental: dois vasos com duas plantas.
+* Covariáveis experimentais:
+    - Indicadora de bloco, I, II, III e IV, (`bloco`),
+    - Dias decorridos após a primeira avaliação, 0, 8, 13, 22, 31 e 38
+      dias. (`dias`),
+    - Indicadora de cultivar de soja, BRS 239, BRS 243 RR, BRS 245 RR,
+      BRS246 RR, (`cult`).
+* Variável resposta:
+    - Número de ninfas de Mosca-branca nos folíolos dos terços superior,
+      médio e inferior.
+
+### Modelagem ###
+
+Preditores considerados:
+
+* $\eta_1 = g(\mu_{ijk}) = \beta_0 + \tau_i + \gamma_j + \delta_k$
+* $\eta_2 = g(\mu_{ijk}) = \beta_0 + \tau_i + \gamma_j + \delta_k +
+\alpha_{jk}$
+
+\hspace{0.3cm}
+\begin{minipage}[t]{0.9\textwidth}
+\small
+$\tau_i$ é o efeito do i-ésimo bloco, $i=1, 2, 3, 4$
+
+$\gamma_j$ o efeito da j-ésima cultivar, $j=1,2,3,4$
+
+$\delta_k$ o efeito do k-ésimo nível de \texttt{dias}, $k= 1, 2, \ldots,
+6$ e
+
+$\alpha_{jk}$ o efeito da interação entre a j-ésima cultivar e o k-ésimo
+nível de \texttt{dias}
+\end{minipage}
+\vspace{0.5cm}
+
+Modelos concorrentes:
+
+* Poisson($\mu_{ijk}$)
+* COM-Poisson($\lambda_{ijk},\, \phi$)
+* Binomial Negativo($\mu_{ijk},\, \theta$)
+* Quasi-Poisson($\mu_{ijk},\, \sigma^2$)
+
+### Medidas de ajuste ###
+
+```{r loglik-whiteFly, include=FALSE}
+
+## Análise de desvios dos modelos
+anP.ntot <- myanova(m1P.ntot, m2P.ntot)
+anC.ntot <- myanova(m1C.ntot, m2C.ntot)
+anB.ntot <- myanova(m1B.ntot, m2B.ntot)
+anQ.ntot <- myanova(m1Q.ntot, m2Q.ntot)
+
+## Tabelas com medidas de ajuste
+tab.ntot <- rbind(anP.ntot, anC.ntot, anB.ntot, anQ.ntot)
+
+## Obtem as estimativas dos parâmetros de dispersão/precisão
+dispersions.ntot <- c(
+    c(rep(NA, 2)),
+    sapply(list(m1C.ntot, m2C.ntot), function(m) coef(m)[1]),
+    sapply(list(m1B.ntot, m2B.ntot), function(m) m$theta),
+    sapply(list(m1Q.ntot, m2Q.ntot), function(m) summary(m)$dispersion))
+
+## Adicionando os parametros de dispersão à tabela
+tab.ntot <- cbind(tab.ntot, dispersions.ntot)
+rownames(tab.ntot) <- NULL
+
+## Juntando as tabelas
+tab.ajuste <- data.frame(
+    pred = rep(paste("Preditor", 1:2), 4),
+    tab.ntot)
+
+## ##----------------------------------------------------------------------
+## ## Copiar e colar o corpo do resultado na customização latex abaixo
+## digits <- c(1, 1, 0, 2, 2, 2, 0, -2, 2)
+## print(xtable(tab.ajuste, digits = digits))
+
+```
+
+\begin{table}[ht]
+\centering
+\footnotesize
+\caption{Medidas de ajuste para avaliação e comparação}
+\begin{tabular}{lcccccrcr}
+  \toprule
+ Poisson & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) &  \\
+  \midrule
+  Preditor 1 & 12 & -922,98 & 1869,96 &  &  &  &  \\
+  Preditor 2 & 27 & -879,23 & 1812,46 & 87,50 & 15 & 2,90E-12 &  \\[0.3cm]
+ COM-Poisson & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) & $\hat{\phi}$  \\
+  \midrule
+  Preditor 1 & 13 & -410,44 & 846,89 &  &  &  & -3,08 \\
+  Preditor 2 & 28 & -407,15 & 870,30 & 6,59 & 15 & 9,68E-01 & -2,95 \\[0.3cm]
+ Binomial Neg. & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) & $\hat{\theta}$ \\
+  \midrule
+  Preditor 1 & 13 & -406,16 & 838,31 &  &  &  & 3,44 \\
+  Preditor 2 & 28 & -400,55 & 857,10 & 11,21 & 15 & 7,38E-01 & 3,99 \\[0.3cm]
+ Quase-Poisson & np & deviance & AIC & F & diff np & P(>F) & $\hat{\sigma}^2$  \\
+  \midrule
+  Preditor 1 & 12 & 1371,32 &  &  &  &  & 17,03 \\
+  Preditor 2 & 27 & 1283,82 &  & 0,31 & 15 & 9,93E-01 & 19,03 \\
+  \bottomrule
+\end{tabular}
+\end{table}
+
+### Valores preditos ###
+
+```{r pred-whiteFly, fig.height=4.2, fig.width=7.5, fig.cap="Valores preditos com intervalos de confiança (95\\%)."}
+
+library(multcomp)
+
+## Predição pontual/intervalar
+pred <- with(whiteFly,
+             expand.grid(
+                 bloco = factor(levels(bloco)[1],
+                                levels = levels(bloco)),
+                 cult = levels(cult),
+                 aval = levels(aval)
+             ))
+
+## Matrix de delineamento para predição, considera o efeito médio de
+## bloco
+X <- model.matrix(~bloco + cult + aval, data = pred)
+bl <- attr(X, "assign") == 1
+X[, bl] <- X[, bl] * 0 + 1/(sum(bl) + 1)
+
+##-------------------------------------------
+## Considerando a Poisson
+aux <- exp(confint(glht(m1P.ntot, linfct = X),
+               calpha = univariate_calpha())$confint)
+colnames(aux) <- c("fit", "lwr", "upr")
+aux <- data.frame(modelo = "Poisson", aux)
+predP <- cbind(pred, aux)
+
+##-------------------------------------------
+## Considerando a COM-Poisson
+aux <- predict(m1C.ntot, newdata = X, type = "response",
+               interval = "confidence")
+aux <- data.frame(modelo = "COM-Poisson", aux[, c("fit", "lwr", "upr")])
+predC <- cbind(pred, aux)
+
+##-------------------------------------------
+## Considerando a Binomial Negativa
+aux <- family(m1B.ntot)$linkinv(
+                      confint(glht(m1B.ntot, linfct = X),
+                              calpha = univariate_calpha())$confint)
+colnames(aux) <- c("fit", "lwr", "upr")
+aux <- data.frame(modelo = "Binomial Negativa", aux)
+predB <- cbind(pred, aux)
+
+##-------------------------------------------
+## Considerando a Quasi-Poisson
+aux <- exp(confint(glht(m1Q.ntot, linfct = X),
+                   calpha = univariate_calpha())$confint)
+colnames(aux) <- c("fit", "lwr", "upr")
+aux <- data.frame(modelo = "Quasi-Poisson", aux)
+predQ <- cbind(pred, aux)
+
+##-------------------------------------------
+pred.all <- rbind(predP, predC, predB, predQ)
+pred.all <- pred.all[with(pred.all, order(cult, aval, modelo)), ]
+
+##----------------------------------------------------------------------
+## Gráfico
+
+key <- list(
+    type = "o", divide = 1,
+    lines = list(pch = 1:nlevels(pred.all$model) + 4,
+                 cex = 0.7),
+    text = list(c("Poisson", "COM-Poisson",
+                  "Binomial Negativa", "Quasi-Poisson"))
+)
+
+## ## A escala do gráfico fica prejudicada, pois os limites do eixo y são
+## ## extendidos para exibir as observações mais distantes
+## xyplot(ntot ~ aval | cult,
+##        data = whiteFly,
+##        layout = c(NA, 1),
+##        as.table = TRUE,
+##        key = key,
+##        alpha = 0.3,
+##        type = c("p", "g"),
+##        xlab = "Número de dias após o inicío do experimento",
+##        ylab = "Número total de moscas-brancas",
+##        par.settings = ps.sub)
+
+segplot(
+    aval ~ lwr + upr | cult,
+    layout = c(NA, 1),
+    xlab = "Número de dias após o inicío do experimento",
+    ylab = "Número total de moscas-brancas",
+    key = key,
+    axis = axis.grid, cex = 0.7,
+    centers = fit, groups = modelo, data = pred.all,
+    horizontal = FALSE, draw = FALSE,
+    lwd = 1.5, pch = 1:nlevels(pred.all$modelo) + 4,
+    panel = panel.groups.segplot, gap = 0.3)
+
+```
+
+<!--------------------------------------------- -->
+## Peixes capturados ##
+
+```{r ajuste-fish, include=FALSE, cache=TRUE}
+
+## Dados
+data(fish, package = "cmpreg")
+
+## Preditores
+f1 <- npeixes ~  campista + npessoas |
+    campista + npessoas + ncriancas
+f2 <- npeixes ~ campista + npessoas * ncriancas |
+    campista + npessoas * ncriancas
+
+## Ajustando os modelos Hurdle Poisson
+library(pscl)
+m1HP <- hurdle(f1, data = fish, dist = "poisson")
+m2HP <- hurdle(f2, data = fish, dist = "poisson")
+
+## Hurdle Binomial Negativo
+m1HB <- hurdle(f1, data = fish, dist = "negbin")
+m2HB <- hurdle(f2, data = fish, dist = "negbin")
+
+## Ajustando os modelos Hurdle COM-Poisson
+m1HC <- hurdlecmp(f1, data = fish)
+m2HC <- hurdlecmp(f2, data = fish)
+
+```
+
+### Estudo ###
+
+Observacional conduzido por biólogos em um Parque Estadual [@UCLA].
+
+* Delineamento: amostragem aleatória.
+* Objetivo: modelar o número de peixes capturados pela atividade de
+  pesca esportiva.
+* Unidade experimental: grupos de pescadores visitantes do parque.
+* Covariáveis mensuradas:
+    - Número de pessoas, (`np`),
+    - Número de crianças. (`nc`),
+    - Indicador de campista no grupo, (`ca`).
+* Variável resposta:
+    - Número de peixes capturados pelo grupo.
+
+### Modelagem ###
+
+Preditores considerados:
+
+* Preditor 1: \quad
+$\begin{aligned}
+  g(\mu_i)     &= \beta_0 + \beta_1 \textrm{ca}_i +
+  \beta_2 \textrm{np}_i \\
+  \textrm{logit}(\pi_i) &= \gamma_0 + \gamma_1 \textrm{ca}_i +
+  \gamma_2 \textrm{np}_i + \gamma_3 \textrm{nc}_i
+\end{aligned}$
+\vspace{0.2cm}
+
+* Preditor 2: \quad
+$\begin{aligned}
+  g(\mu_i)     &= \beta_0 + \beta_1 \textrm{ca}_i +
+  \beta_2 \textrm{np}_i + \beta_3 \textrm{nc}_i +
+  \beta_4 (\textrm{np}_i \cdot \textrm{nc}_i) \\
+  \textrm{logit}(\pi_i) &= \gamma_0 + \gamma_1 \textrm{ca}_i +
+  \gamma_2 \textrm{np}_i + \gamma_3 \textrm{nc}_i +
+  \gamma_4 (\textrm{np}_i \cdot \textrm{nc}_i)
+\end{aligned}$
+\vspace{0.5cm}
+
+Modelos concorrentes:
+
+* Hurdle Poisson($\pi_i,\, \mu_i$)
+* Hurdle COM-Poisson($\pi_i,\, \lambda_i,\, \phi$)
+* Hurdle Binomial Negativo($\pi_i,\, \mu_i,\, \theta$)
+
+### Medidas de ajuste ###
+
+```{r logLik-fish, include=FALSE}
+
+## Tabelas de ANOVA
+anHP <- myanova(m1HP, m2HP)
+anHC <- myanova(m1HC, m2HC)
+anHB <- myanova(m1HB, m2HB)
+
+## Obtem as estimativas dos parametros de dispersao
+dispHC <- sapply(list(m1HC, m2HC), function(m) m@coef[1])
+dispHB <- sapply(list(m1HB, m2HB), function(m) m$theta)
+dispersions <- c(NA, NA, dispHB, dispHC)
+
+## Empilhando
+tab <- data.frame(pred = rep(paste("Preditor", 1:2), 3))
+tab <- cbind(tab, rbind(anHP, anHB, anHC), dispersions)
+
+## ## Gerando o código latex
+## digits <- c(1, 1, 0, 2, 2, 2, 0, -2, 2)
+## xtable(tab, digits = digits)
+
+```
+
+\begin{table}[ht]
+\centering
+\footnotesize
+\caption{Medidas de ajuste para avaliação e comparação}
+\label{tab:ajuste-fish}
+\begin{tabular}{lcccccrc}
+  \toprule
+Poisson & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) & \\
+  \midrule
+  Preditor 1 & 7 & -857,48 & 1728,96 &  &  &  &  \\
+  Preditor 2 & 10 & -744,58 & 1509,17 & 225,79 & 3 & 1,12E-48 &  \\[0.3cm]
+Binomial Neg. & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) & $\hat{\theta}$ \\
+  \midrule
+  Preditor 1 & 8 & -399,79 & 815,58 &  &  &  & 0,20 \\
+  Preditor 2 & 11 & -393,72 & 809,44 & 12,14 & 3 & 6,91E-03 & 0,37 \\[0.3cm]
+COM-Poisson & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) & $\hat{\phi}$ \\
+  \midrule
+  Preditor 1 & 8 & -409,85 & 835,71 &  &  &  & -8,77 \\
+  Preditor 2 & 11 & -402,30 & 826,59 & 15,12 & 3 & 1,72E-03 & -3,77 \\
+  \bottomrule
+\end{tabular}
+\end{table}
+
+### Valores preditos ###
+
+```{r pred-fish, fig.height=4, fig.width=6.5, out.width="0.9\\textwidth", fig.cap="Valores preditos do número de peixes capturados."}
+
+##======================================================================
+## Preditos
+
+## Região para predição
+pred <- expand.grid(campista = c("Não", "Sim"),
+                    ncriancas = 0:3, npessoas = 1:4)
+
+##-------------------------------------------
+## Estimando as médias
+
+## Pelo Hurdle Poisson
+aux <- predict(m2HP, newdata = pred, type = "response")
+predHP <- cbind(pred, fit = aux, model = "HP")
+
+## Pelo Hurdle Binomial Negativo
+aux <- predict(m2HB, newdata = pred, type = "response")
+predHB <- cbind(pred, fit = aux, model = "HB")
+
+## Pelo Hurdle COM-Poisson
+aux <- predict(m2HC, newdata = pred, type = "response")
+predHC <- cbind(pred, fit = aux, model = "HC")
+
+##
+pred.all <- rbind(predHP, predHB, predHC)
+
+##-------------------------------------------
+## Gráfico final
+
+key <- list(
+    lines = list(lty = 1:3),
+    text = list(
+        paste("Hurdle", c("Poisson", "COM-Poisson",
+                          "Binomial Negativo")))
+)
+
+xyplot(npeixes ~ npessoas | campista,
+       groups = ncriancas, data = subset(fish, npeixes < 50),
+       jitter.x = TRUE,
+       jitter.y = TRUE,
+       type = c("p", "g"),
+       xlab = "Número de pessoas no grupo",
+       ylab = "Número de peixes capturados",
+       key = key,
+       alpha = 0.3,
+       strip = strip.custom(
+           strip.names = TRUE, var.name = "campista"
+       )) +
+    as.layer(
+        xyplot(fit ~ npessoas | campista,
+               groups = ncriancas, data = predHP,
+               type = "l",
+               lty = 1)
+    ) +
+    as.layer(
+        xyplot(fit ~ npessoas | campista,
+               groups = ncriancas, data = predHC,
+               type = "l",
+               lty = 2)
+    ) +
+    as.layer(
+        xyplot(fit ~ npessoas | campista,
+               groups = ncriancas, data = predHB,
+               type = "l",
+               lty = 3)
+    )
+##-------------------------------------------
+## Legenda
+cols <- trellis.par.get("superpose.line")$col[1:4]
+draw.key(
+    key = list(
+        cex = 0.9,
+        columns = 1,
+        lines = list(
+            lty = 1, lwd = 2, col = cols),
+        text = list(
+            as.character(paste(unique(fish$ncriancas), "crianças")))
+    ), draw = TRUE,
+    vp = grid::viewport(
+        x = grid::unit(0.22, "npc"), y = grid::unit(0.6, "npc")))
+
+```
+
+<!--------------------------------------------- -->
+## Número de nematoides ##
+
+```{r ajuste-nematodes, include=FALSE, cache=FALSE}
+
+library(lme4)
+data(nematodes)
+
+## Preditores
+f1 <- nema ~ (1|cult)
+f2 <- nema ~ log(off) + (1|cult)
+
+## Ajuste dos mixed Poisson
+m1PM <- glmer(f1, data = nematodes, family = poisson)
+m2PM <- glmer(f2, data = nematodes, family = poisson)
+
+## ## Ajuste dos mixed COM-Poisson
+## m1CM <- mixedcmp(f1, data = nematodes, sumto = 50)
+## m2CM <- mixedcmp(f2, data = nematodes, sumto = 50)
+load("../docs/mixedcmp_models.rda")
+
+```
+
+### Experimento ###
+
+Conduzido no IAPAR em casa de vegetação.
+
+* Delineamento: inteiramente casualizado com cinco repetições.
+* Objetivo: avaliar a resistência à nematoides de linhagens de feijoeiro.
+* Unidade amostral: alíquota de 1ml da solução de raizes lavadas,
+  trituradas, peneiradas e diluídas em água provida por um vaso com duas
+  plantas.
+* Covariáveis:
+    - Indicador de linhagem de feijoeiro, A, B, C, $\ldots$, S (`cult`)
+    - Concentração de raiz na solução. (`sol`)
+* Variáveis resposta:
+    - Número de nematoides.
+
+### Modelagem ###
+
+Preditores considerados:
+
+* Preditor 1: $g(\mu_{ij}) = \beta_0 + b_j$
+* Preditor 2: $g(\mu_{ij}) = \beta_0 + \beta_1 \log(\textrm{sol})_i +
+  b_j$
+
+\hspace{0.35cm}
+\begin{minipage}[t]{0.9\textwidth}
+$b_j \sim \textrm{Normal}(0,\, \sigma^2)$
+\end{minipage}
+\vspace{0.5cm}
+
+Modelos concorrentes:
+
+* Poisson($\mu_{ij}$)
+* COM-Poisson($\lambda_{ij},\, \phi$)
+
+### Medidas de ajuste ###
+
+\begin{table}[ht]
+\centering
+\footnotesize
+\caption{Medidas de ajuste para avaliação e comparação}
+\begin{tabular}{lcccccrcr}
+  \toprule
+ Poisson & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) &  \\
+  \midrule
+  Preditor 1 & 2 & -237,20 & 478,40 &  &  &  &  &  \\
+  Preditor 2 & 3 & -234,66 & 475,32 & 5,07 & 1 & 2,43E-02 &  &  \\[0.3cm]
+ COM-Poisson & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) & $\hat{\phi}$ & P($>\rchi^2$) \\
+  \midrule
+  Preditor 1 & 3 & -236,85 & 479,71 &  &  &  & 0,15 & 4,06E-01 \\
+  Preditor 2 & 4 & -233,86 & 475,72 & 5,99 & 1 & 1,44E-02 & 0,23 & 2,05E-01 \\
+   \bottomrule
+\end{tabular}
+\end{table}
+
+### Valores preditos ###
+
+```{r pred-nematodes, fig.height=4.2, fig.width=7.4, fig.cap="Valores preditos nos modelos de efeitos mistos."}
+
+##-------------------------------------------
+## Obtendo os efeitos aleatórios
+ranefP <- ranef(m2PM)$cult[, 1]
+ranefC <- mixedcmp.ranef(m2CM)
+ranef.all <- rbind(
+    data.frame(model = "PM", ranef = ranefP),
+    data.frame(model = "CM", ranef = ranefC))
+
+##-------------------------------------------
+## Valores preditos
+pred <- with(
+    nematodes,
+    expand.grid(off = seq(min(off), max(off), length.out = 20),
+                cult = levels(cult))
+    )
+X <- model.matrix(~log(off), data = pred)
+
+## Pelo Poisson Mixed
+aux <- predict(m2PM, newdata = pred, type = "link")
+predPM <- data.frame(pred, y = exp(aux), model = "MP")
+muPM <- data.frame(pred, mu = exp(X %*% fixef(m2PM)), model = "MP")
+
+## Pelo COM-Poisson Mixed
+aux <- predict(m2CM, newdata = pred, type = "link")
+predCM <- data.frame(pred, y = calc_mean_cmp(aux, phi = m2CM@coef[1]),
+                     model = "MC")
+muCM <- data.frame(pred, mu = calc_mean_cmp(X %*% m2CM@coef[-(1:2)],
+                                            phi = m2CM@coef[1]),
+                   model = "MC")
+
+## Agrupa as predições
+pred.all <- rbind(predPM, predCM)
+mu.all <- rbind(muPM, muCM)
+
+xy1 <- densityplot(
+    ~ranef, groups =  model,
+    auto.key = list(
+        column = 1,
+        text = c("Poisson", "COM-Poisson")
+    ),
+    xlab = "Predição dos efeitos\n aleatórios",
+    ylab = "Densidade",
+    data = ranef.all,
+    grid = TRUE,
+    par.settings = ps.sub)
+
+key <- list(
+    column = 1,
+    lines = list(lty = c(1, 2), lwd = c(3, 1)),
+    text = list(c("Perfil Médio", "Perfil por cultivar")))
+
+## Faz o gráfico
+nematodes2 <- rbind(nematodes, nematodes)
+nematodes2$model <- rep(c("MP", "MC"), each = nrow(nematodes))
+xy2 <- xyplot(nema ~ off | model,
+              groups = cult,
+              data = nematodes2,
+              type = c("p", "g"),
+              alpha = 0.4,
+              key = key,
+              xlab = paste("Solução de massa fresca de raizes\n",
+                           "pelo volume de água"),
+              ylab = "Contagem de nematoides",
+              strip = strip.custom(
+                  factor.levels = c("Poisson", "COM-Poisson")
+              ),
+              par.settings = ps.sub) +
+    as.layer(
+        xyplot(y ~ off | model, groups = cult, data = pred.all,
+               type = "l", lty = 2)
+    ) +
+    as.layer(
+        xyplot(mu ~ off | model, groups = cult, data = mu.all,
+               type = "l", col = 1, lwd = 3)
+    )
+
+## Organiza layout
+print(xy2, position = c(0, 0, 0.6, 1), more = TRUE)
+print(xy1, position = c(0.57, 0, 1, 1), more = FALSE)
+
+```
+
+<!--------------------------------------------- -->
+## Discussões ##
+
+###  ###
+
+* Similaridade entre inferências via modelo Quasi-Poisson e COM-Poisson;
+* Desempenho do modelo Binomial Negativo;
+* Interpretação dos parâmetros nos modelos baseados na COM-Poisson
+* Problemas numéricos para determinação da matriz hessiana no modelo
+  Hurdle COM-Poisson;
+* Procedimentos computacionalmente intensivos na avaliação da
+  verossimilhança no caso COM-Poisson de efeitos aleatórios;
+* Não ortogonalidade observada (empírica) entre os parâmetros de locação
+  e de precisão no modelo COM-Poisson;
+* Comportamento simétrico dos perfis de log-verossimilhança para o
+  parâmetro $\phi$ da COM-Poisson.
+
+<!--------------------------------------------- -->
+# Considerações finais #
+
+### Conclusões ###
+
+Aplicação do modelo COM-Poisson:
+
+* Resultados similares aos providos pela abordagem semi-paramétrica via
+  quasi-verossimilhança;
+* A não ortogonalidade entre os parâmetros de locação e precisão no
+  modelo COM-Poisson se mostra como característica da distrição;
+* A simetria nos perfis de verossimilhança do parâmetro de precisão
+  também.
+* A avaliação da constante de normalização é problemática no modelo.
+
+
+### Conclusões ###
+
+Análise de dados de contagem:
+
+* Modelo Poisson inadequado na maioria das aplicações, mostrando que a
+  suposição de equidispersão é de fato restritiva;
+* Modelos alternativos ao Poisson devem ser empregados na análise de
+  dados de contagem;
+* Sugere-se o modelo COM-Poisson como alternativa totalmente
+  paramétrica e bastante flexível.
+
+### Trabalhos futuros ###
+
+* Estudar reparametrizações do modelo COM-Poisson;
+* Avaliar aproximações da constante de normalização;
+* Realizar estudos de simulação para avaliar a robustez do modelo;
+* Implementar o modelo COM-Poisson inflacionado de zeros;
+* Implementar o modelo COM-Poisson com efeitos aleatórios dependentes.
+
+<!--------------------------------------------- -->
+#  #
+### Publicização ###
+
+\begin{columns}[c]
+  \column{.3\textwidth}
+\begin{flushright}
+  \includegraphics[scale=0.1]{./images/octocat} \\
+\end{flushright}
+  \hfill
+\column{.7\textwidth}
+\url{https://github.com/JrEduardo/cmpreg}
+\url{https://github.com/JrEduardo/tccDocument}
+\end{columns}
+
+\vfill
+\includegraphics[scale=0.1]{./images/software}
+
+### Referências ###
+\small
