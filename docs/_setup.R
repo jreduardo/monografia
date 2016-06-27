@@ -28,6 +28,7 @@ wrapfigure <- function(align = "L", width = "0.5") {
 ##======================================================================
 ## Opções gerais do knitr
 library(knitr)
+library(xtable)
 opts_chunk$set(
     warning = FALSE,
     message = FALSE,
