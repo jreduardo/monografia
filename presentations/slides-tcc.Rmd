@@ -43,21 +43,20 @@ library(cmpreg)
 ### Dados de contagem ###
 
 \begin{figure}[t]
-  \includegraphics[height=1cm]{./images/count}
+  \includegraphics[height=0.9cm]{./images/count}
 \end{figure}
 
 São variáveis aleatórias aleatórias que representam o número de
 ocorrências de um evento em um dominío discreto ou contínuo.
 \vspace{0.5cm}
 
-Se $Y$ é uma v.a. de contagem, $y = 0, 1, 2, \ldots$
+Se $Y$ é uma variável aleatória de contagem, $y = 0, 1, 2, \ldots$
 \vspace{0.5cm}
 
 Exemplos:
 
  * Número de filhos por casal;
  * Número de indivíduos infectados por uma doença;
- * Número de acidentes de trânsito em um mês;
  * Número de _posts_ em uma rede social durante um dia;
  * Número de frutos produzidos;
  * ...
@@ -79,7 +78,7 @@ Exemplos:
 
 ###  ###
 
-```{r, fig.height = 4, fig.cap = "Ilustração de processos pontuais que levam a contagens com diferentes níveis de dispersão."}
+```{r, fig.height = 3.5, fig.cap = "Ilustração de processos pontuais que levam a contagens com diferentes níveis de dispersão."}
 
 mygrid <- expand.grid(xc = 1:3, yc = 1:3)
 mygrid <- data.frame(mygrid)
@@ -111,14 +110,17 @@ xyplot(y ~ x | caso, data = da,
                              "Superdispersão",
                              "Subdispersão")),
        panel = function(x, y, subscripts, ...) {
-           l <- seq(min(x), max(x), length.out = 10)
-           panel.abline(h = l, v = l, col = col, lty = 2)
+           ## l <- seq(min(x), max(x), length.out = 10)
+           panel.grid(h = 10, v = 10, col = col, lty = 2, ...)
+           ## panel.abline(h = l, v = l, col = col, lty = 2)
            panel.xyplot(x, y, ...)
        })
 
 ```
 
 ### Distribuições de probabilidades para dados de contagem ###
+
+Com base em @Winkelmann2008 e @Kokonendji2014
 
 \begin{table}
 \centering
@@ -152,16 +154,16 @@ Katz                                & \checkmark        & \checkmark     & \chec
   \cline{2-4} \\[-0.3cm]
                                     & Equidispersão     & Superdispersão & Subdispersão \\[0.1cm]
   \hline
-  \rowcolor{teal!20}
-\textbf{Poisson}                             & \checkmark        &                &              \\
-  \rowcolor{teal!20}
-\textbf{Binomial Negativa}                   & \checkmark        & \checkmark     &              \\
+  \rowcolor{teal!30}
+Poisson                             & \checkmark        &                &              \\
+  \rowcolor{teal!30}
+Binomial Negativa                   & \checkmark        & \checkmark     &              \\
 \textit{Inverse Gaussian Poisson}   & \checkmark        & \checkmark     &              \\
 \textit{Compound Poisson}           & \checkmark        & \checkmark     &              \\
 Poisson Generalizada                & \checkmark        & \checkmark     & \checkmark   \\
 \textit{Gamma-Count}                & \checkmark        & \checkmark     & \checkmark   \\
-  \rowcolor{teal!20}
-\textbf{COM-Poisson}                         & \checkmark        & \checkmark     & \checkmark   \\
+  \rowcolor{teal!30}
+COM-Poisson                         & \checkmark        & \checkmark     & \checkmark   \\
 Katz                                & \checkmark        & \checkmark     & \checkmark   \\
 \textit{Poisson Polynomial}         & \checkmark        & \checkmark     & \checkmark   \\
 \textit{Double-Poisson}             & \checkmark        & \checkmark     & \checkmark   \\
@@ -170,6 +172,181 @@ Katz                                & \checkmark        & \checkmark     & \chec
 \end{tabular}
 }
 \end{table}
+
+### Distribuição COM-Poisson ###
+
+Proposta por @Conway1962.
+
+\begin{block}{Função massa de probabilidade}
+\begin{equation}
+  \label{eqn:pmf-compoisson}
+  \Pr(Y=y \mid \lambda, \nu) = \frac{\lambda^y}{(y!)^\nu Z(\lambda, \nu)},
+  \qquad \qquad
+  Z(\lambda, \nu) = \sum_{j=0}^\infty\frac{\lambda^j}{(j!)^\nu}
+\end{equation}
+\end{block}
+
+* Não tem expressão fechada para média e variância;
+* Apresenta distribuições bastante conhecidas como casos particulares:
+    - Poisson - $\nu = 1$;
+    - Bernoulli - $\nu \to \infty$;
+    - Geométrica - $\nu = 0$ e $\lambda < 1$.
+
+### Distribuição COM-Poisson ###
+
+```{r distr-compoisson, fig.height=3.4, fig.width=6.7, fig.cap="Probabilidades pela distribuição COM-Poisson."}
+
+library(cmpreg)
+##-------------------------------------------
+## Parametros da distribuição
+pars <- list("p1" = log(c(1.362, 0.4)),
+             "p2" = log(c(8, 1)),
+             "p3" = log(c(915, 2.5)))
+mus <- sapply(pars, function(p) calc_mean_cmp(p[1], p[2], sumto = 50))
+vars <- sapply(pars, function(p) calc_var_cmp(p[1], p[2], sumto = 50))
+
+##-------------------------------------------
+## Calculando as probabilidades
+y <- 0:30
+
+## COM-Poisson
+py.co <- sapply(pars, function(p) dcmp(y, p[1], p[2], sumto = 50))
+da.co <- as.data.frame(py.co)
+da.co <- cbind(y, stack(da.co))
+
+## Poisson
+py.po <- sapply(mus, function(p) dpois(y, lambda = p))
+da.po <- as.data.frame(py.po)
+da.po <- cbind(y, stack(da.po))
+
+##-------------------------------------------
+## Objetos para grafico da lattice
+l <- sapply(pars, function(p) exp(p[1]))
+n <- sapply(pars, function(p) exp(p[2]))
+fl <- substitute(
+    expression(lambda == l1~","~nu == n1,
+               lambda == l2~","~nu == n2,
+               lambda == l3~","~nu == n3),
+    list(l1 = l[1], l2 = l[2], l3 = l[3],
+         n1 = n[1], n2 = n[2], n3 = n[3]))
+cols <- trellis.par.get("superpose.line")$col[1:2]
+yaxis <- pretty(da.po$values, n = 2)
+ylim <- c(-0.1, max(da.po$values)*1.2)
+key <- list(
+    columns = 2,
+    lines = list(lty = 1, col = cols),
+    text = list(c("Poisson", "COM-Poisson")))
+
+##-------------------------------------------
+## Grafico
+xyplot(values ~ c(y - 0.15) | ind, data = da.po,
+       type = c("h", "g"),
+       xlab = "y", ylab = expression(Pr(Y == y)),
+       ylim = ylim, xlim = extendrange(y),
+       scales = list(y = list(at = yaxis)),
+       layout = c(NA, 1),
+       key = key,
+       strip = strip.custom(factor.levels = fl)) +
+    as.layer(xyplot(
+        values ~ c(y + 0.15) | ind, data = da.co,
+        type = "h", col = cols[2]))
+for(i in 1:3){
+    trellis.focus("panel", i, 1, highlight=FALSE)
+    grid::grid.text(label = sprintf("E[Y]:  %.1f\nV[Y]:  %.1f",
+                                    mus[i], mus[i]),
+                    x = .57, y = 0.03,
+                    default.units = "npc",
+                    gp = grid::gpar(col = cols[1]),
+                    just = c("left", "bottom"))
+grid::grid.text(label = sprintf("E[Y]:  %.1f\nV[Y]:  %.1f",
+                                mus[i], vars[i]),
+                x = .05, y = 0.03,
+                default.units = "npc",
+                gp = grid::gpar(col = cols[2]),
+                just = c("left", "bottom"))
+}
+trellis.unfocus()
+
+```
+
+### Relações média-variância ###
+
+```{r mv, fig.height=4, fig.width=8, fig.cap="Relações Média e Variância COM-Poisson e Binomial Negativa."}
+
+##-------------------------------------------
+## Parâmetros considerados
+nu <- seq(0.3, 4, length.out = 50)
+col <- brewer.pal(n = 8, name = "RdBu")
+col <- colorRampPalette(colors = col)(length(nu))
+
+##-------------------------------------------
+## Etiquetas da legenda
+labels <- substitute(
+    expression(nu == p1, nu == p2, nu == p3),
+    list(p1 = min(nu), p2 = median(nu), p3 = max(nu)))
+
+##-------------------------------------------
+## Gráfico
+
+par(mfrow = c(1,2), mar = c(6.5, 5, 3, 4) + 0.1, las = 1)
+## Curva identidade representando a Poisson
+curve((1/1)*(mu + (1 - 1)/(2*1)), xlab = "", ylab = "",
+      from = 0, to = 10, xname = "mu")
+title(ylab = expression(V(X) == frac(nu*(E(X) + 1)-1, nu^2)),
+      line = 2.5)
+title(xlab = expression(E(X) == lambda^{1/nu} - frac(nu-1, 2*nu)),
+      line = 4)
+grid()
+
+## Curvas da relação média e variância da COM-Poisson
+for (a in seq_along(nu)) {
+    curve((1/nu[a])*(mu + (nu[a] - 1)/(2*nu[a])),
+          add = TRUE, xname = "mu", col = col[a], lwd = 2)
+}
+plotrix::color.legend(
+    xl = 11, yb = 2.5, xr = 12, yt = 6.5,
+    gradient = "y", align = "rb",
+    legend = round(fivenum(nu)[c(1, 3, 5)]),
+    rect.col = col)
+mtext(text = expression(nu), side = 3, cex = 1.3,
+      line = -3.5, at = 11.5)
+
+##-------------------------------------------
+## Parâmetros considerados
+theta <- seq(0.5, 50, length.out = 50)
+col <- rev(brewer.pal(n = 8, name = "RdBu"))
+col <- colorRampPalette(colors = col)(length(theta))
+
+##-------------------------------------------
+## Etiquetas da legenda
+labels <- substitute(
+    expression(theta == p1, theta == p2, theta == p3),
+    list(p1 = min(theta), p2 = median(theta), p3 = max(theta)))
+
+##-------------------------------------------
+## Gráfico
+
+## Curva identidade representando a Poisson
+## par(mar = c(5.5, 4.2, 3, 3), las = 1)
+curve(mu + 1*0,
+      from = 0, to = 10, xname = "mu",
+      ylab = expression(V(Y) == mu + mu^2~"/"~theta),
+      xlab = expression(E(Y) == mu))
+grid()
+## Curvas da relação média e variância da Binomial Negativa
+for (a in seq_along(theta)) {
+    curve(mu + (mu^2)/theta[a],
+          add = TRUE, xname = "mu", col = col[a], lwd = 2)
+}
+plotrix::color.legend(
+    xl = 11, yb = 2.5, xr = 12, yt = 6.5,
+    gradient = "y", align = "rb",
+    legend = round(fivenum(theta)[c(1, 3, 5)]),
+    rect.col = col)
+mtext(text = expression(theta), side = 3, cex = 1.3,
+      line = -3.5, at = 11.5)
+
+```
 
 # Objetivos #
 
@@ -185,7 +362,6 @@ dados de contagem:
 * Disponibilizando os recursos computacionais para ajuste dos modelos,
   em formato de pacote R.
 
-
 # Materiais e Métodos #
 
 ## Materiais ##
@@ -197,27 +373,28 @@ Seis conjuntos de dados analisados:
 \only<1>{
 \begin{itemize}
   \tightlist
-  \item Capulhos de algodão sob desfolha artificial
-  \item Produtividade de algodão sob infestação de Mosca-branca
-  \item Produtividade de soja sob umidade e adubação potássica
-  \item Ocorrência de ninfas de Mosca-branca em lavoura de soja
-  \item Peixes capturados por visitantes de um parque Estadual
-  \item Número de nematoides em raizes de feijoeiro
+  \item Capulhos de algodão sob desfolha artificial;
+  \item Produtividade de algodão sob infestação de Mosca-branca;
+  \item Produtividade de soja sob umidade e adubação potássica;
+  \item Ocorrência de ninfas de Mosca-branca em lavoura de soja;
+  \item Peixes capturados por visitantes de um parque Estadual;
+  \item Número de nematoides em raizes de feijoeiro.
 \end{itemize}
 }
 \only<2>{
 \begin{itemize}
   \tightlist
   \setbeamercolor{itemize item}{fg=teal!30}
-  \item \textcolor{teal!30}{Capulhos de algodão sob desfolha artificial}
+  \item \textcolor{teal!30}{Capulhos de algodão sob desfolha artificial;}
   \setbeamercolor{itemize item}{fg=teal}
-  \item \textbf{Produtividade de algodão sob infestação de Mosca-branca}
+  \item Produtividade de algodão sob infestação de Mosca-branca;
   \setbeamercolor{itemize item}{fg=teal!30}
-  \item \textcolor{teal!30}{Produtividade de soja sob umidade e adubação potássica}
+  \item \textcolor{teal!30}{Produtividade de soja sob umidade e adubação
+  potássica;}
   \setbeamercolor{itemize item}{fg=teal}
-  \item \textbf{Ocorrência de ninfas de Mosca-branca em lavoura de soja}
-  \item \textbf{Peixes capturados por visitantes de um parque Estadual}
-  \item \textbf{Número de nematoides em raizes de feijoeiro}
+  \item Ocorrência de ninfas de Mosca-branca em lavoura de soja;
+  \item Peixes capturados por visitantes de um parque Estadual;
+  \item Número de nematoides em raizes de feijoeiro.
 \end{itemize}
 }
 \end{center}
@@ -227,10 +404,14 @@ Seis conjuntos de dados analisados:
 Software R versão `r with(R.version, paste0(major, ".",
 minor))`. Principais pacotes:
 
-* `MASS` (modelo binomial negativo)
-* `pscl` (modelagem de excesso de zeros)
-* `lme4` (modelo Poisson com efeito aleatório Normal)
-* `bbmle` (ajuste de modelos via máxima verossimilhança)
+* `MASS` - `r packageVersion("MASS")`:
+  ajuste dos modelos binomial negativo;
+* `pscl` - `r packageVersion("pscl")`:
+  modelagem de excesso de zeros;
+* `lme4` - `r packageVersion("lme4")`:
+  ajuste dos modelos Poisson com efeito aleatório Normal;
+* `bbmle` - `r packageVersion("bbmle")`:
+  ajuste de modelos via máxima verossimilhança.
 
 ## Métodos ##
 ### Estimação via máxima verossimilhança ###
@@ -252,9 +433,9 @@ $$\hat{\Theta} = \underset{\Theta}{\textrm{arg max }} \ell(\Theta \mid
     - $\phi = 0 \Rightarrow \textrm{Equidispersão}$
     - $\phi > 0 \Rightarrow \textrm{Subdispersão}$
 
-\begin{block}{log-verossimilhança}
+\begin{block}{Log-verossimilhança}
 \begin{equation}
-  \label{loglik-compoissonr}
+\label{loglik-compoisson}
   \ell(\phi, \beta \mid \underline{y}) = \sum_{i=1}^n y_i \log(\lambda_i) -
   e^\phi \sum_{i=1}^n \log(y!) - \sum_{i=1}^n \log(Z(\lambda_i, \phi))
 \end{equation}
@@ -272,7 +453,7 @@ em que $\lambda_i = e^{X_i\beta}$, com $X_i$ o vetor $(x_{i1}, x_{i2},
 * $\underline{\lambda}=\exp(X\beta)$ o parâmetro de locação da
   distribuição COM-Poisson truncada.
 
-\begin{block}{verossimilhança}
+\begin{block}{Verossimilhança}
 \begin{equation}
   \label{eqn:loglik-hurdlecmp}
   \Ell(\phi, \beta, \gamma \mid \underline{y}) =
@@ -310,14 +491,13 @@ $$\begin{aligned}
   \right ) db_i
 \end{equation}
 
-\noindent
-sendo $m$ o número de grupos que compartilham do mesmo efeito aleatório,
-$q$ o número de efeitos aleatórios (intercepto aleatório, inclinação e
-intercepto aleatórios, etc.) e $n_i$ o número de observações no i-ésimo
-grupo.
+$m:$ o número de grupos que compartilham do mesmo efeito aleatório; \\
+$q:$ o número de efeitos aleatórios (intercepto aleatório, inclinação e
+intercepto aleatórios, etc.); e \\
+$n_i:$ o número de observações no i-ésimo grupo.
 \end{block}
 
-# Resultados #
+# Resultados e Discussões #
 
 <!--------------------------------------------- -->
 ## Pacote R ##
@@ -325,7 +505,7 @@ grupo.
 ### `cmpreg`: Ajuste de Modelos de Regressões COM-Poisson ###
 
 Implementação em R de um _framework_ para ajuste dos modelos de
-regressão COM-Poisson, pacote `cmpreg`
+regressão COM-Poisson, pacote `cmpreg`.
 
 ```{r pacote, echo=TRUE, eval=FALSE}
 
@@ -416,16 +596,16 @@ prof.nnos <- profile(m3C.nnos, which = "phi")
 
 Conduzido na UFGD em casa de vegetação [@Martelli2008].
 
-* Delineamento: inteiramente casualizado com cinco repetições
 * Objetivo: avaliar o impacto da praga Mosca-branca na produção de
-  algodão.
-* Unidade amostral: vaso com duas plantas.
+  algodão;
+* Delineamento: inteiramente casualizado com cinco repetições
+* Unidade amostral: vaso com duas plantas;
 * Covariável experimental:
-    - Tempo de exposição das plantas à praga, em dias. (`dexp`)
+    - Tempo de exposição das plantas à praga, em dias (`dexp`);
 * Variáveis resposta:
-    - Número de capulhos produzidos
-    - Número de estruturas reprodutivas
-    - Número de nós
+    - Número de capulhos produzidos;
+    - Número de estruturas reprodutivas;
+    - Número de nós.
 
 ### Modelagem ###
 
@@ -462,34 +642,24 @@ anQ.nnos <- myanova(m1Q.nnos, m2Q.nnos, m3Q.nnos)
 
 ## Tabela com medidas de ajuste
 tab.ncapu <- data.frame(
-    modelos = paste("Preditor", 1:3),
+    ## modelos = paste("Preditor", 1:3),
     anP.ncapu[, c("np", "ll", "AIC", "P(>Chisq)")],
     anC.ncapu[, c("ll", "AIC", "P(>Chisq)")],
     anQ.ncapu[, c("dev", "P(>F)")])
 
 tab.nerep <- data.frame(
-    modelos = paste("Preditor", 1:3),
+    ## modelos = paste("Preditor", 1:3),
     anP.nerep[, c("np", "ll", "AIC", "P(>Chisq)")],
     anC.nerep[, c("ll", "AIC", "P(>Chisq)")],
     anQ.nerep[, c("dev", "P(>F)")])
 
 tab.nnos <- data.frame(
-    modelos = paste("Preditor", 1:3),
+    ## modelos = paste("Preditor", 1:3),
     anP.nnos[, c("np", "ll", "AIC", "P(>Chisq)")],
     anC.nnos[, c("ll", "AIC", "P(>Chisq)")],
     anQ.nnos[, c("dev", "P(>F)")])
 
-## Empilhando
-tab.ajuste <- rbind(tab.ncapu, tab.nerep, tab.nnos)
-
-##-------------------------------------------
-## Estimativas e testes para o parametro phi
-phis <- cmptest(m3C.ncapu, m2C.nerep, m3C.nnos)
-
-## ##----------------------------------------------------------------------
-## ## Copiar e colar o corpo do resultado na customização latex abaixo
-## digits <- c(1, 1, 0, 2, 2, -2, 2, 2, -2, 2, -2)
-## print(xtable(tab.ajuste, digits = digits))
+digits <- c(1, 0, 2, 2, 4, 2, 2, 4, 2, 4)
 
 ```
 
@@ -497,30 +667,203 @@ phis <- cmptest(m3C.ncapu, m2C.nerep, m3C.nnos)
 \footnotesize
 \centering
 \caption{Medidas de ajuste para avaliação e comparação}
-\begin{tabular}{lccccccccc}
+\only<1>{
+\begin{tabular}{ccccccccc}
   \toprule
-  & & \multicolumn{3}{c}{Poisson} & \multicolumn{3}{c}{COM-Poisson} & \multicolumn{2}{c}{Quasi-Poisson} \\
-  \cmidrule(lr){3-5} \cmidrule(lr){6-8} \cmidrule(lr){9-10}
-  & np & $\ell$ & AIC & P($>\rchi^2$) & $\ell$ & AIC & P($>\rchi^2$) & deviance & P($>F$) \\
+  & \multicolumn{3}{c}{Poisson} & \multicolumn{3}{c}{COM-Poisson} & \multicolumn{2}{c}{Quasi-Poisson} \\
+  \cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-9}
+  np & $\ell$ & AIC & P($>\rchi^2$) & $\ell$ & AIC & P($>\rchi^2$) & deviance & P($>F$) \\
   \midrule
-  \multicolumn{10}{l}{{\bfseries \footnotesize Número de capulhos produzidos}} \\[0.0cm]
+  \specialrule{0em}{0.5em}{0em} %% Apenas para espaçamento
+  \multicolumn{9}{l}{{\bfseries \footnotesize Número de capulhos produzidos}} \\[0.0cm]
   \cline{1-5} \\[-0.2cm]
-   & 1 & -105,27 & 212,55 & --- & -92,05 & 188,09 & --- & 20,80 & --- \\
-   & 2 & -105,03 & 214,05 & 4,83E-01 & -91,31 & 188,62 & 2,25E-01 & 20,31 & 2,23E-01 \\
-   & 3 & -104,44 & 214,88 & 2,78E-01 & -89,47 & 186,95 & 5,52E-02 & 19,13 & 6,16E-02 \\[0.2cm]
-  \multicolumn{10}{l}{{\bfseries \footnotesize Número de estruturas reprodutivas}} \\[0.0cm]
+```{r body11, results="asis"}
+
+##----------------------------------------------------------------------
+## Copiar e colar o corpo do resultado na customização latex abaixo
+print(xtable(tab.ncapu, digits = digits),
+      include.colnames = FALSE,
+      hline.after = NULL,
+      only.contents = TRUE)
+
+```
+  \specialrule{0em}{0.5em}{0em} %% Apenas para espaçamento
+  \multicolumn{9}{l}{{\bfseries \footnotesize Número de estruturas reprodutivas}} \\[0.0cm]
   \cline{1-5} \\[-0.2cm]
-   & 1 & -104,74 & 211,49 & --- & -86,41 & 176,82 & --- & 16,23 & --- \\
-   & 2 & -104,27 & 212,54 & 3,32E-01 & -84,59 & 175,18 & 5,66E-02 & 15,29 & 6,19E-02 \\
-   & 3 & -104,06 & 214,12 & 5,16E-01 & -83,73 & 175,47 & 1,90E-01 & 14,87 & 2,07E-01 \\[0.2cm]
-  \multicolumn{10}{l}{{\bfseries \footnotesize Número de nós da planta}} \\[0.0cm]
+```{r body12, results="asis"}
+
+##----------------------------------------------------------------------
+## Copiar e colar o corpo do resultado na customização latex abaixo
+print(xtable(tab.nerep, digits = digits),
+      include.colnames = FALSE,
+      hline.after = NULL,
+      only.contents = TRUE)
+
+```
+  \specialrule{0em}{0.5em}{0em} %% Apenas para espaçamento
+  \multicolumn{9}{l}{{\bfseries \footnotesize Número de nós da planta}} \\[0.0cm]
   \cline{1-5} \\[-0.2cm]
-   & 1 & -143,79 & 289,59 & --- & -120,58 & 245,16 & --- & 12,69 & --- \\
-   & 2 & -143,48 & 290,95 & 4,25E-01 & -119,03 & 244,06 & 7,87E-02 & 12,05 & 7,39E-02 \\
-   & 3 & -142,95 & 291,89 & 3,04E-01 & -116,27 & 240,54 & 1,88E-02 & 11,00 & 2,23E-02 \\
+```{r body13, results="asis"}
+
+##----------------------------------------------------------------------
+## Copiar e colar o corpo do resultado na customização latex abaixo
+print(xtable(tab.nnos, digits = digits),
+      include.colnames = FALSE,
+      hline.after = NULL,
+      only.contents = TRUE)
+
+```
    \bottomrule
 \end{tabular}
+}
+\only<2>{
+\begin{tabular}{ccccccccc}
+  \toprule
+  & \multicolumn{3}{c}{Poisson} & \multicolumn{3}{c}{COM-Poisson} & \multicolumn{2}{c}{Quasi-Poisson} \\
+  \cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-9}
+  np & $\ell$ & AIC & P($>\rchi^2$) & $\ell$ & AIC & P($>\rchi^2$) & deviance & P($>F$) \\
+  \midrule
+  \specialrule{0em}{0.5em}{0em} %% Apenas para espaçamento
+  \multicolumn{9}{l}{{\bfseries \footnotesize Número de capulhos produzidos}} \\[0.0cm]
+  \cline{1-5} \\[-0.2cm]
+```{r body11b, results="asis"}
+
+##----------------------------------------------------------------------
+## Copiar e colar o corpo do resultado na customização latex abaixo
+print(xtable(tab.ncapu, digits = digits),
+      include.colnames = FALSE,
+      hline.after = NULL,
+      only.contents = TRUE,
+      add.to.row = list(
+          pos = list(2), command = "\\rowcolor{teal!30}"
+      ))
+
+```
+  \specialrule{0em}{0.5em}{0em} %% Apenas para espaçamento
+  \multicolumn{9}{l}{{\bfseries \footnotesize Número de estruturas reprodutivas}} \\[0.0cm]
+  \cline{1-5} \\[-0.2cm]
+```{r body12b, results="asis"}
+
+##----------------------------------------------------------------------
+## Copiar e colar o corpo do resultado na customização latex abaixo
+print(xtable(tab.nerep, digits = digits),
+      include.colnames = FALSE,
+      hline.after = NULL,
+      only.contents = TRUE,
+      add.to.row = list(
+          pos = list(1), command = "\\rowcolor{teal!30}"
+      ))
+
+```
+  \specialrule{0em}{0.5em}{0em} %% Apenas para espaçamento
+  \multicolumn{9}{l}{{\bfseries \footnotesize Número de nós da planta}} \\[0.0cm]
+  \cline{1-5} \\[-0.2cm]
+```{r body13b, results="asis"}
+
+##----------------------------------------------------------------------
+## Copiar e colar o corpo do resultado na customização latex abaixo
+print(xtable(tab.nnos, digits = digits),
+      include.colnames = FALSE,
+      hline.after = NULL,
+      only.contents = TRUE,
+      add.to.row = list(
+          pos = list(2), command = "\\rowcolor{teal!30}"
+      ))
+
+```
+   \bottomrule
+\end{tabular}
+}
 \end{table}
+
+### Avaliação da dispersão ###
+
+```{r prof-cottonBolls2, fig.height=3, fig.width=7, fig.cap="Perfis de log-verossimilhança para o parâmetro de precisão da COM-Poisson."}
+
+##======================================================================
+## Causa
+da.ncapu <- as.data.frame(prof.ncapu)
+da.nerep <- as.data.frame(prof.nerep)
+da.nnos <- as.data.frame(prof.nnos)
+##
+levels(da.nerep$param) <- "phi2"
+levels(da.nnos$param) <- "phi3"
+##
+vars <- c("param", "z", "focal")
+da <- rbind(da.ncapu[, vars], da.nerep[, vars], da.nnos[, vars])
+##
+cols <- trellis.par.get("superpose.line")$col[1:2]
+xyplot(abs(z) ~ focal | param, data = da,
+       layout = c(NA, 1),
+       scales = list(x = "free"),
+       subset = abs(z) < 3.5,
+       type = c("l", "g"),
+       strip = strip.custom(
+           factor.levels = c(
+               "Capulhos produzidos",
+               "Estruturas reprodutivas",
+               "Nós da planta"
+           )
+       ),
+       ylab = expression(abs(z)~~(sqrt(~Delta~"deviance"))),
+       xlab = expression(phi),
+       panel = function(x, y, subscripts, ...) {
+           conf <- c(0.9, 0.95, 0.99)
+           hl <- sqrt(qchisq(conf, 1))
+           ##-------------------------------------------
+           mle <- x[y == 0]
+           xl <- x[x < mle]; yl <- y[x < mle]
+           xr <- x[x > mle]; yr <- y[x > mle]
+           ##-------------------------------------------
+           funleft <- approxfun(x = yl, y = xl)
+           funright <- approxfun(x = yr, y = xr)
+           vxl <- funleft(hl)
+           vxr <- funright(hl)
+           vz <- c(hl, hl)
+           ##-------------------------------------------
+           panel.xyplot(x, y, ...)
+           panel.arrows(c(vxl, vxr), 0, c(vxl, vxr), vz,
+                        code = 1, length = 0.1, lty = 2,
+                        col = "gray40")
+           panel.segments(vxl, vz, vxr, vz, lty = 2,
+                          col = "gray40")
+           panel.abline(h = 0, v = mle, lty = 3)
+           panel.text(x = rep(mle, 2), y = vz+0.1,
+                      labels = paste(conf*100, "%"),
+                      col = "gray20")
+           panel.abline(v = 0, col = cols[2])
+       })
+
+```
+
+### Avaliação da matriz de covariância ###
+
+```{r corr-cottonBolls2, fig.height=1.7, fig.width=5, out.width="1\\linewidth", fig.cap="Imagem da matriz de correlação entre os parâmetros do modelo COM-Poisson."}
+
+pnames <- c("phi", "beta0", "beta1", "beta2")
+
+Vcov <- vcov(m3C.ncapu)
+Corr.ncapu <- cov2cor(Vcov)
+dimnames(Corr.ncapu) <- list(pnames, pnames)
+
+Vcov <- vcov(m3C.nnos)
+Corr.nnos <- cov2cor(Vcov)
+dimnames(Corr.nnos) <- list(pnames, pnames)
+
+pnames <- c("phi", "beta0", "beta1")
+Vcov <- vcov(m2C.nerep)
+Corr.nerep <- cov2cor(Vcov)
+dimnames(Corr.nerep) <- list(pnames, pnames)
+
+par(mfrow = c(1, 3))
+mycorrplot(Corr.ncapu, mar = c(1.5, 0, 0, 0))
+mtext(text = "Capulhos produzidos", side = 1, cex = 0.7)
+mycorrplot(Corr.nerep, mar = c(1.5, 0, 0, 0))
+mtext(text = "Estruturas reprodutivas", side = 1, cex = 0.7)
+mycorrplot(Corr.nnos, mar = c(1.5, 0, 0, 0))
+mtext(text = "Número de nós", side = 1, cex = 0.7)
+
+```
 
 ### Valores preditos ###
 
@@ -625,13 +968,13 @@ xyplot(count ~ dexp | va, data = da,
        scales = list(
            y = list(relation = "free", rot = 0)),
        strip = strip.custom(
-           factor.levels = c("Estruturas reprodutivas ",
-                             "Capulhos produzidos",
-                             "Nós da planta")),
+           factor.levels = c(
+               "Capulhos produzidos",
+               "Estruturas reprodutivas",
+               "Nós da planta")),
        alpha = 0.3,
        spread = 0.15,
-       panel = panel.beeswarm,
-       par.settings = ps.sub)+
+       panel = panel.beeswarm)+
     as.layer(
         xyplot(fit + lwr + upr ~ dexp | var, data = predP,
                layout = c(NA, 1),
@@ -696,16 +1039,16 @@ prof.ntot <- profile(m1C.ntot, which = "phi")
 
 Conduzido na UFGD em casa de vegetação [@Suekane2011].
 
-* Delineamento: blocos casualizados com quatro blocos.
-* Objetivo: avaliar a propensão de cultivares de soja à praga
-  Mosca-branca.
-* Unidade experimental: dois vasos com duas plantas.
+* Objetivo: avaliar a ocorrência de mosca-branca nas diferentes
+  cultivares de soja;
+* Delineamento: blocos casualizados, quatro blocos;
+* Unidade experimental: dois vasos com duas plantas;
 * Covariáveis experimentais:
-    - Indicadora de bloco, I, II, III e IV, (`bloco`),
+    - Indicadora de bloco, I, II, III e IV, (`bloco`);
     - Dias decorridos após a primeira avaliação, 0, 8, 13, 22, 31 e 38
-      dias. (`dias`),
+      dias, (`dias`);
     - Indicadora de cultivar de soja, BRS 239, BRS 243 RR, BRS 245 RR,
-      BRS246 RR, (`cult`).
+      BRS246 RR, (`cult`);
 * Variável resposta:
     - Número de ninfas de Mosca-branca nos folíolos dos terços superior,
       médio e inferior.
@@ -714,9 +1057,9 @@ Conduzido na UFGD em casa de vegetação [@Suekane2011].
 
 Preditores considerados:
 
-* $\eta_1 = g(\mu_{ijk}) = \beta_0 + \tau_i + \gamma_j + \delta_k$
-* $\eta_2 = g(\mu_{ijk}) = \beta_0 + \tau_i + \gamma_j + \delta_k +
-\alpha_{jk}$
+* Preditor 1: $g(\mu_{ijk}) = \beta_0 + \tau_i + \gamma_j + \delta_k$
+* Preditor 2: $g(\mu_{ijk}) = \beta_0 + \tau_i + \gamma_j + \delta_k +
+  \alpha_{jk}$
 
 \hspace{0.3cm}
 \begin{minipage}[t]{0.9\textwidth}
@@ -769,10 +1112,9 @@ tab.ajuste <- data.frame(
     pred = rep(paste("Preditor", 1:2), 4),
     tab.ntot)
 
-## ##----------------------------------------------------------------------
-## ## Copiar e colar o corpo do resultado na customização latex abaixo
-## digits <- c(1, 1, 0, 2, 2, 2, 0, -2, 2)
-## print(xtable(tab.ajuste, digits = digits))
+##----------------------------------------------------------------------
+## Copiar e colar o corpo do resultado na customização latex abaixo
+digits <- c(1, 1, 0, 2, 2, 2, 0, 4, 2)
 
 ```
 
@@ -780,27 +1122,168 @@ tab.ajuste <- data.frame(
 \centering
 \footnotesize
 \caption{Medidas de ajuste para avaliação e comparação}
+\only<1>{
 \begin{tabular}{lcccccrcr}
   \toprule
  Poisson & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) &  \\
   \midrule
-  Preditor 1 & 12 & -922,98 & 1869,96 &  &  &  &  \\
-  Preditor 2 & 27 & -879,23 & 1812,46 & 87,50 & 15 & 2,90E-12 &  \\[0.3cm]
+```{r body21, results="asis"}
+
+##----------------------------------------------------------------------
+## Copiar e colar o corpo do resultado na customização latex abaixo
+print(xtable(tab.ajuste[1:2, ], digits = digits),
+      include.colnames = FALSE,
+      hline.after = NULL,
+      only.contents = TRUE)
+
+```
+  \specialrule{0em}{0.5em}{0em} %% Apenas para espaçamento
  COM-Poisson & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) & $\hat{\phi}$  \\
   \midrule
-  Preditor 1 & 13 & -410,44 & 846,89 &  &  &  & -3,08 \\
-  Preditor 2 & 28 & -407,15 & 870,30 & 6,59 & 15 & 9,68E-01 & -2,95 \\[0.3cm]
+```{r body22, results="asis"}
+
+##----------------------------------------------------------------------
+## Copiar e colar o corpo do resultado na customização latex abaixo
+print(xtable(tab.ajuste[3:4, ], digits = digits),
+      include.colnames = FALSE,
+      hline.after = NULL,
+      only.contents = TRUE)
+
+```
+  \specialrule{0em}{0.5em}{0em} %% Apenas para espaçamento
  Binomial Neg. & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) & $\hat{\theta}$ \\
   \midrule
-  Preditor 1 & 13 & -406,16 & 838,31 &  &  &  & 3,44 \\
-  Preditor 2 & 28 & -400,55 & 857,10 & 11,21 & 15 & 7,38E-01 & 3,99 \\[0.3cm]
+```{r body23, results="asis"}
+
+##----------------------------------------------------------------------
+## Copiar e colar o corpo do resultado na customização latex abaixo
+print(xtable(tab.ajuste[5:6, ], digits = digits),
+      include.colnames = FALSE,
+      hline.after = NULL,
+      only.contents = TRUE)
+
+```
+  \specialrule{0em}{0.5em}{0em} %% Apenas para espaçamento
  Quase-Poisson & np & deviance & AIC & F & diff np & P(>F) & $\hat{\sigma}^2$  \\
   \midrule
-  Preditor 1 & 12 & 1371,32 &  &  &  &  & 17,03 \\
-  Preditor 2 & 27 & 1283,82 &  & 0,31 & 15 & 9,93E-01 & 19,03 \\
+```{r body24, results="asis"}
+
+##----------------------------------------------------------------------
+## Copiar e colar o corpo do resultado na customização latex abaixo
+print(xtable(tab.ajuste[7:8, ], digits = digits),
+      include.colnames = FALSE,
+      hline.after = NULL,
+      only.contents = TRUE)
+
+```
   \bottomrule
 \end{tabular}
+}
+\only<2>{
+\begin{tabular}{lcccccrcr}
+  \toprule
+ Poisson & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) &  \\
+  \midrule
+```{r body21b, results="asis"}
+
+##----------------------------------------------------------------------
+## Copiar e colar o corpo do resultado na customização latex abaixo
+print(xtable(tab.ajuste[1:2, ], digits = digits),
+      include.colnames = FALSE,
+      hline.after = NULL,
+      only.contents = TRUE,
+      add.to.row = list(
+          pos = list(1), command = "\\rowcolor{teal!30}"
+      ))
+
+```
+  \specialrule{0em}{0.5em}{0em} %% Apenas para espaçamento
+ COM-Poisson & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) & $\hat{\phi}$  \\
+  \midrule
+```{r body22b, results="asis"}
+
+##----------------------------------------------------------------------
+## Copiar e colar o corpo do resultado na customização latex abaixo
+print(xtable(tab.ajuste[3:4, ], digits = digits),
+      include.colnames = FALSE,
+      hline.after = NULL,
+      only.contents = TRUE,
+      add.to.row = list(
+          pos = list(0), command = "\\rowcolor{teal!30}"
+      ))
+
+```
+  \specialrule{0em}{0.5em}{0em} %% Apenas para espaçamento
+ Binomial Neg. & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) & $\hat{\theta}$ \\
+  \midrule
+```{r body23b, results="asis"}
+
+##----------------------------------------------------------------------
+## Copiar e colar o corpo do resultado na customização latex abaixo
+print(xtable(tab.ajuste[5:6, ], digits = digits),
+      include.colnames = FALSE,
+      hline.after = NULL,
+      only.contents = TRUE,
+      add.to.row = list(
+          pos = list(0), command = "\\rowcolor{teal!30}"
+      ))
+
+```
+  \specialrule{0em}{0.5em}{0em} %% Apenas para espaçamento
+ Quase-Poisson & np & deviance & AIC & F & diff np & P(>F) & $\hat{\sigma}^2$  \\
+  \midrule
+```{r body24b, results="asis"}
+
+##----------------------------------------------------------------------
+## Copiar e colar o corpo do resultado na customização latex abaixo
+print(xtable(tab.ajuste[7:8, ], digits = digits),
+      include.colnames = FALSE,
+      hline.after = NULL,
+      only.contents = TRUE,
+      add.to.row = list(
+          pos = list(0), command = "\\rowcolor{teal!30}"
+      ))
+
+```
+  \bottomrule
+\end{tabular}
+}
 \end{table}
+
+### Avaliando a dispersão e convergência de Z ###
+
+```{r convergez-prof-whiteFly, fig.height=3.5, fig.width=7, fig.cap="Convergência das constantes de normalização e perfil de log-verossimilhança para o parâmetro de precisão da COM-Poisson."}
+
+##-------------------------------------------
+## Constante normalizadora
+
+## Para nvag
+lam.ntot <- predict(m2C.ntot)
+zs.ntot <- sapply(lam.ntot, function(l) {
+    funZ(exp(l), exp(m2C.ntot@coef[1]), maxit = 1500, tol = 0.001)
+})
+names(zs.ntot) <- 1:nrow(whiteFly)
+const.ntot <- plyr::ldply(zs.ntot)
+const.ntot <- rbind(data.frame(const.ntot, var = "ntot"))
+
+xy1 <- xyplot(z ~ j | var, data = const.ntot,
+             type = c("l", "g"),
+             scales = "free",
+             yscale.components = yscale.components.logpower,
+             ylab = list(
+                 expression(frac(lambda[i]^j, "(j!)"^nu)),
+                 rot = 0),
+             strip = strip.custom(
+                 factor.levels = c("Número de ninfas")))
+
+##-------------------------------------------
+## Perfil de log-verossimilhanca para phi
+xy2 <- myprof(prof.ntot, namestrip = expression(phi), subset = 4)
+
+print(xy1, split = c(1, 1, 2, 1), more = TRUE)
+print(xy2, split = c(2, 1, 2, 1), more = FALSE)
+
+```
 
 ### Valores preditos ###
 
@@ -986,12 +1469,11 @@ dispHB <- sapply(list(m1HB, m2HB), function(m) m$theta)
 dispersions <- c(NA, NA, dispHB, dispHC)
 
 ## Empilhando
-tab <- data.frame(pred = rep(paste("Preditor", 1:2), 3))
-tab <- cbind(tab, rbind(anHP, anHB, anHC), dispersions)
+tab.fish <- data.frame(pred = rep(paste("Preditor", 1:2), 3))
+tab.fish <- cbind(tab.fish, rbind(anHP, anHB, anHC), dispersions)
 
-## ## Gerando o código latex
-## digits <- c(1, 1, 0, 2, 2, 2, 0, -2, 2)
-## xtable(tab, digits = digits)
+## Gerando o código latex
+digits <- c(1, 1, 0, 2, 2, 2, 0, 4, 2)
 
 ```
 
@@ -1000,22 +1482,107 @@ tab <- cbind(tab, rbind(anHP, anHB, anHC), dispersions)
 \footnotesize
 \caption{Medidas de ajuste para avaliação e comparação}
 \label{tab:ajuste-fish}
+\only<1>{
 \begin{tabular}{lcccccrc}
   \toprule
 Poisson & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) & \\
   \midrule
-  Preditor 1 & 7 & -857,48 & 1728,96 &  &  &  &  \\
-  Preditor 2 & 10 & -744,58 & 1509,17 & 225,79 & 3 & 1,12E-48 &  \\[0.3cm]
+```{r body31, results="asis"}
+
+##----------------------------------------------------------------------
+## Copiar e colar o corpo do resultado na customização latex abaixo
+digits[8] <- -1
+print(xtable(tab.fish[1:2, ], digits = digits),
+      include.colnames = FALSE,
+      hline.after = NULL,
+      only.contents = TRUE)
+
+```
+  \specialrule{0em}{0.5em}{0em} %% Apenas para espaçamento
 Binomial Neg. & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) & $\hat{\theta}$ \\
   \midrule
-  Preditor 1 & 8 & -399,79 & 815,58 &  &  &  & 0,20 \\
-  Preditor 2 & 11 & -393,72 & 809,44 & 12,14 & 3 & 6,91E-03 & 0,37 \\[0.3cm]
+```{r body32, results="asis"}
+
+##----------------------------------------------------------------------
+## Copiar e colar o corpo do resultado na customização latex abaixo
+digits[8] <- 4
+print(xtable(tab.fish[3:4, ], digits = digits),
+      include.colnames = FALSE,
+      hline.after = NULL,
+      only.contents = TRUE)
+
+```
+  \specialrule{0em}{0.5em}{0em} %% Apenas para espaçamento
 COM-Poisson & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) & $\hat{\phi}$ \\
   \midrule
-  Preditor 1 & 8 & -409,85 & 835,71 &  &  &  & -8,77 \\
-  Preditor 2 & 11 & -402,30 & 826,59 & 15,12 & 3 & 1,72E-03 & -3,77 \\
+```{r body33, results="asis"}
+
+##----------------------------------------------------------------------
+## Copiar e colar o corpo do resultado na customização latex abaixo
+print(xtable(tab.fish[5:6, ], digits = digits),
+      include.colnames = FALSE,
+      hline.after = NULL,
+      only.contents = TRUE)
+
+```
   \bottomrule
 \end{tabular}
+}
+\only<2>{
+\begin{tabular}{lcccccrc}
+  \toprule
+Poisson & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) & \\
+  \midrule
+```{r body31b, results="asis"}
+
+##----------------------------------------------------------------------
+## Copiar e colar o corpo do resultado na customização latex abaixo
+digits[8] <- -1
+print(xtable(tab.fish[1:2, ], digits = digits),
+      include.colnames = FALSE,
+      hline.after = NULL,
+      only.contents = TRUE,
+      add.to.row = list(
+          pos = list(1), command = "\\rowcolor{teal!30}"
+      ))
+
+```
+  \specialrule{0em}{0.5em}{0em} %% Apenas para espaçamento
+Binomial Neg. & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) & $\hat{\theta}$ \\
+  \midrule
+```{r body32b, results="asis"}
+
+##----------------------------------------------------------------------
+## Copiar e colar o corpo do resultado na customização latex abaixo
+digits[8] <- 4
+print(xtable(tab.fish[3:4, ], digits = digits),
+      include.colnames = FALSE,
+      hline.after = NULL,
+      only.contents = TRUE,
+      add.to.row = list(
+          pos = list(1), command = "\\rowcolor{teal!30}"
+      ))
+
+```
+  \specialrule{0em}{0.5em}{0em} %% Apenas para espaçamento
+COM-Poisson & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) & $\hat{\phi}$ \\
+  \midrule
+```{r body33b, results="asis"}
+
+##----------------------------------------------------------------------
+## Copiar e colar o corpo do resultado na customização latex abaixo
+print(xtable(tab.fish[5:6, ], digits = digits),
+      include.colnames = FALSE,
+      hline.after = NULL,
+      only.contents = TRUE,
+      add.to.row = list(
+          pos = list(1), command = "\\rowcolor{teal!30}"
+      ))
+
+```
+  \bottomrule
+\end{tabular}
+}
 \end{table}
 
 ### Valores preditos ###
@@ -1131,14 +1698,15 @@ load("../docs/mixedcmp_models.rda")
 
 Conduzido no IAPAR em casa de vegetação.
 
-* Delineamento: inteiramente casualizado com cinco repetições.
-* Objetivo: avaliar a resistência à nematoides de linhagens de feijoeiro.
+* Objetivo: avaliar a resistência de linhagens de feijoeiro à nematoides;
+* Delineamento: inteiramente casualizado com cinco repetições;
 * Unidade amostral: alíquota de 1ml da solução de raizes lavadas,
-  trituradas, peneiradas e diluídas em água provida por um vaso com duas
-  plantas.
+  trituradas, peneiradas, diluídas em água. Provida por um vaso com duas
+  plantas;
 * Covariáveis:
-    - Indicador de linhagem de feijoeiro, A, B, C, $\ldots$, S (`cult`)
-    - Concentração de raiz na solução. (`sol`)
+    - Indicador de linhagem de feijoeiro, A, B, C, $\ldots$, S,
+      (`cult`);
+    - Concentração de raiz na solução, (`sol`);
 * Variáveis resposta:
     - Número de nematoides.
 
@@ -1146,13 +1714,19 @@ Conduzido no IAPAR em casa de vegetação.
 
 Preditores considerados:
 
-* Preditor 1: $g(\mu_{ij}) = \beta_0 + b_j$
-* Preditor 2: $g(\mu_{ij}) = \beta_0 + \beta_1 \log(\textrm{sol})_i +
-  b_j$
+* Preditor 1: $g(\mu_{ij}) = \beta_0 + b_i$
+* Preditor 2: $g(\mu_{ij}) = \beta_0 + \beta_1 \log(\textrm{sol})_{ij} +
+  b_i$
 
 \hspace{0.35cm}
 \begin{minipage}[t]{0.9\textwidth}
-$b_j \sim \textrm{Normal}(0,\, \sigma^2)$
+$b_i \sim \textrm{Normal}(0,\, \sigma^2)$
+\vspace{0.2cm}
+
+\small
+$i: $ varia entre as linhagens, $i=1, 2, \ldots, 19$; e \\
+$j: $ varia entre as observações dentro das linhagens, $j=1, 2, \ldots,
+n_i$.
 \end{minipage}
 \vspace{0.5cm}
 
@@ -1163,23 +1737,125 @@ Modelos concorrentes:
 
 ### Medidas de ajuste ###
 
+```{r logLik-nematodes, include=FALSE}
+
+## Anova
+anP <- myanova(m1PM, m2PM)
+anC <- myanova(m1CM, m2CM)
+
+## TRV entre Mixed-Poisson e Mixed-COMPoisson
+trv <- 2 * (anC[, 2] - anP[, 2])
+pvs <- pchisq(q = trv, df = 1, lower.tail = FALSE)
+phi <- sapply(list(m1CM, m2CM), function(model) model@fullcoef[1])
+
+## Empilha na tabela
+tab.nema <- data.frame(
+    preditor = rep(paste("Preditor", 1:2), 2),
+    rbind(cbind(anP, cbind(c(NA, NA)), c(NA, NA)),
+          cbind(anC, phi, pvs)))
+
+digits <- c(1, 1, 0, 2, 2, 2, 0, 4, 2, 4)
+
+```
+
 \begin{table}[ht]
 \centering
 \footnotesize
 \caption{Medidas de ajuste para avaliação e comparação}
+\only<1>{
 \begin{tabular}{lcccccrcr}
   \toprule
  Poisson & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) &  \\
   \midrule
-  Preditor 1 & 2 & -237,20 & 478,40 &  &  &  &  &  \\
-  Preditor 2 & 3 & -234,66 & 475,32 & 5,07 & 1 & 2,43E-02 &  &  \\[0.3cm]
+```{r body41, results="asis"}
+
+##----------------------------------------------------------------------
+## Copiar e colar o corpo do resultado na customização latex abaixo
+print(xtable(tab.nema[1:2, ], digits = digits),
+      include.colnames = FALSE,
+      hline.after = NULL,
+      only.contents = TRUE)
+
+```
+  \specialrule{0em}{0.5em}{0em} %% Apenas para espaçamento
  COM-Poisson & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) & $\hat{\phi}$ & P($>\rchi^2$) \\
   \midrule
-  Preditor 1 & 3 & -236,85 & 479,71 &  &  &  & 0,15 & 4,06E-01 \\
-  Preditor 2 & 4 & -233,86 & 475,72 & 5,99 & 1 & 1,44E-02 & 0,23 & 2,05E-01 \\
+```{r body42, results="asis"}
+
+##----------------------------------------------------------------------
+## Copiar e colar o corpo do resultado na customização latex abaixo
+print(xtable(tab.nema[3:4, ], digits = digits),
+      include.colnames = FALSE,
+      hline.after = NULL,
+      only.contents = TRUE)
+
+```
+  \specialrule{0em}{0.5em}{0em} %% Apenas para espaçamento
    \bottomrule
 \end{tabular}
+}
+\only<2>{
+\begin{tabular}{lcccccrcr}
+  \toprule
+ Poisson & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) &  \\
+  \midrule
+```{r body41b, results="asis"}
+
+##----------------------------------------------------------------------
+## Copiar e colar o corpo do resultado na customização latex abaixo
+print(xtable(tab.nema[1:2, ], digits = digits),
+      include.colnames = FALSE,
+      hline.after = NULL,
+      only.contents = TRUE,
+      add.to.row = list(
+          pos = list(1), command = "\\rowcolor{teal!30}"
+      ))
+
+```
+  \specialrule{0em}{0.5em}{0em} %% Apenas para espaçamento
+ COM-Poisson & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) & $\hat{\phi}$ & P($>\rchi^2$) \\
+  \midrule
+```{r body42b, results="asis"}
+
+##----------------------------------------------------------------------
+## Copiar e colar o corpo do resultado na customização latex abaixo
+print(xtable(tab.nema[3:4, ], digits = digits),
+      include.colnames = FALSE,
+      hline.after = NULL,
+      only.contents = TRUE,
+      add.to.row = list(
+          pos = list(1), command = "\\rowcolor{teal!30}"
+      ))
+
+```
+  \specialrule{0em}{0.5em}{0em} %% Apenas para espaçamento
+   \bottomrule
+\end{tabular}
+}
 \end{table}
+
+### Avaliação dos perfis de verossimilhança ###
+
+```{r prof-nematodes, fig.height=3, fig.width=7, fig.cap="Perfis de verossimilhança dos parâmetros estimados no modelo COM-Poisson Misto."}
+
+fl <- expression(phi, log(sigma), beta[0], beta[1])
+myprof(profCM, subset = 3.5,
+       namestrip = fl, xlab = "Parâmetros do modelo")
+
+```
+
+### Imagem da matriz de covariância ###
+
+```{r corr-nematodes, fig.width=3.2, fig.height=3.2, out.width="0.5\\textwidth", fig.cap="Imagem da matriz de covariância entre os parâmetros do modelo COM-Poisson."}
+
+pnames <- c("phi", "lsigma", paste0("beta", 0:1))
+
+Vcov <- vcov(m2CM)
+Corr <- cov2cor(Vcov)
+dimnames(Corr) <- list(pnames, pnames)
+mycorrplot(Corr)
+
+```
 
 ### Valores preditos ###
 
@@ -1274,13 +1950,13 @@ print(xy1, position = c(0.57, 0, 1, 1), more = FALSE)
 
 * Similaridade entre inferências via modelo Quasi-Poisson e COM-Poisson;
 * Desempenho do modelo Binomial Negativo;
-* Interpretação dos parâmetros nos modelos baseados na COM-Poisson
+* Interpretação dos parâmetros nos modelos baseados na COM-Poisson;
 * Problemas numéricos para determinação da matriz hessiana no modelo
   Hurdle COM-Poisson;
 * Procedimentos computacionalmente intensivos na avaliação da
   verossimilhança no caso COM-Poisson de efeitos aleatórios;
 * Não ortogonalidade observada (empírica) entre os parâmetros de locação
-  e de precisão no modelo COM-Poisson;
+  e de precisão no modelo COM-Poisson; e
 * Comportamento simétrico dos perfis de log-verossimilhança para o
   parâmetro $\phi$ da COM-Poisson.
 
@@ -1294,10 +1970,11 @@ Aplicação do modelo COM-Poisson:
 * Resultados similares aos providos pela abordagem semi-paramétrica via
   quasi-verossimilhança;
 * A não ortogonalidade entre os parâmetros de locação e precisão no
-  modelo COM-Poisson se mostra como característica da distrição;
+  modelo COM-Poisson se mostra como característica da distribuição;
 * A simetria nos perfis de verossimilhança do parâmetro de precisão
-  também.
-* A avaliação da constante de normalização é problemática no modelo.
+  também; e
+* A avaliação da constante de normalização é uma dificuldade
+  computacional do modelo.
 
 
 ### Conclusões ###
@@ -1307,7 +1984,7 @@ Análise de dados de contagem:
 * Modelo Poisson inadequado na maioria das aplicações, mostrando que a
   suposição de equidispersão é de fato restritiva;
 * Modelos alternativos ao Poisson devem ser empregados na análise de
-  dados de contagem;
+  dados de contagem; e
 * Sugere-se o modelo COM-Poisson como alternativa totalmente
   paramétrica e bastante flexível.
 
@@ -1316,7 +1993,7 @@ Análise de dados de contagem:
 * Estudar reparametrizações do modelo COM-Poisson;
 * Avaliar aproximações da constante de normalização;
 * Realizar estudos de simulação para avaliar a robustez do modelo;
-* Implementar o modelo COM-Poisson inflacionado de zeros;
+* Implementar o modelo COM-Poisson inflacionado de zeros; e
 * Implementar o modelo COM-Poisson com efeitos aleatórios dependentes.
 
 <!--------------------------------------------- -->

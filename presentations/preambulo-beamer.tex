@@ -14,8 +14,8 @@
 % ---
 % date: "`r format(Sys.time(), '%d de %B de %Y')`"
 % fontsize: "10pt"
-% output: 
-%   beamer_presentation: 
+% output:
+%   beamer_presentation:
 %     fig_caption: yes
 %     highlight: zenburn
 %     includes:
@@ -68,7 +68,7 @@
 
 \setbeamertemplate{frametitle}{
   \nointerlineskip
-  \begin{beamercolorbox}[sep=0.3cm, ht=1.8em, 
+  \begin{beamercolorbox}[sep=0.3cm, ht=1.8em,
     wd=\paperwidth]{frametitle}
     \vbox{}\vskip-2ex%
     \strut\hspace*{3ex}\large\bfseries\insertframetitle\strut
@@ -92,7 +92,7 @@
 %% ======================================================================
 %% Página Inicial
 
-\setbeamertemplate{title page}[default]
+\setbeamertemplate{title page}[default][plain]
 \setbeamercolor{title}{fg=teal}
 \setbeamercolor{author}{fg=black!70}
 \setbeamercolor{institute}{fg=black!70}
@@ -106,7 +106,7 @@
 \setbeamertemplate{headline}{\bfseries
   \leavevmode%
   \hbox{%
-    \begin{beamercolorbox}[wd=.5\paperwidth, ht=2.2ex, dp=1ex, right, 
+    \begin{beamercolorbox}[wd=.5\paperwidth, ht=2.2ex, dp=1ex, right,
       rightskip=1em]{section in head/foot}
       \hspace*{2ex}\insertsectionhead
     \end{beamercolorbox}%
@@ -122,7 +122,7 @@
 \setbeamertemplate{footline}{\ttfamily\bfseries
   \leavevmode%
   \hbox{%
-    \begin{beamercolorbox}[wd=.3\paperwidth, ht=2.4ex, dp=1ex, right, 
+    \begin{beamercolorbox}[wd=.3\paperwidth, ht=2.4ex, dp=1ex, right,
       rightskip=1em]{footlinecolor}
       \insertshortauthor%
     \end{beamercolorbox}%
@@ -147,18 +147,6 @@
 
 \usefonttheme{professionalfonts}
 \usefonttheme{serif}
-%% \usepackage{palatino}
-%% \usepackage{eulervm}
-%% \usepackage[none]{ubuntu}
-%% \usepackage{verbatim}
-%% 
-%% \usefonttheme{professionalfonts}
-%% \usefonttheme{serif}
-%% \renewcommand{\ttdefault}{ubuntumono}
-%% \renewcommand{\ttfamily}{\fontUbuntuMono}
-%% \makeatletter
-%% \def\verbatim@font{\normalsize\fontUbuntuMono}
-%% \makeatother
 
 %% ======================================================================
 %% Colorindo ambiente verbatim
@@ -187,7 +175,7 @@
 %% Formatando slides para seções e subseções
 
 \AtBeginSection[]{
-  \begin{frame}[c, allowframebreaks]
+  \begin{frame}[c, allowframebreaks, noframenumbering, plain]
     \begin{center}
       \textcolor{teal}{\thesection} \\ \vspace{0.3cm}
       \parbox{0.6\textwidth}{
@@ -197,7 +185,7 @@
 }
 
 \AtBeginSubsection{
-  \begin{frame}[c, allowframebreaks]
+  \begin{frame}[c, allowframebreaks, noframenumbering, plain]
     \begin{center}
       \textcolor{teal}{\thesection.\thesubsection} \\ \vspace{0.3cm}
       \parbox{0.6\textwidth}{
@@ -212,7 +200,7 @@
 
 \title[Extensões e Aplicações do Modelo COM-Poisson]{Extensões e
   Aplicações do Modelo de Regressão Conway-Maxwell-Poisson para
-  Modelagem de Dados de Contagem} 
+  Modelagem de Dados de Contagem}
 \author[Eduardo E. R. Junior \& Walmes M. Zeviani]{
   Eduardo Elias Ribeiro Junior \\
   Orientação: Prof. Dr. Walmes Marques Zeviani}
@@ -229,4 +217,3 @@
 % como `template: template.tex`. Assim não são sobrepostas as definição
 % padrão do knitr com as modificações feitas. Utilizar como base o arquivo
 % em ~/.../rmarkdown/rmd/latex/default.tex
-
