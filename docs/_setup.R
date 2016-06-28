@@ -45,7 +45,7 @@ opts_chunk$set(
 
 ##======================================================================
 ## Configura opções de output no documento
-options(digits = 3, OutDec = ",",
+options(digits = 3, OutDec = ",", scipen=-1,
         xtable.caption.placement = "top",
         xtable.include.rownames = FALSE,
         xtable.booktabs = TRUE)
@@ -99,6 +99,21 @@ fonte <- function(texto, side = 1, line = -1, adj = 0,
     mtext(texto, cex = cex,
           side = side, line = line, adj = adj, outer = outer, ...)
     invisible()
+}
+
+##======================================================================
+## Calcula Z para um c(lambda, phi)
+funZ <- function(lambda, nu, maxit = 500, tol = 1e-5) {
+    z <- rep(NA, maxit)
+    j = 1
+    ##
+    z[j] <- exp(j * log(lambda) - nu * lfactorial(j))
+    ##
+    while (abs(z[j] - 0) > tol && j <= maxit) {
+        j = j + 1
+        z[j] <- exp(j * log(lambda) - nu * lfactorial(j))
+    }
+    return(cbind("j" = 0:j, "z" = c(1, z[!is.na(z)])))
 }
 
 ##======================================================================
