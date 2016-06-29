@@ -9,6 +9,7 @@ output:
     highlight: tango
     includes:
       in_header: preambulo-beamer.tex
+      after_body: thanks.tex
     keep_tex: yes
     slide_level: 3
 ---
@@ -46,9 +47,8 @@ library(cmpreg)
   \includegraphics[height=0.9cm]{./images/count}
 \end{figure}
 
-São variáveis aleatórias aleatórias que representam o número de
-ocorrências de um evento em um dominío discreto ou contínuo.
-\vspace{0.5cm}
+São variáveis aleatórias que representam o número de ocorrências de um
+evento em um dominío discreto ou contínuo.  \vspace{0.5cm}
 
 Se $Y$ é uma variável aleatória de contagem, $y = 0, 1, 2, \ldots$
 \vspace{0.5cm}
@@ -188,9 +188,9 @@ Proposta por @Conway1962.
 
 * Não tem expressão fechada para média e variância;
 * Apresenta distribuições bastante conhecidas como casos particulares:
-    - Poisson - $\nu = 1$;
-    - Bernoulli - $\nu \to \infty$;
-    - Geométrica - $\nu = 0$ e $\lambda < 1$.
+    - Poisson, quando $\nu = 1$;
+    - Bernoulli, quando $\nu \to \infty$;
+    - Geométrica, quando $\nu = 0$ e $\lambda < 1$.
 
 ### Distribuição COM-Poisson ###
 
@@ -457,17 +457,18 @@ em que $\lambda_i = e^{X_i\beta}$, com $X_i$ o vetor $(x_{i1}, x_{i2},
 \begin{equation}
   \label{eqn:loglik-hurdlecmp}
   \Ell(\phi, \beta, \gamma \mid \underline{y}) =
-  \ind [\underline{\pi}] \cdot (1-\ind) \left [
-    (1-\underline{\pi})\left (
-    \frac{\underline{\lambda}^y}{(y!)^{e^\phi}
-      Z(\underline{\lambda}, \phi)}
-  \right ) \left (
-    1-\frac{1}{Z(\underline{\lambda}, \phi)}
-  \right ) \right ]
+  \prod_{i \in \Omega_0} \left [  \pi_i \right ]
+  \prod_{i \in \Omega_+} \left [
+    (1-\pi_i) \left (
+    \frac{\lambda_i^{y_i}}{(y_i!)^{e^\phi}
+      Z(\lambda_i, \phi)}
+  \right ) \left ( 1-\frac{1}{Z(\lambda_i, \phi)} \right )
+  \right ]
 \end{equation}
 
 \noindent
-em que $\ind$ é uma função indicadora para $y = 0$
+$\Omega_0 = {i \mid y_i = 0}$ \\
+$\Omega_+ = {i \mid y_i > 0}$
 \end{block}
 
 ### Verossimilhança do modelo misto COM-Poisson ###
@@ -1129,6 +1130,7 @@ digits <- c(1, 1, 0, 2, 2, 2, 0, 4, 2)
   \midrule
 ```{r body21, results="asis"}
 
+digits[8] <- -1
 ##----------------------------------------------------------------------
 ## Copiar e colar o corpo do resultado na customização latex abaixo
 print(xtable(tab.ajuste[1:2, ], digits = digits),
@@ -1142,6 +1144,7 @@ print(xtable(tab.ajuste[1:2, ], digits = digits),
   \midrule
 ```{r body22, results="asis"}
 
+digits[8] <- 4
 ##----------------------------------------------------------------------
 ## Copiar e colar o corpo do resultado na customização latex abaixo
 print(xtable(tab.ajuste[3:4, ], digits = digits),
@@ -1186,6 +1189,7 @@ print(xtable(tab.ajuste[7:8, ], digits = digits),
   \midrule
 ```{r body21b, results="asis"}
 
+digits[8] <- -1
 ##----------------------------------------------------------------------
 ## Copiar e colar o corpo do resultado na customização latex abaixo
 print(xtable(tab.ajuste[1:2, ], digits = digits),
@@ -1195,6 +1199,7 @@ print(xtable(tab.ajuste[1:2, ], digits = digits),
       add.to.row = list(
           pos = list(1), command = "\\rowcolor{teal!30}"
       ))
+digits[8] <- 4
 
 ```
   \specialrule{0em}{0.5em}{0em} %% Apenas para espaçamento
@@ -1339,7 +1344,7 @@ aux <- data.frame(modelo = "Quasi-Poisson", aux)
 predQ <- cbind(pred, aux)
 
 ##-------------------------------------------
-pred.all <- rbind(predP, predC, predB, predQ)
+pred.all <- rbind(predP, predC, predQ, predB)
 pred.all <- pred.all[with(pred.all, order(cult, aval, modelo)), ]
 
 ##----------------------------------------------------------------------
@@ -1350,7 +1355,7 @@ key <- list(
     lines = list(pch = 1:nlevels(pred.all$model) + 4,
                  cex = 0.7),
     text = list(c("Poisson", "COM-Poisson",
-                  "Binomial Negativa", "Quasi-Poisson"))
+                  "Quasi-Poisson", "Binomial Negativa"))
 )
 
 ## ## A escala do gráfico fica prejudicada, pois os limites do eixo y são
@@ -1949,6 +1954,7 @@ print(xy1, position = c(0.57, 0, 1, 1), more = FALSE)
 ###  ###
 
 * Similaridade entre inferências via modelo Quasi-Poisson e COM-Poisson;
+
 * Desempenho do modelo Binomial Negativo;
 * Interpretação dos parâmetros nos modelos baseados na COM-Poisson;
 * Problemas numéricos para determinação da matriz hessiana no modelo
@@ -1990,11 +1996,13 @@ Análise de dados de contagem:
 
 ### Trabalhos futuros ###
 
+Sugestões para continuidade da pesquisa:
+
 * Estudar reparametrizações do modelo COM-Poisson;
 * Avaliar aproximações da constante de normalização;
 * Realizar estudos de simulação para avaliar a robustez do modelo;
 * Implementar o modelo COM-Poisson inflacionado de zeros; e
-* Implementar o modelo COM-Poisson com efeitos aleatórios dependentes.
+* Expandir o modelo COM-Poisson de efeitos aleatórios.
 
 <!--------------------------------------------- -->
 #  #
