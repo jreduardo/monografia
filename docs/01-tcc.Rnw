@@ -1,24 +1,3 @@
-%% abtex2-modelo-trabalho-academico.tex, v<VERSION> laurocesar
-%% Copyright 2012-<COPYRIGHT_YEAR> by abnTeX2 group at http://www.abntex.net.br/
-%%
-%% This work may be distributed and/or modified under the
-%% conditions of the LaTeX Project Public License, either version 1.3
-%% of this license or (at your option) any later version.
-%% The latest version of this license is in
-%%   http://www.latex-project.org/lppl.txt
-%% and version 1.3 or later is part of all distributions of LaTeX
-%% version 2005/12/01 or later.
-%%
-%% This work has the LPPL maintenance status `maintained'.
-%%
-%% The Current Maintainer of this work is the abnTeX2 team, led
-%% by Lauro César Araujo. Further information are available on
-%% http://www.abntex.net.br/
-%%
-%% This work consists of the files abntex2-modelo-trabalho-academico.tex,
-%% abntex2-modelo-include-comandos and abntex2-modelo-references.bib
-%%
-
 % ------------------------------------------------------------------------
 % ------------------------------------------------------------------------
 % abnTeX2: Modelo de Trabalho Academico (tese de doutorado, dissertacao de
@@ -45,6 +24,21 @@
 	svgnames
 	]{abntex2}
 
+% ---
+% Novo list of (listings) para QUADROS
+% ---
+
+\newcommand{\quadroname}{Quadro}
+\newcommand{\listofquadrosname}{Lista de quadros}
+
+\newfloat[chapter]{quadro}{loq}{\quadroname}
+\newlistof{listofquadros}{loq}{\listofquadrosname}
+\newlistentry{quadro}{loq}{0}
+
+% configurações para atender às regras da ABNT
+\counterwithout{quadro}{chapter}
+\renewcommand{\cftquadroname}{\quadroname\space}
+\renewcommand*{\cftquadroaftersnum}{\hfill--\hfill}
 
 % ---
 % PACOTES
@@ -97,6 +91,7 @@
 \usepackage{tikz}
 \usepackage{pdflscape}			% para ambiente landscape
 \usepackage{pgfgantt}			% cronograma estilo gráfico de gantt
+\usepackage{multicol}
 \usetikzlibrary{backgrounds}
 
 % ---
@@ -142,7 +137,7 @@
 % ---
 % Informações de dados para CAPA e FOLHA DE ROSTO
 % ---
-\titulo{Extensões e Aplicações Modelo de Regressão
+\titulo{Extensões e Aplicações do Modelo de Regressão
   Conway-Maxwell-Poisson para Modelagem de Dados de Contagem}
 \vspace{2cm}
 \autor{Eduardo Elias Ribeiro Junior}
@@ -227,7 +222,7 @@
 
 <<setup, include=FALSE, cache=FALSE>>=
 source("_setup.R")
-library(tccPackage)
+library(cmpreg)
 @
 
 
@@ -314,29 +309,29 @@ library(tccPackage)
   representam o número de ocorrências de um evento em um domínio
   discreto ou contínuo.  Para análise estatística dessas variáveis, o
   modelo de Poisson é amplamente utilizado. Porém, não são raras as
-  situações de sub ou superdispersão, que inviabilizam o emprego deste
+  situações de sub ou superdispersão, que inviabilizam o emprego desse
   modelo. Uma alternativa paramétrica é o modelo COM-Poisson que, com a
   adição de um parâmetro, contempla diferentes níveis de dispersão.
-  Outras características bastantes frequentes em dados de contagem são
-  frequência excessiva de valores zeros e estrutura de correlação entre
-  observações, muitas vezes induzida pelo processo de casualização ou
-  amostragem. Nesses casos os modelos adotados devem ser
-  adaptados. Neste trabalho são exploradas as características da
-  distribuição COM-Poisson e apresentados os modelos de regressão
-  COM-Poisson de efeitos fixos, com modelagem para excesso de zeros e
-  incluindo efeitos aleatórios. O emprego dos modelos COM-Poisson e suas
-  extensões é ilustrado com aplicações onde seus resultados são
-  comparados com as abordagens Poisson, Quasi-Poisson e Binomial
-  Negativa (para casos de superdispersão) via níveis descritivos de
-  testes de razão de verossimilhanças, critério de informação de Akaike
-  e predições pontuais e intervalares. O ajuste dos modelos é feito via
-  maximização da verossimilhança. Os resultados mostram que o modelo
-  Poisson é de fato restritivo, com ajustes inadequados na maioria das
-  aplicações. O modelo COM-Poisson, por sua vez, mostrou-se bastante
-  flexível com resultados similares aos obtidos via abordagem
-  semi-paramétrica Quasi-Poisson. As extensões propostas para o modelo
-  COM-Poisson apresentaram resultados satisfatórios, sendo equivalentes
-  as abordagens já consolidadas na literatura.
+  Outras características frequentes em dados de contagem são excesso de
+  contagens nulas e estrutura de correlação entre observações, muitas
+  vezes induzida pelo processo de casualização ou amostragem. Nesses
+  casos os modelos adotados devem ser adaptados. Neste trabalho são
+  exploradas as características da distribuição COM-Poisson e
+  apresentados os modelos de regressão COM-Poisson de efeitos fixos, com
+  modelagem para excesso de zeros e incluindo efeitos aleatórios. O
+  emprego dos modelos COM-Poisson e suas extensões é ilustrado com
+  aplicações e seus resultados são comparados com as abordagens Poisson,
+  Quasi-Poisson e Binomial Negativa (para casos de superdispersão) via
+  níveis descritivos de testes de razão de verossimilhanças, critério de
+  informação de Akaike e predições pontuais e intervalares. O ajuste dos
+  modelos é feito via maximização da verossimilhança. Os resultados
+  mostram que o modelo Poisson é de fato restritivo, com ajustes
+  inadequados na maioria das aplicações. O modelo COM-Poisson, por sua
+  vez, mostrou-se bastante flexível apresentando resultados similares
+  aos obtidos via abordagem semi-paramétrica Quasi-Poisson. As extensões
+  propostas para o modelo COM-Poisson apresentaram resultados
+  satisfatórios, sendo equivalentes às abordagens já consolidadas na
+  literatura.
 
   \textbf{Palavras-chave}:
   COM-Poisson; dados de contagem; subdispersão; superdispersão; excesso
@@ -356,6 +351,14 @@ library(tccPackage)
 % ---
 \pdfbookmark[0]{\listtablename}{lot}
 \listoftables*
+\cleardoublepage
+% ---
+
+% ---
+% inserir lista de quadros
+% ---
+\pdfbookmark[0]{\listofquadrosname}{loq}
+\listofquadros*
 \cleardoublepage
 % ---
 

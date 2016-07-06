@@ -7,40 +7,40 @@ quantidade disponível para dados contínuos. Destaca-se o modelo
 log-linear Poisson como o modelo mais utilizado quando se trata de dados
 de contagem. Porém, não raramente os dados de contagens apresentam
 variância superior ou inferior à sua média. Esses são os casos de super
-ou subdispersão já enunciados no capítulo \ref{cap:introducao}, que
-quando ocorrem inviabilizam o uso da distribuição Poisson.
+ou subdispersão já enunciados no \autoref{cap:introducao} que,
+quando ocorrem, inviabilizam o uso da distribuição Poisson.
 
-Nos casos de fuga da equidispersão algumas abordagens não paramétricas
+Nos casos de fuga da equidispersão algumas abordagens semi-paramétricas
 são empregadas. Nesse contexto, são alternativas os métodos de estimação
 via quase-verossimilhança, estimação robusta dos erros padrões
 (estimador ``sanduíche'') e estimação dos erros padrões via reamostragem
 (``\textit{bootstrap}'') \cite{Hilbe2014}. Desses métodos detalha-se,
 brevemente, somente o método de estimação via função de
-quase-verossimilhança na seção
-\ref{cap02:estimacao-via-quase-verossimilhanca}.
+quase-verossimilhança na
+\autoref{cap02:estimacao-via-quase-verossimilhanca}.
 
 No contexto paramétrico, pesquisas recentes trazem modelos bastante
 flexíveis à fuga de equidispersão no campo da Estatística aplicada, veja
-\citeonline{Sellers2010, Zeviani2014, Lord2010}. Na tabela
-\ref{tab:distribuicoes} são listadas as distribuições de probabilidades
-consideradas por \citeonline{Winkelmann2008} e
+\citeonline{Sellers2010, Zeviani2014, Lord2010}. No
+\autoref{quad:distribuicoes} são listadas as distribuições de
+probabilidades consideradas por \citeonline{Winkelmann2008} e
 \citeonline{Kokonendji2014} e as características de dados de contagem
-que são contempladas. Nota-se que a Poisson na verdade é um caso
-particular, pois é a única das distribuições listadas que contempla
-somente a característica de equidispersão, ainda observa-se um
-conjunto maior de distribuições para os casos de superdispersão com
-relação os casos de subdispersão. Embora este grande número de
-distribuições exista para lidar com os casos de fuga de equidispersão,
-são poucos os pacotes estatísticos que as disponibilizam como
-alternativas para ajuste de modelos de regressão para dados de contagem.
+que são contempladas. Nota-se que a Poisson na verdade é a única das
+distribuições listadas que contempla somente a característica de
+equidispersão. Observa-se um conjunto maior de distribuições para
+os casos de superdispersão com relação aos casos de subdispersão. Embora
+esse grande número de distribuições exista para lidar com os casos de
+fuga de equidispersão, são poucos os pacotes estatísticos que as
+disponibilizam como alternativas para ajuste de modelos de regressão
+para dados de contagem.
 
 %%----------------------------------------------------------------------
 %% Tabela das distribuições para dados de contagem
-\begin{table}
+\begin{quadro}
 \centering
 \caption{Distribuições de probabilidades para dados de contagem com
   indicação das características contempladas}
-\label{tab:distribuicoes}
+\label{quad:distribuicoes}
 \begin{tabular}{lccc}
   \toprule
 \multirow{2}{*}{Distribuição}       & \multicolumn{3}{c}{Contempla a característica de} \\
@@ -64,17 +64,17 @@ Katz                                & \checkmark        & \checkmark     & \chec
   \small
 \item Fonte: Elaborado pelo autor.
 \end{tablenotes}
-\end{table}
+\end{quadro}
 %%----------------------------------------------------------------------
 
 Dos modelos paramétricos, o Binomial Negativo aparece em destaque com
 implementações já consolidadas nos principais \textit{softwares}
 estatísticos e frequentes aplicações nos casos de superdispersão. Na
-seção \ref{cap02:binomneg} detalhes da construção desses modelos são
-apresentados. Dos demais modelos derivados das distribuições listadas na
-tabela \ref{tab:distribuicoes} este trabalho abordará somente o
-modelo COM-Poisson, que é apresentado com detalhes na seção
-\ref{cap02:compoisson}.
+\autoref{cap02:binomneg} detalhes da construção desses modelos são
+apresentados. Dos demais modelos derivados das distribuições listadas no
+\autoref{quad:distribuicoes} este trabalho abordará somente o modelo
+COM-Poisson, que é apresentado com detalhes na
+\autoref{cap02:compoisson}.
 
 Um outro fenômeno que é frequente em dados de contagem é a ocorrência
 excessiva de zeros. Esse fenômeno sugere a modelagem de dois processos
@@ -82,44 +82,42 @@ geradores de dados, o gerador de zeros extra e o gerador das
 contagens. Existem ao menos duas abordagens pertinentes para estes casos
 que são os modelos de mistura e os modelos condicionais. Na abordagem
 por modelos de mistura a variável resposta é modelada como uma mistura
-de duas distribuições, no trabalho de \citeonline{Lambert1992},
+de duas distribuições. \citeonline{Lambert1992} apresenta
 uma mistura da distribuição Bernoulli com uma distribuição de Poisson ou
 Binomial Negativa. Considerando os modelos condicionais, também chamados
 de modelos de barreira \cite{Ridout1998}, tem-se que a modelagem da
 variável resposta é realizada em duas etapas. A primeira refere-se ao
 processo gerador de contagens nulas e a segunda ao gerador de contagens
 não nulas. Nesse trabalho a modelagem de excesso de zeros se dará
-somente via modelos de barreira. A seção \ref{cap02:zeros} é destinada a
+somente via modelos de barreira. A \autoref{cap02:zeros} é destinada a
 um breve detalhamento desta abordagem.
 
 Neste capítulo também é abordada a situação da inclusão de efeitos
-aleatórios na seção \ref{cap02:aleatorio}. Em análise de dados de
-contagem a inclusão desses efeitos permitem acomodar variabilidade
-extra e incorporar a estrutura amostral do problema como em experimentos
-com medidas repetidas ou longitudinais e experimentos em parcelas
+aleatórios na \autoref{cap02:aleatorio}. Em análise de dados de contagem
+a inclusão desses efeitos permitem acomodar variabilidade extra e
+incorporar a estrutura amostral do problema, como em experimentos com
+medidas repetidas ou longitudinais e experimentos em parcelas
 subdivididas.
 
 \section{Modelo Poisson}
 \label{cap02:poisson}
 
-A Poisson é uma das principais distribuição de probabilidades
+A Poisson é uma das principais distribuições de probabilidades
 discretas. Com suporte nos inteiros não negativos, uma variável
 aleatória segue um modelo Poisson se sua função massa de probabilidade
 for
-
 \begin{equation}
   \label{eqn:pmf-poisson}
-  \Pr(Y = y \mid \lambda) = \frac{\lambda^ye^{-\lambda}}{y!}
-    \qquad y = 0, 1, 2, \ldots
+  \Pr(Y = y \mid \lambda) = \frac{\lambda^ye^{-\lambda}}{y!},
+  \qquad y = 0, 1, 2, \ldots
 \end{equation}
-
-\noindent
-em que $\lambda > 0$ representa a taxa de ocorrência do evento. Uma
-particularidade já destacada desta distribuição é que $E(X) = V(X) =
-\lambda$. Isso torna a distribuição Poisson bastante restritiva. Na
-figura \ref{fig:distr-poisson} são apresentadas as distribuições Poisson
-para diferentes parâmetros, note que devido a propriedade $E(X) = V(X)$
-contagens maiores também são mais dispersas.
+em que $\lambda > 0$ representa a taxa de ocorrência do
+evento. Uma particularidade já destacada desta distribuição é que $E(X)
+= V(X) = \lambda$. Isso torna a distribuição Poisson bastante
+restritiva. Na \autoref{fig:distr-poisson} são apresentadas as
+distribuições Poisson para diferentes parâmetros. Note que, devido a
+propriedade $E(X) = V(X)$, contagens de médias maiores também tem
+probabilidades mais dispersas.
 
 <<distr-poisson, fig.height=3.3, fig.width=6.7, fig.cap="Probabilidades pela distribuição Poisson para diferentes parâmetros.">>=
 
@@ -147,39 +145,37 @@ distribuição Exponencial. Essa relação estabelece que se os tempos entre
 a ocorrência de eventos se distribuem conforme modelo Exponencial de
 parâmetro $\lambda$ a contagem de eventos em um intervalo de tempo $t$
 tem distribuição Poisson com média $\lambda t$. A distribuição
-\textit{Gamma-Count}, citada na tabela \ref{tab:distribuicoes}, estende
-esta propriedade do processo adotando a distribuição Gama para os tempos
-entre eventos tornando a distribuição da contagem decorrente mais
+\textit{Gamma-Count}, citada no \autoref{quad:distribuicoes}, estende
+essa propriedade do processo adotando a distribuição Gama para os tempos
+entre eventos, tornando a distribuição da contagem decorrente mais
 flexível \cite{Winkelmann1995, Zeviani2014}.
 
 Outra propriedade que decorre da construção do modelo Poisson é sobre a
 razão entre probabilidades sucessivas, $\frac{\Pr(Y=y-1)}{\Pr(Y=y)} =
 \frac{y}{\lambda}$. Essa razão é linear em $y$ e tem sua taxa de
-crescimento ou decrescimento como $\frac{1}{\lambda}$. Os modelos Katz e
+variação instantânea igual a  $\frac{1}{\lambda}$. Os modelos Katz e
 COM-Poisson se baseiam na generalização dessa razão de probabilidades a
 fim de flexibilizar a distribuição de probabilidades.
 
 A utilização do modelo Poisson na análise de dados se dá por meio do
-modelo de regressão Poisson. Seja $Y_i$ variáveis aleatórias
-condicionalmente independentes, dados as covariáveis $X_i$,
-$i=1,2,\ldots,n$. O modelo de regressão log-linear Poisson, sob a teoria
-dos MLG's é definido como
-
+modelo de regressão Poisson. Sejam $Y_1, Y_2, \ldots, Y_n$ variáveis
+aleatórias condicionalmente independentes, dado o vetor de covariáveis
+$\underline{x}_i^t=(x_{i1},x_{i2},\ldots,x_{ip})$. O modelo de regressão
+log-linear Poisson, sob a teoria dos MLG's, é definido como
 \begin{equation}
   \label{eqn:reg-poisson}
   \begin{split}
-    Y_i \mid & X_i \sim \textrm{Poisson}(\mu_i) \\
-    &\log(\mu_i) = X_i\beta
+    Y_i \mid & \underline{x}_i \sim \textrm{Poisson}(\mu_i) \\
+    &\log(\mu_i) = \underline{x}_i^t\beta
   \end{split}
 \end{equation}
-
-\noindent
-em que $\mu_i > 0$ é a média da variável aleatória $Y_i \mid X_i$ que é
-calculada a partir do vetor $\beta \in \mathbb{R}^p$.
+em que $\mu_i > 0$ é a média da variável aleatória $Y_i$ condicionada ao
+vetor de covariáveis $\underline{x}_i^t$, que é calculada a partir do
+vetor $\beta \in \mathbb{R}^p$.
 
 O processo de estimação do vetor $\beta$ é baseado na maximização da
-verossimilhança, que nas distribuições pertencentes à família
-exponencial, os MLG's, é realizada via algoritmo de mínimos quadrados
+função de verossimilhança que, nas distribuições pertencentes à família
+exponencial, é realizada via algoritmo de mínimos quadrados
 ponderados iterativamente, ou, do inglês \textit{Iteractive Weighted
   Least Squares - IWLS} \cite{Nelder1972}.
 
@@ -188,50 +184,49 @@ ponderados iterativamente, ou, do inglês \textit{Iteractive Weighted
 
 \citeonline{Wedderburn1974} propôs uma forma de estimação a partir de
 uma função biparamétrica, denominada quase-verossimilhança. Suponha
-$y_i$ observações independentes com esperanças $\mu_i$ e variâncias
-$V(\mu_i)$, em que $V$ é uma função positiva e conhecida. A função de
-quase-verossimilhança é expressa como
-
+$Y_1, Y_2, \ldots, Y_n$ variáveis aleatórias independentes com $E(Y_i) =
+\mu_i$ e variâncias $V(\mu_i)$, em que $V$ é uma função
+positiva e conhecida. A função de quase-verossimilhança é expressa como
 \begin{equation}
   \label{eqn:quase-verossimilhanca}
-  Q(\mu_i \mid y_i) = \int_{y_i}^{\mu_i} \frac{y_i - t}{\sigma^2 V(\mu_i)}dt
+  Q(\mu_i \mid y_i) = \int_{y_i}^{\mu_i}
+  \frac{y_i - \mu_i^t}{\sigma^2 V(\mu_i)}d\mu_i^t
 \end{equation}
 
-Na expressão \ref{eqn:quase-verossimilhanca} a função de
-quase-verossimilhança é definida a partir da especificação de $\mu_i$,
-$V(\mu_i)$ e $\sigma^2$. O processo de estimação via maximização dessa
-função compartilha, do método baseado na maximazação da verossimilhança,
-as mesmas estimativas para $\mu_i$, porém a dispersão de $y_i$, $V(y_i)
-= \theta V(\mu_i)$ é corrigida pelo parâmetro adicional $\sigma^2$.
+Na \autoref{eqn:quase-verossimilhanca} a função de quase-verossimilhança
+é definida a partir da especificação de $\mu_i$, $V(\mu_i)$ e
+$\sigma^2$. O processo de estimação via maximização dessa função
+compartilha, do método baseado na maximazação da função de
+verossimilhança, as mesmas estimativas para $\mu_i$, porém a dispersão
+de $y_i$ é corrigida pelo parâmetro adicional $\sigma^2$, $V(y_i) =
+\sigma^2 V(\mu_i)$.
 
-Assim os problemas com a fuga da suposição de equidispersão podem ser
-superados quando a estimação por máxima quase-verossimilhança é
-adotada. Porém um resultado dessa abordagem é que
-
+Com a adição desse parâmetro de dispersão $\sigma^2$, os problemas com a
+fuga da suposição de equidispersão são superados. Porém um resultado
+dessa abordagem é que
 \begin{equation}
   \label{eqn:quasi-informacao}
   -E\left ( \frac{\partial^2 Q(\mu \mid y)}{\partial \mu^2} \right) \leq
   -E\left ( \frac{\partial^2 \ell(\mu \mid y)}{\partial \mu^2} \right)
 \end{equation}
-
-\noindent
-ou seja a informação a respeito de $\mu$ quando se conhece apenas
+ou seja, a informação a respeito de $\mu$ quando se descreve apenas
 $\sigma^2$ e $V(\mu)$, a relação entre média e variância, é menor do que
-a informação quando se conhece a distribuição da variável resposta, dada
-pela log-verossimilhança $\ell(\mu \mid y)$. Além disso ressalta-se que,
-de forma geral, não é possível descrever uma distribuição de
+a informação quando se descreve a distribuição da variável resposta,
+dada pela log-verossimilhança $\ell(\mu \mid y)$. Além disso ressalta-se
+que, de forma geral, não é possível descrever uma distribuição de
 probabilides para $Y$ somente com as especificações de $\sigma^2$ e
 $V(\mu)$.
 
-Em modelos de regressão, $g(\mu_i) = X\beta$ e $V(\mu_i)$ definem a
-função de quase-verossimilhança. Nessa abordagem são estimados os
-parâmetros $\beta$ e $\sigma^2$. A estimativa do vetor $\beta$ pode ser
-obtidas pelo algoritmo \textit{IWLS}. Usando as funções quase-escore e
-matriz de quase-informação chega-se ao mesmo algoritmo de estimação dado
-no caso Poisson, que não depende de $\sigma^2$. O parâmetro $\sigma^2$ é
-estimado separadamente, pós estimação dos $\beta$'s. Um estimador usual
-é o baseado na estatística $\chi^2$ de Pearson.
-
+Em modelos de regressão, $g(\mu_i) = \underline{x}_i^t\beta$ e
+$V(\mu_i)$ definem a função de quase-verossimilhança. Nessa abordagem
+são estimados os parâmetros $\beta$ e $\sigma^2$. A estimação do vetor
+$\beta$ pode ser realizada pelo algoritmo \textit{IWLS}. Usando as
+funções quase-escore, derivadas de primeira ordem da função $Q(\mu_i
+\mid y_i)$ em relaçao aos $\beta$'s, e matriz de quase-informação,
+derivadas de segunda ordem, chega-se ao mesmo algoritmo de estimação
+dado no caso Poisson, que não depende de $\sigma^2$. O parâmetro
+$\sigma^2$ é estimado separadamente, pós estimação dos $\beta$'s. Um
+estimador usual é o baseado na estatística $\chi^2$ de Pearson
 \begin{equation}
   \label{eqn:estimador-theta}
   \hat{\sigma^2} = \frac{1}{n-p} \sum_{i=1}^n
@@ -241,11 +236,10 @@ estimado separadamente, pós estimação dos $\beta$'s. Um estimador usual
 \section{Modelo Binomial Negativo}
 \label{cap02:binomneg}
 
-Uma das principais alternativas paramétricas para dados de contagem
-superdispersos é a distribuição Binomial Negativa. A função massa de
-probabilidade da distribuição Binomial Negativa pode ser deduzida de um
-processo hierárquico de efeitos aleatórios onde se assume que
-
+Uma das principais distribuições paramétricas para dados de contagem
+superdispersos é a Binomial Negativa. A função massa de probabilidade da
+distribuição Binomial Negativa pode ser deduzida de um processo
+hierárquico de efeitos aleatórios em que se assume
 \begin{equation}
   \label{eqn:proc-binomneg}
   \begin{split}
@@ -253,44 +247,6 @@ processo hierárquico de efeitos aleatórios onde se assume que
     & b \sim \textrm{Gama}(\mu, \theta)
   \end{split}
 \end{equation}
-
-\noindent
-A função massa de probabilidade decorrente da estrutura descrita em
-\ref{eqn:proc-binomneg} é deduzida integrando os efeitos aleatórios.
-Considere $f(y \mid b)$ como a função massa de probabilidade da
-distribuição Poisson (vide expressão em \ref{eqn:pmf-poisson}) e $g(b
-\mid \mu, \phi)$ a função densidade da distribuição Gama \footnote{O
-  desenvolvimento detalhado da integral pode ser visto em
-  \citeonline[pág. 303-305]{Paula2013}. Obs.: A função densidade do
-  modelo Gama está parametrizada para que $\mu$ represente a média da
-  distribuição.}
-
-\begin{equation}
-  \label{eqn:proc-binomneg}
-  \begin{split}
-    \Pr(Y = y \mid \mu,\theta) &= \int_0^\infty f(y \mid b)
-       g(b \mid \mu,\theta) db\\
-    &= \frac{\theta^\theta}{y!\mu^\theta\Gamma(\theta)}
-       \int_0^\infty e^{-b(1 + \theta/\mu)} b^{y+\theta-1}db \\
-    &= \frac{\Gamma(\theta + y)}{\Gamma(y+1)\Gamma(\theta)}
-       \left ( \frac{\mu}{\mu + \theta} \right )^y
-       \left ( \frac{\theta}{\mu + \theta} \right )^\theta
-       \qquad y = 0, 1, 2, \cdots
-  \end{split}
-\end{equation}
-
-\noindent
-com $\mu >0$ e $\theta > 0$. Esse é um caso particular de um modelo de
-efeito aleatório cuja integral tem solução analítica e por consequência
-o modelo marginal tem forma fechada. Outro caso que se baseia no mesmo
-princípio é o modelo \textit{Inverse Gaussian Poisson}, que como o nome
-sugere adota a distribuição Inversa Gaussiana para os efeitos
-aleatórios. Na figura \ref{fig:distr-binomneg} são apresentadas as
-distribuições Binomial Negativa para diferentes parâmetros $\theta$ em
-comparação com a distribuição Poisson equivalente em locação. Note que
-quanto menor o parâmetro $\theta$, maior a dispersão da
-distribuição. Isso introduz uma propriedade importante desse modelo,
-para $\theta \to \infty$ a distribuição reduz-se a Poisson.
 
 <<distr-binomneg, fig.height=3.4, fig.width=6.7, fig.cap="Probabilidades pela distribuição Binomial Negativa para diferentes níveis de dispersão, fixando a média em 5.">>=
 
@@ -343,13 +299,13 @@ xyplot(values ~ c(y - 0.15) | ind, data = da.po,
         type = "h", col = cols[2]))
 for(i in 1:3){
     trellis.focus("panel", i, 1, highlight=FALSE)
-    grid::grid.text(label = sprintf("E[Y]:  %.1f\nV[Y]:  %.1f",
+    grid::grid.text(label = sprintf("E(Y):  %.1f\nV(Y):  %.1f",
                                     mu, mu),
                     x = .62, y = 0.03,
                     default.units = "npc",
                     gp = grid::gpar(col = cols[1]),
                     just = c("left", "bottom"))
-    grid::grid.text(label = sprintf("E[Y]:  %.1f\nV[Y]:  %.1f",
+    grid::grid.text(label = sprintf("E(Y):  %.1f\nV(Y):  %.1f",
                                     mu, vars[i]),
                     x = .08, y = 0.03,
                     default.units = "npc",
@@ -360,14 +316,39 @@ trellis.unfocus()
 
 @
 
-Os momentos média e variância da distribuição Binomial Negativa são
-expressos como $E(Y) = \mu$ e $V(Y) = \mu + \mu^2/\sigma^2$. Pelas
-expressões fica evidente a característica da Binomial Negativa de
-acomodar somente superdispersão, pois $E(Y)$ é menor que $V(Y)$ para
-qualquer $\sigma^2$. Percebe-se também que quanto maior o parâmetro
-$\sigma^2$ mais $E(Y)$ se aproxima de $V(Y)$, e no limite, quando
-$\sigma^2 \rightarrow \infty$, $E(Y) = V(Y)$ fazendo com que a
-distribuição Binomial Negativa se reduza a Poisson.
+A função massa de probabilidade de $Y$, decorrente da estrutura descrita
+na \autoref{eqn:proc-binomneg} é deduzida integrando os efeitos
+aleatórios.  Considere $f(y \mid b)$ como a função massa de
+probabilidade da distribuição Poisson (vide \autoref{eqn:pmf-poisson}) e
+$g(b \mid \mu, \phi)$ a função densidade da distribuição Gama
+\footnote{O desenvolvimento detalhado da integral pode ser visto em
+  \citeonline[pág. 303-305]{Paula2013}. Obs.: A função densidade do
+  modelo Gama está parametrizada para que $\mu$ represente a média da
+  distribuição.}
+\begin{equation}
+  \label{eqn:proc-binomneg}
+  \begin{split}
+    \Pr(Y = y \mid \mu,\theta) &= \int_0^\infty f(y \mid b)
+       g(b \mid \mu,\theta) db\\
+    &= \frac{\theta^\theta}{y!\mu^\theta\Gamma(\theta)}
+       \int_0^\infty e^{-b(1 + \theta/\mu)} b^{y+\theta-1}db \\
+    &= \frac{\Gamma(\theta + y)}{\Gamma(y+1)\Gamma(\theta)}
+       \left ( \frac{\mu}{\mu + \theta} \right )^y
+       \left ( \frac{\theta}{\mu + \theta} \right )^\theta,
+       \qquad y = 0, 1, 2, \cdots
+  \end{split}
+\end{equation}
+com $\mu >0$ e $\theta > 0$. Esse é um caso particular de um modelo de
+efeito aleatório, cuja integral tem solução analítica e, por
+consequência, o modelo marginal tem forma fechada. Outro caso que se
+baseia no mesmo princípio é o modelo \textit{Inverse Gaussian Poisson},
+que, como o nome sugere, adota a distribuição Inversa Gaussiana para os
+efeitos aleatórios. Na \autoref{fig:distr-binomneg} são apresentadas
+as distribuições Binomial Negativa para diferentes parâmetros $\theta$
+em comparação com a distribuição Poisson, equivalente em locação. Note
+que quanto menor o parâmetro $\theta$, maior a dispersão da
+distribuição. Isso introduz uma propriedade importante desse modelo,
+para $\theta \to \infty$ a distribuição reduz-se a Poisson.
 
 <<mv-binomneg, fig.height=4, fig.width=4, fig.cap="Relação Média e Variância na distribuição Binomial Negativa.">>=
 
@@ -409,51 +390,55 @@ fonte("Fonte: Elaborado pelo autor.", cex = 0.95)
 
 @
 
-A relação funcional entre média e variância é ilustrada na figura
-\ref{fig:mv-binomneg} onde são apresentadas as médias e variâncias para
-$\mu$ entre 0 e 10 e $\theta$ entre 0 e 50. O comportamento dessa
-relação proporciona um maior flexibilidade à distribuição em acomodar
-superdispersão, uma característica importante exibida nesta figura é que
-para a Binomial Negativa se aproximar a Poisson em contagens altas o
-$\theta$ deve ser extremamente grande.
+Os momentos média e variância da distribuição Binomial Negativa são
+dados por $E(Y) = \mu$ e $V(Y) = \mu + \mu^2/\sigma^2$. Pelas expressões
+fica evidente a característica da Binomial Negativa de acomodar somente
+superdispersão, pois $E(Y)$ é menor que $V(Y)$ para qualquer
+$\sigma^2$. Percebe-se também que quanto maior o parâmetro $\sigma^2$
+mais $E(Y)$ se aproxima de $V(Y)$, e no limite, quando $\sigma^2
+\rightarrow \infty$, $E(Y) = V(Y)$ fazendo com que a distribuição
+Binomial Negativa se reduza à Poisson.
+
+A relação funcional entre média e variância é ilustrada na
+\autoref{fig:mv-binomneg} em que são apresentadas as médias e variâncias
+para $\mu$, entre 0 e 10, e $\theta$, entre 0 e 50. O comportamento
+dessa relação proporciona uma maior flexibilidade à distribuição em
+acomodar superdispersão. Uma característica importante exibida nessa
+figura é que para a Binomial Negativa se aproximar da Poisson em médias
+altas o $\theta$ deve ser extremamente grande.
 
 O emprego do modelo Binomial Negativo em problemas se regressão ocorre
 de maneira similar aos MLG's, com exceção de que a distribuição só
-pertence a família exponencial de distribuições se o parâmetro $\theta$
-for conhecido e assim o processo sofre algumas
-alterações. Primeiramente, assim como na Poisson, defini-se $g(\mu_i) =
-X\beta$, comumente utiliza-se a função $g(\mu_i) =
-\log(\mu_i)$. Desenvolvendo a log-verossimilhança e suas funções
-derivadas, função escore e matriz de informação de Fisher, mostra-se que
-matriz de informação é bloco diagonal caracterizando a ortogonalidade
-dos parâmetros $\beta$ de locação e $\theta$ de dispersão. Deste fato
-decorre que a estimação dos parâmetros pode ser realizada em paralelo,
-ou seja, estima-se o vetor $\beta$ pelo método de \textit{IWLS} e
-posteriormente o parâmetro $\theta$ pelo método de Newton-Raphson,
-faz-se os dois procedimentos simultaneamente até a convergência das
-estimativas.
+pertence à família exponencial de distribuições se o parâmetro $\theta$
+for fixado e assim o processo sofre algumas alterações. Primeiramente,
+assim como na Poisson, define-se $g(\mu_i) = \underline{x}_i^t\beta$,
+comumente utiliza-se a função $g(\mu_i) = \log(\mu_i)$. A partir da
+log-verossimilhança e suas funções derivadas, função escore e matriz de
+informação de Fisher, mostra-se que matriz de informação é bloco
+diagonal caracterizando a ortogonalidade dos parâmetros $\beta$ de
+locação e $\theta$ de dispersão. Desse fato decorre que a estimação dos
+parâmetros pode ser realizada em paralelo, ou seja, estima-se o vetor
+$\beta$ pelo algoritmo \textit{IWLS} e posteriormente o parâmetro
+$\theta$ pelo método de Newton-Raphson.  Os dois procedimentos são
+realizados simultaneamente até a convergência das estimativas.
 
 \section{Modelo COM-Poisson}
 \label{cap02:compoisson}
 
 A distribuição de probabilidades COM-Poisson foi proposta por
-\citeonline{Conway1962}, em um contexto de filas e generaliza a Poisson
+\citeonline{Conway1962}, em um contexto de filas, e generaliza a Poisson
 em termos da razão de probabilidades sucessivas, como será visto
-adiante. Seja $Y$ uma variável aleatória COM-Poisson, então sua função
+adiante. Seja $Y$ uma variável aleatória COM-Poisson então sua função
 massa de probabilidade é
-
 \begin{equation}
   \label{eqn:pmf-compoisson}
-  \Pr(Y=y \mid \lambda, \nu) = \frac{\lambda^y}{(y!)^\nu Z(\lambda, \nu)}
+  \Pr(Y=y \mid \lambda, \nu) = \frac{\lambda^y}{(y!)^\nu Z(\lambda, \nu)},
   \qquad y = 0, 1, 2, \ldots
 \end{equation}
-
-\noindent
 em que $\lambda > 0$, $\nu \geq 0$ e $Z(\lambda, \nu)$ é uma constante
-de normalização, calculada para que de fato \ref{eqn:pmf-compoisson}
-seja uma função massa de probabilidade ($\sum_{i=1}^\infty \Pr(Y = y) =
-1$). $Z(\lambda, \nu)$ é definida como se segue
-
+de normalização, calculada para que de fato a \autoref{eqn:pmf-compoisson}
+seja uma função massa de probabilidade ($\sum_{i=0}^\infty \Pr(Y = i) =
+1$). A função $Z(\lambda, \nu)$ é definida como se segue
 \begin{equation}
   \label{eqn:constante-z}
   Z(\lambda, \nu) = \sum_{j=0}^\infty \frac{\lambda^j}{(j!)^\nu}
@@ -461,26 +446,23 @@ seja uma função massa de probabilidade ($\sum_{i=1}^\infty \Pr(Y = y) =
 
 O fato que torna a distribuição COM-Poisson mais flexível é a razão
 entre probabilidades sucessivas
-
 \begin{equation}
   \label{eqn:prob-ratio}
   \frac{\Pr(Y=y-1)}{\Pr(Y=y)} = \frac{y^\nu}{\lambda}
 \end{equation}
-
-\noindent
-que se caracteriza não necessariamente linear em $y$, diferentemente da
-Poisson, o que permite caudas mais pesadas ou mais leves à distribuição
-\cite{Sellers2010}. Na figura \ref{fig:distr-compoisson} são
+que se caracteriza não, necessariamente, linear em $y$, diferentemente
+da Poisson, o que permite caudas mais pesadas ou mais leves à
+distribuição \cite{Sellers2010}. Na \autoref{fig:distr-compoisson} são
 apresentadas as distribuições COM-Poisson para diferentes valores de
 $\lambda$ e $\nu$, em contraste com as equivalentes, em locação,
 distribuições Poisson. Nessa figura pode-se ver a flexibilidade desse
 modelo, pois i) contempla o caso de subdispersão mesmo em contagens
 baixas ($E(Y)=3$, painel a esquerda), a distribuição permite caudas
-pesadas e consequentemente uma dispersão extra Poisson, ii) contempla
+pesadas e consequentemente uma dispersão extra Poisson; ii) contempla
 subdispersão mesmo em contagens altas, onde na Poisson tem-se
 variabilidade na mesma magnitude, na COM-Poisson pode-se ter caudas mais
 leves concentrando as probabilidades em torno da média (painel a
-direita) e iii) tem como caso particular a Poisson quando o parâmetro
+direita); e iii) tem como caso particular a Poisson quando o parâmetro
 $\nu = 1$ (painel central).
 
 <<distr-compoisson, fig.height=3.4, fig.width=6.7, fig.cap="Probabilidades pela distribuição COM-Poisson para diferentes parâmetros.">>=
@@ -542,13 +524,13 @@ xyplot(values ~ c(y - 0.15) | ind, data = da.po,
         type = "h", col = cols[2]))
 for(i in 1:3){
     trellis.focus("panel", i, 1, highlight=FALSE)
-    grid::grid.text(label = sprintf("E[Y]:  %.1f\nV[Y]:  %.1f",
+    grid::grid.text(label = sprintf("E(Y):  %.1f\nV(Y):  %.1f",
                                     mus[i], mus[i]),
                     x = .57, y = 0.03,
                     default.units = "npc",
                     gp = grid::gpar(col = cols[1]),
                     just = c("left", "bottom"))
-grid::grid.text(label = sprintf("E[Y]:  %.1f\nV[Y]:  %.1f",
+grid::grid.text(label = sprintf("E(Y):  %.1f\nV(Y):  %.1f",
                                 mus[i], vars[i]),
                 x = .05, y = 0.03,
                 default.units = "npc",
@@ -561,19 +543,19 @@ trellis.unfocus()
 
 Uma das vantagens do modelo COM-Poisson é que possui, além da Poisson
 quando $\nu = 1$, outras distribuições bem conhecidas como casos
-particulares. Esses casos particulares ocorrem essencialmente devido a
-forma assumida pela série infinita $Z(\lambda, \nu)$. Quando $\lambda =
-1$, $Z(\lambda, \nu = 1) = e^\lambda$ e substituindo na expressão
-\ref{eqn:pmf-compoisson}, tem-se a distribuição Poisson
+particulares. Esses casos particulares ocorrem essencialmente devido à
+forma assumida pela série infinita $Z(\lambda, \nu)$. Quando $\nu = 1$,
+$Z(\lambda, \nu = 1) = e^\lambda$ e substituindo na
+\autoref{eqn:pmf-compoisson}, tem-se a distribuição Poisson
 resultante. Quando $\nu \rightarrow \infty,\, Z(\lambda, \nu)
 \rightarrow 1+\lambda$ e a distribuição COM-Poisson se aproxima de uma
 distribuição Bernoulli com $P(Y=1)=\frac{\lambda}{1+\lambda}$. E quando
 $\nu = 0$ e $\lambda < 1$ $Z(\lambda, \nu)$ é uma soma geométrica que
-resulta em $(1-\lambda)^{-1}$ e a expressão \ref{eqn:pmf-compoisson} se
-resume a uma distribuição Geométrica com $P(Y=0)=(1-\lambda)$
-\cite{Shmueli2005}. Os três respectivos casos particulares citados são
-ilustrados na figura \ref{fig:casos-particulares}, onde os parâmetros
-foram escolhidos conforme restrições para redução da distribuição.
+resulta em $(1-\lambda)^{-1}$ e a \autoref{eqn:pmf-compoisson} se resume
+a uma distribuição Geométrica com $P(Y=0)=(1-\lambda)$
+\cite{Shmueli2005}. Os três casos particulares citados são ilustrados na
+\autoref{fig:casos-particulares}, onde os parâmetros foram escolhidos
+conforme restrições para redução da distribuição.
 
 <<casos-particulares, fig.height=3, fig.width=7, fig.cap="Exemplos de casos particulares da distribuição COM-Poisson.">>=
 
@@ -617,7 +599,7 @@ xyplot(values ~ y | ind, data = da,
        layout = c(NA, 1),
        par.strip = list(lines = 2, col = "transparent"),
        sub = "Fonte: Elaborado pelo autor.")
-distr <- c("Poisson", "Bernoulli", "Geométrica")
+distr <- expression("Poisson", ""%~~%"Bernoulli", "Geométrica")
 ##-------------------------------------------
 ## http://stackoverflow.com/questions/33632344/strip-with-two-lines-title-r-lattice-plot
 for (i in 1:3) {
@@ -636,7 +618,6 @@ for (i in 1:3) {
 Um inconveniente desse modelo é que os momentos média e variância não
 tem forma fechada. Sendo assim, devem ser calculados a partir da
 definição
-
 $$
   E(Y) = \sum_{y = 0}^{\infty} y \cdot p(y) \qquad \textrm{e} \qquad
   V(Y) = \sum_{y = 0}^{\infty} y^2 \cdot p(y) - E^2(Y)
@@ -644,27 +625,23 @@ $$
 
 \citeonline{Shmueli2005}, a partir de uma aproximação para $Z(\lambda,
 \nu)$, apresenta uma forma aproximada para os momentos da distribuição
-
 \begin{equation}
   \label{eqn:cmp-mean-aprox}
   E(Y) \approx \lambda^{1/\nu} - \frac{\nu - 1}{2\nu} \qquad
   \textrm{e} \qquad
   V(Y) \approx \frac{\lambda^{1/\nu}}{\nu}
 \end{equation}
-
-\noindent
 os autores ressaltam que essa aproximação é satisfatória para $\nu \leq
-1$ ou $\lambda > 10^\nu$. Na figura \ref{fig:mv-compoisson} é
-representada a relação média e variância aproximada pelas expressões em
+1$ ou $\lambda > 10^\nu$. Na \autoref{fig:mv-compoisson} é representada
+a relação média e variância aproximada pelas expressões em
 \ref{eqn:cmp-mean-aprox}. Percebe-se que a relação é praticamente linear
 entre média e variância, \citeonline{Sellers2010} descrevem que essa
 pode ser relação pode, ainda, ser aproximada por
-$\frac{1}{\nu}E(Y)$. Dessas aproximações, bem como das visualizações em
-\ref{fig:distr-compoisson}, \ref{fig:casos-particulares} e
-\ref{fig:mv-compoisson} deduz-se que o parâmetros $\nu$, ou
-$\frac{1}{\nu}$, controla a precisão da distribuição, sendo ela
-equidispersa quando $\nu = 1$, superdispersa quando $\nu < 1$ e
-subdispersa quando $\nu > 1$.
+$\frac{1}{\nu}E(Y)$. Dessas aproximações, bem como das visualizações na
+\autoref{fig:distr-compoisson}, \autoref{fig:casos-particulares} e
+\autoref{fig:mv-compoisson}, deduz-se que o parâmetro $\nu$, controla a
+precisão da distribuição, sendo ela equidispersa quando $\nu = 1$,
+superdispersa quando $\nu < 1$ e subdispersa quando $\nu > 1$.
 
 <<mv-compoisson, fig.height=4, fig.width=4, fig.cap="Relação Média e Variância na distribuição COM-Poisson.">>=
 
@@ -693,7 +670,7 @@ title(xlab = expression(E(X) == lambda^{1/nu} - frac(nu-1, 2*nu)),
       line = 4)
 grid()
 
-## Curvas da relação média e variância da Binomial Negativa
+## Curvas da relação média e variância da COM-Poisson
 for (a in seq_along(nu)) {
     curve((1/nu[a])*(mu + (nu[a] - 1)/(2*nu[a])),
           add = TRUE, xname = "mu", col = col[a], lwd = 2)
@@ -705,46 +682,44 @@ plotrix::color.legend(
     rect.col = col)
 mtext(text = expression(nu), side = 3, cex = 1.3,
       line = -3.5, at = 11.5)
+abline(0, 1)
 fonte("Fonte: Elaborado pelo autor.", cex = 0.95)
-
-wrapfigure()
 
 @
 
-Embora o modelo COM-Poisson não tenha expressão fechada para a média da
-distribuição pode-se utilizá-lo como modelo associado a distribuição
-condicional da variável resposta de contagem. Isso é feito incorporando
-um preditor linear em $\lambda$, que mesmo não representando a média,
+Embora a distribuição COM-Poisson não tenha expressão fechada para a
+média, pode-se utilizá-la como distribuição condicional da variável
+resposta de contagem em modelos de regressão. Isso é feito incorporando
+um preditor linear em $\lambda$ que, mesmo não representando a média,
 está associado com a locação da distribuição, ou seja, modela-se a média
 indiretamente nessa abordagem. O modelo de regressão é definido com as
 variáveis aleatórias condicionalmente independentes $Y_1, Y_2, \ldots,
-Y_n$, dado o vetor de covariáveis $X_i = (x_{i1}, x_{i2}, \ldots,
-x_{ip})$ seguindo um modelo COM-Poisson de parâmetros $\lambda_i =
-e^{X_i\beta}$, $i = 1, 2, \ldots, n$ e $\nu$ comum a todas as
-observações. Na expressão \ref{eqn:reg-poisson} o modelo é devidamente
-formulado, conforme a notação de MLG's
+Y_n$, dado o vetor de covariáveis $\underline{x}_i = (x_{i1}, x_{i2},
+\ldots, x_{ip})$ seguindo um modelo COM-Poisson de parâmetros $\lambda_i
+= e^{\underline{x}_i^t\beta}$, $i = 1, 2, \ldots, n$ e $\nu$ comum a
+todas as observações. Na \autoref{eqn:reg-compoisson} o modelo é
+devidamente formulado, conforme a notação de MLG's
 
 \begin{equation}
   \label{eqn:reg-compoisson}
   \begin{split}
-    Y_i \mid & X_i \sim \textrm{COM-Poisson}(\lambda_i, \nu) \\
-    &\eta(E(Y_i \mid X_i)) = \log(\lambda_i) = X_i\beta
+    Y_i \mid & \underline{x}_i \sim \textrm{COM-Poisson}(\lambda_i,
+    \nu) \\
+    &g(E(Y_i \mid \underline{x}_i)) =
+    \log(\lambda_i) = \underline{x}_i^t\beta
   \end{split}
 \end{equation}
 
 O algoritmo para estimação do conjunto de parâmetros $\Theta = (\nu,
-\beta)$ do modelo é baseado na maximização da log-verossimilhança, que
-decorrente da especificação em \ref{eqn:reg-compoisson} é
-
+\beta)$ do modelo é baseado na maximização da log-verossimilhança que,
+decorrente da especificação em \ref{eqn:reg-compoisson}, é dada por
 \begin{equation}
   \label{eqn:loglik-compoisson}
-  \ell(\nu, \beta \mid \underline{y}) = \sum_i^n y_i \log(\lambda_i) -
-  \nu \sum_i^n \log(y!) - \sum_i^n \log(Z(\lambda_i, \nu))
+  \ell(\nu, \beta \mid \underline{y}) = \sum_{i=1}^n y_i
+  \log(\lambda_i) - \nu \sum_{i=1}^n \log(y!) - \sum_{i=1}^n
+  \log(Z(\lambda_i, \nu))
 \end{equation}
-
-\noindent
 e então as estimativas de máxima verossimilhança são
-
 $$
 \hat{\Theta} = (\hat{\nu}, \hat{\beta}) =
 \underset{(\nu,\,\beta)}{\textrm{arg max }} \ell(\nu, \beta \mid
@@ -752,21 +727,6 @@ $$
 $$
 
 <<constante-z, fig.height=3, fig.width=6.7, fig.cap="Convergência da constante de normalização da COM-Poisson para diferentes conjuntos de parâmetros.">>=
-
-##-------------------------------------------
-## Calcula Z para um c(lambda, phi)
-funZ <- function(lambda, nu, maxit = 500, tol = 1e-5) {
-    z <- rep(NA, maxit)
-    j = 1
-    ##
-    z[j] <- exp(j * log(lambda) - nu * lfactorial(j))
-    ##
-    while (abs(z[j] - 0) > tol && j <= maxit) {
-        j = j + 1
-        z[j] <- exp(j * log(lambda) - nu * lfactorial(j))
-    }
-    return(cbind("j" = 0:j, "z" = c(1, z[!is.na(z)])))
-}
 
 ##-------------------------------------------
 ## Parametros da distribuição
@@ -801,22 +761,22 @@ xyplot(z ~ j | .id, data = da,
 
 @
 
-Para avaliação da log-verossimilhança em \ref{eqn:loglik-compoisson} a
-constante de normalização $Z(\lambda, \nu)$, conforme definida em
-\ref{eqn:constante-z} é calcula para cada observação o que
+Para avaliação da log-verossimilhança, \autoref{eqn:loglik-compoisson},
+a constante de normalização $Z(\lambda, \nu)$, conforme definida em
+\ref{eqn:constante-z}, é calculada para cada observação, o que
 potencialmente torna o processo de estimação lento. Uma ilustração do
 número de incrementos considerados para cálculo da constante $Z(\lambda,
-\nu)$ é apresentada na figura \ref{fig:constante-z}. Nesta ilustração
-foram utilizados os mesmos parâmetros definidos em
-\ref{fig:distr-compoisson} e o número de incrementos
-considerados para convergência \footnote{Adotou-se como critério de
-  convergência a iteração $j$ tal que $\lambda^j/(j!)^\nu <
-  0,00001$}. de $Z(\lambda, \nu)$ foram \Sexpr{c(table(da[, ".id"]))}
-nos primeiro, segundo e terceiro painéis respectivamente.
+\nu)$ é apresentada na \autoref{fig:constante-z}. Nesta ilustração
+foram utilizados os mesmos parâmetros das distribuições na
+\autoref{fig:distr-compoisson}. O número de incrementos necessários para
+convergência\footnote{Adotou-se como critério de convergência a
+  iteração $j$ tal que $\lambda^j/(j!)^\nu < 0,00001$} de $Z(\lambda,
+\nu)$ foram \Sexpr{c(table(da[, ".id"]))} nos primeiro, segundo e
+terceiro painéis respectivamente.
 
 Detalhes computacionais do algoritmo de maximização e manipulações
 algébricas para eficiência na avaliação da log-verossimilhança no modelo
-COM-Poisson são discutidos na seção \ref{cap03:metodos}.
+COM-Poisson são discutidos na \autoref{cap03:metodos}.
 
 \section{Modelos para excesso de zeros}
 \label{cap02:zeros}
@@ -824,31 +784,33 @@ COM-Poisson são discutidos na seção \ref{cap03:metodos}.
 Problemas com excesso de zeros são comuns em dados de
 contagem. Caracteriza-se como excesso de zeros casos em que a quantidade
 observada de contagens nulas supera substancialmente aquela esperada
-pelo modelo de contagem adotado. No caso do modelo Poisson a fração de
-zeros é $e^{-\lambda}$.
+pelo modelo de contagem adotado.
 
-As contagens nulas que geram o excesso de zeros podem ser explicadas de
+As contagens nulas em dados com excesso de zeros podem ser explicadas de
 duas formas distintas. A primeira denomina-se de zeros estruturais,
 quando a ocorrência de zero se dá pela ausência de determinada
-característica na população e a segunda, que zeros amostrais que
-ocorrem segundo um processo gerador de dados de contagem (e.g processo
+característica na população e a segunda de zeros amostrais, que ocorrem
+segundo um processo gerador de dados de contagem (e.g processo
 Poisson). Por exemplo, considerando o número de dias que uma família
 consome um determinado produto, tem-se aquelas famílias que não consomem
 o produto (zeros estruturais) e as demais famílias que consomem o
 produto, porém não o consumiram no intervalo de tempo considerado no
-estudo (zeros amostrais). Assim, de forma geral são dois processos
+estudo (zeros amostrais). Assim, de forma geral, são dois processos
 geradores de dados em uma variável aleatória de contagem com excessivos
 zeros.
 
-Em geral, quando dados de contagem apresentam excessos de valores zero
-também apresentarão superdispersão. Todavia, essa dispersão pode ser
-exclusivamente devido ao excesso de zeros e assim os modelos
-alternativos já apresentados não terão um bom desempenho. Uma ilustração
-deste fato é apresentada na figura \ref{fig:ilustra-zeros}, em que foram
-simulados dados com excesso de zeros e ajustado um modelo
-COM-Poisson. Em ambos os casos o modelo não se ajustou adequadamente,
-indicando que os excessos de zeros devem ser abordados de forma
-diferente.
+Em geral, quando dados de contagem apresentam excesso de zeros também
+apresentarão superdispersão. Todavia, essa dispersão pode ser
+exclusivamente devido ao excesso de zeros, e os modelos alternativos já
+apresentados não terão um bom desempenho. Uma ilustração desse fato é
+apresentada na \autoref{fig:ilustra-zeros}, em que foram simulados dados
+com excesso de zeros. A simulação foi realizada de forma hierárquica,
+simulando valores $y_z$ de uma variável aleatória Bernoulli de parâmetro
+$\pi$ e, para $y_z=0$ armazenou-se o zero e para $y_z=1$ simulou-se de
+uma distribuição Poisson de paramêtro $\lambda$. Ajustando um modelo
+COM-Poisson para as duas simulações com diferentes parâmetros $\pi$ e
+$\lambda$, observa-se que o modelo não se mostra adequado, indicando que
+os excessos de zeros devem ser abordados de forma diferente.
 
 <<ilustra-zeros, fig.cap="Ilustração de dados de contagem com excesso de zeros.", fig.height=3, fig.width=5>>=
 
@@ -857,14 +819,14 @@ diferente.
 set.seed(20124689)
 n <- 1000
 
-lambda <- 2; pi <- 0.9
-y1 <- sapply(rbinom(n, 1, pi), function(x) {
-    ifelse(x == 0, 0, rpois(1, lambda))
+lambda1 <- 2; pi1 <- 0.9
+y1 <- sapply(rbinom(n, 1, pi1), function(x) {
+    ifelse(x == 0, 0, rpois(1, lambda1))
 })
 
-lambda <- 5; pi <- 0.85
-y2 <- sapply(rbinom(n, 1, pi), function(x) {
-    ifelse(x == 0, 0, rpois(1, lambda))
+lambda2 <- 5; pi2 <- 0.85
+y2 <- sapply(rbinom(n, 1, pi2), function(x) {
+    ifelse(x == 0, 0, rpois(1, lambda2))
 })
 
 ##-------------------------------------------
@@ -896,6 +858,11 @@ key <- list(
     columns = 2,
     lines = list(lty = 1, col = cols),
     text = list(c("Observado", "COM-Poisson")))
+fl <- substitute(
+    expression(pi == p1~","~lambda == l1,
+               pi == p2~","~lambda == l2),
+    list(p1 = pi1, p2 = pi2, l1 = lambda1, l2 = lambda2)
+)
 
 ##-------------------------------------------
 ## Gráfico
@@ -905,7 +872,9 @@ xyplot(py_real ~ c(yu - 0.15) | caso, data = da,
        ylab = expression(Pr(Y==y)),
        ylim = ylim,
        key = key,
-       strip = strip.custom(factor.levels = paste("Simulação", 1:2)),
+       strip = strip.custom(
+           factor.levels = fl
+       ),
        sub = "Fonte: Elaborado pelo autor.") +
     as.layer(xyplot(
         py_dcmp ~ c(yu + 0.15) | caso, data = da,
@@ -923,57 +892,52 @@ as duas principais abordagens são i) os modelos de mistura
 \textit{Hurdle Models}. Neste trabalho somente a abordagem via modelos
 condicionais será considerada. A função massa de probabilidade do modelo
 Hurdle é
-
 \begin{equation}
   \label{eqn:pmf-hurdle}
   \Pr(Y = y \mid \pi, \Theta_c) =
     \begin{dcases*}
-      \pi & \text{se } y = 0,\\
+      \pi &, \text{se } y = 0\,;\\
       (1 - \pi) \frac{\Pr(Z = z \mid \Theta_c)}{1 - \Pr(Z = 0 \mid
-        \Theta_c)} & \text{se } y = 1, 2, \dots
+        \Theta_c)} &, \text{se } y = 1, 2, \dots
     \end{dcases*}
 \end{equation}
-
-\noindent
 em que $0<\pi<1$, representa a probabilidade de ocorrência de zeros e
 $\Pr(Z = z \mid \Theta_c)$ a função massa de probabilidade de uma
 variável aleatória de contagem $Z$, como a Poisson ou a Binomial
 Negativa.
 
-Da especificação em \ref{eqn:pmf-hurdle}, os momentos média e variância
-são obtidos usando as definições $E(Y) = \sum_{y=1}^\infty y \cdot
-\Pr(Y=y)$ e $V(Y) = \sum_{y=1}^\infty y^2 \cdot \Pr(Y=y) - E^2(Y)$
+Da especificação em \ref{eqn:pmf-hurdle}, a média e a variância
+são obtidas usando as definições $E(Y) = \sum_{y=1}^\infty y \cdot
+\Pr(Y=y)$ e $V(Y) = \sum_{y=1}^\infty y^2 \cdot \Pr(Y=y) - E^2(Y)$.
 
 $$
 E(Y) = \frac{E(Z)(1-\pi)}{1-\Pr(Z = 0)} \quad \textrm{e} \quad
-V(Y) = \frac{1-\pi}{1-Pr(Z = 0)} \left [ E(Z) \frac{(1-\pi)}{1-\Pr(Z =
+V(Y) = \frac{1-\pi}{1-\Pr(Z = 0)} \left [ E(Z) \frac{(1-\pi)}{1-\Pr(Z =
     0)} \right ]
 $$
 
 Para a inclusão de covariáveis, caracterizando um problema de regressão,
 dado que o modelo tem dois processos modela-se ambos como se segue
-
 \begin{equation}
   \label{eqn:reg-hurdle}
-  \log \left (\frac{\pi_i}{1-\pi_i} \right ) = G_i\gamma \qquad e \qquad
+  \log \left (\frac{\pi_i}{1-\pi_i} \right ) =
+  \underline{\textsf{z}}_i^t\gamma \qquad \textrm{e} \qquad
   \begin{matrix}
     Z_i \sim D(\mu_i, \phi) \\
-    g(\mu_i) = X_i\beta
+    g(\mu_i) = \underline{x}_i^t\beta
   \end{matrix}
 \end{equation}
-
-\noindent
-com $i = 1, 2, \ldots, n$, $G_i$ e $X_i$ as covariáveis da i-ésima
-observação consideradas para explicação da contagens nulas e não nulas
-respectivamente, $D(\mu_i, \phi)$ uma distribuição de probabilidades
-considerada para as contagens não nulas que pode conter ou não um
-parâmetro $\phi$ adicional, se Poisson, $D(\mu_i, \phi)$ se resume a
-$\textrm{Poisson}(\mu_i)$ e $g(\mu_i)$ uma função de ligação, nos casos
-Poisson e Binomial Negativa considera-se $\log(\mu_i)$. O que está
-implícito na formulação \ref{eqn:reg-hurdle} é que para a componente que
-explica a geração de zeros está sendo considerada a distribuição
-Bernoulli de parâmetro $\pi_i$, contudo pode-se utilizar distribuições
-censuradas a direita no ponto $y=1$ para estimação desta probabilidade,
+com $i = 1, 2, \ldots, n$, $\underline{\textsf{z}}_i$ e
+$\underline{x}_i$ as covariáveis da i-ésima observação consideradas para
+explicação da contagens nulas e não nulas respectivamente, $D(\mu_i,
+\phi)$ uma distribuição de probabilidades considerada para as contagens
+não nulas que pode conter ou não um parâmetro $\phi$ adicional e
+$g(\mu_i)$ uma função de ligação.  Nos casos Poisson e Binomial
+Negativa, em geral, considera-se $g(\mu_i) = \log(\mu_i)$. O que está
+implícito na formulação em \ref{eqn:reg-hurdle} é que para a componente
+que explica a geração de zeros está sendo considerada a distribuição
+Bernoulli de parâmetro $\pi_i$. Contudo pode-se utilizar distribuições
+censuradas à direita no ponto $y=1$ para estimação dessa probabilidade,
 como explicam \citeonline{Zeileis2007}.
 
 \section{Modelos de efeitos aleatórios}
@@ -981,7 +945,7 @@ como explicam \citeonline{Zeileis2007}.
 
 Nas seções anteriores os modelos que flexibilizam algumas suposições do
 modelo Poisson, basicamente permitindo casos não equidispersos e
-modelando conjuntamente um processo gerador de zeros extra foram
+modelando conjuntamente um processo gerador de zeros extra, foram
 explorados. Contudo, uma suposição dos modelos de regressão para dados
 de contagem vistos até aqui é que as variáveis aleatórias $Y_1, Y_2,
 \ldots, Y_n$ são condicionalmente independentes, dado o vetor de
@@ -989,50 +953,49 @@ covariáveis. Porém não são raras as situações em que essa suposição não
 se mostra adequada. \citeonline{Ribeiro2012} cita alguns exemplos:
 
 \begin{itemize}
-  \item as observações podem ser correlacionadas no espaço,
-  \item as observações podem ser correlacionadas no tempo,
+  \item as observações podem ser correlacionadas no espaço;
+  \item as observações podem ser correlacionadas no tempo;
   \item interações complexas podem ser necessárias para modelar o efeito
-    conjunto de algumas covariáveis,
+    conjunto de algumas covariáveis;
   \item heterogeneidade entre indivíduos ou unidades podem não ser
     suficientemente descrita por covariáveis.
 \end{itemize}
 
 Nessas situações pode-se estender a classe de modelos de regressão com a
 adição de efeitos aleatórios que incorporam termos baseados em variáveis
-não observáveis (latentes) ao modelo, permitindo assim acomodar uma
+não observáveis (latentes) ao modelo, permitindo acomodar uma fonte de
 variabilidade, que pode ser ou não estruturada, não prescrita pelo
-modelo. De forma geral a especificação dos modelos de efeitos aleatórios
-segue uma especificação hierárquica
-
+modelo. De forma geral os modelos de efeitos aleatórios seguem uma
+especificação hierárquica
 \begin{equation}
   \label{eqn:reg-misto}
   \begin{split}
-    Y_{ij} \mid b_{i},& X_{ij} \sim \textrm{D}(\mu_{ij}, \phi) \\
-    g(&\mu_{ij}) =  X_{ij}\beta + Z_ib_i \\
-    & b \sim \textrm{K}(\Theta_b)
+    Y_{ij} \mid b_{i},\,& \underline{x}_{ij} \sim
+    \textrm{D}(\mu_{ij}, \phi) \\
+    g(&\mu_{ij}) =  \underline{x}_{ij}^t\beta + \underline{z}_i^tb_i \\
+    & b_i \sim \textrm{K}(\Theta_b)
   \end{split}
 \end{equation}
-
-\noindent
 para $i = 1, 2, \ldots, m$ (grupos com efeitos aleatórios comuns) e $j =
 1, 2, \ldots, n$ (observações) com D$(\mu_{ij}, \phi)$, uma distribuição
 considerada para as variáveis resposta condicionalmente independentes,
 $g(\mu_{ij})$ uma função de ligação conforme definida na teoria dos
-MLG's, $X_{ij}$ e $Z_{i}$ os vetores conhecidos que representam os
-efeitos das covariáveis de interesse e os termos que definem os grupos
-considerados como aleatórios, $b_i$ uma quantidade aleatória provida de
-uma distribuição K$(\Theta_b)$. Nesses modelos uma quantidade aleatória
-é somada ao preditor linear, diferentemente dos modelos de efeitos fixos
-e a partir desta quantidade é possível induzir uma estrutura de
-dependência entre as observações.
+MLG's, $\underline{x}_{ij}$ e $\underline{z}_{i}$ os vetores conhecidos
+que representam os efeitos das covariáveis de interesse e os termos que
+definem os grupos considerados como aleatórios, $b_i$ uma quantidade
+aleatória provida de uma distribuição K$(\Theta_b)$. Nesses modelos um
+termo aleatório é somado ao preditor linear, diferentemente dos
+modelos de efeitos fixos, e a partir deste termo é possível induzir
+uma estrutura de dependência entre as observações.
 
-Como são duas quantidades aleatórias no modelo, $Y \mid X$ e $b$, a
-verossimilhança para um modelo de efeito aleatório é dada integrando-se
-os efeitos aleatórios
+Como são dois termos aleatórios no modelo, $Y_{ij}$ condicional ao vetor
+de covariáveis e $b_i$, a verossimilhança para um modelo de efeito
+aleatório é dada integrando-se os efeitos aleatórios
 
 \begin{equation}
   \label{eqn:loglik-misto}
-  \Ell(\beta, \phi, \Theta_b \mid \underline{y}) = \prod_{i=1}^m \int_{\R^q}
+  \Ell(\beta, \phi, \Theta_b \mid \underline{y}, \underline{b}) =
+  \prod_{i=1}^m \int_{\R^q}
   \left ( \prod_{j=1}^{n_i} f_D(y_{ij}, \mu, b_i)\right ) \cdot f_K(b
   \mid \Theta_b) db_i
 \end{equation}
@@ -1040,30 +1003,26 @@ os efeitos aleatórios
 Na avaliação da verossimilhança é necessário o cálculo de $m$ integrais
 de dimensão $q$. Para muitos casos essa integral não tem forma analítica
 sendo necessários métodos numéricos de intergração, que são discutidos
-na seção \ref{cap03:metodos}. As estimativas de máxima verossimilhança
+na \autoref{cap03:metodos}. As estimativas de máxima verossimilhança
 são
-
 $$
 \hat{\Theta} = (\hat{\beta}, \hat{\Theta_b}) =
 \underset{(\beta,\,\Theta_b)}{\textrm{arg max }} \log(\Ell(\beta, \phi,
-\Theta_b \mid \underline{y}))
+\Theta_b \mid \underline{y}, \underline{b}))
 $$
 
-\noindent
 Em modelos de efeitos mistos é comum adotar como distribuição para os
 efeitos aleatórios uma Normal $q$-variada com média 0 e matriz de
-variância e covariâncias $\Sigma$, ou seja, na especificação
-\ref{eqn:reg-misto} K$(\Theta_b) = NMV_q(0, \Sigma)$. Para estes casos
-os principais métodos de aproximação da integral tem desempenhos
-melhores \cite{Bates2015}.
+variâncias e covariâncias $\Sigma$, ou seja, na especificação
+\ref{eqn:reg-misto} K$(\Theta_b) = NMV_q(0, \Sigma)$.
 
 Como mencionado anteriormente modelos de efeitos aleatórios são
-candidatos a modelagem de dados superdispersos. Quando não há uma
+candidatos à modelagem de dados superdispersos. Quando não há uma
 estrutura de delineamento experimental ou observacional pode-se incluir
 efeitos aleatórios ao nível de observação (e então $m=n$, ou seja, os
-vetores $Y$ e $b$ tem mesma dimensão). Casos particulares de modelos de
-efeitos aleatórios, onde o efeito aleatório é adicionado ao nível de
-observação são o modelo Binomial Negativo e o \textit{Inverse Gaussian
-  Model}, em ambos os casos a integral, definida em
-\ref{eqn:loglik-misto} tem solução analítica e consequentemente a
-marginal em $Y$ forma fechada.
+vetores $Y$ e $\underline{b}$ tem mesma dimensão). Casos particulares de
+modelos de efeitos aleatórios, onde o efeito aleatório é adicionado ao
+nível de observação são o modelo Binomial Negativo e o \textit{Inverse
+  Gaussian Model}. Em ambos os casos a integral, definida a
+\autoref{eqn:loglik-misto}, tem solução analítica e, consequentemente, a
+marginal em $Y$, forma fechada.

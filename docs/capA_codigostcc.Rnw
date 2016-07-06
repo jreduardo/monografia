@@ -5,7 +5,7 @@
 Todos os resultados apresentados são realizados com o \textit{software}
 R, cujo códigos para ajuste dos modelos COM-Poisson de efeito fixo,
 aleatório e com componente de barreira foram disponibilizados em formato
-de pacote no endereço \url{github.com/jreduardo/tccPackage}. Nesse
+de pacote no endereço \url{github.com/jreduardo/cmpreg}. Nesse
 apêndice são apresentados os códigos, que utilizam as funções do pacote,
 para produzir os resultados da seção \ref{sec:analise-cottonBolls2}
 (modelos de regressão de efeitos fixos). Todavia, os códigos que
@@ -15,15 +15,15 @@ visualizados no complemento online
 <<code-cottonBolls2, echo=TRUE, eval=FALSE>>=
 
 ##----------------------------------------------------------------------
-## Instalando o pacote tccPackage, elaborado no trabalho
+## Instalando o pacote cmpreg, elaborado no trabalho
 library(devtools)
-install_git("git@github.com:JrEduardo/tccPackage.git")
+install_git("git@github.com:JrEduardo/cmpreg.git")
 
 ##----------------------------------------------------------------------
 ## Análise de dados apresentados na seção ... (v.a. número de nós)
 
 ## Carrega o pacote no workspace
-library(tccPackage)
+library(cmpreg)
 
 ## Dados
 data(cottonBolls2)
