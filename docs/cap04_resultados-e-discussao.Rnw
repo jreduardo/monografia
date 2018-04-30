@@ -5,11 +5,10 @@
 Neste capítulo são apresentados os resultados e discussões da aplicação
 dos modelos de regressão COM-Poisson ajustados aos dados apresentados na
 \autoref{cap03:materiais-dados}. Os resultados são comparados com
-abordagens já utilizadas na Estatística aplicada. As primeiras seis
-seções são destinadas à apresentação das análises estatísticas de cada
-conjunto de dados citado. Na \autoref{cap04:discussao} discussões
-gerais sobre os resultados dos modelos COM-Poisson empregados nas
-análises são realizadas.
+abordagens comuns na estatística aplicada. As primeiras seis seções são
+destinadas à apresentação das análises estatísticas de cada conjunto de
+dados citado. Na \autoref{cap04:discussao}, faz-se uma discussão geral
+sobre os resultados dos modelos COM-Poisson empregados nas análises.
 
 \section{Análise de dados de capulhos de algodão sob efeito de desfolha}
 \label{sec:analise-cottonBolls}
@@ -57,21 +56,22 @@ prof.cottonBolls <- profile(m5C, which = "phi")
 Diante da estrutura do experimento apresentada na
 \autoref{sec:cottonBolls} foram propostos, por \citeonline{Zeviani2014},
 cinco preditores crescentes em complexidade que testam aspectos
-interesses sobre os fatores experimentais. Abaixo os cinco preditores
-considerados são descritos, sendo \texttt{def} a covariável que
-representa o nível de desfolha artificial (0, 25, 50, 75 e 100\%).
-
-\noindent
-Preditor 1: $g(\mu) = \beta_0$ \\
-Preditor 2: $g(\mu) = \beta_0 + \beta_1 \textrm{def}$ \\
-Preditor 3: $g(\mu) = \beta_0 + \beta_{1} \textrm{def} + \beta_2
-\textrm{def}^2$ \\
-Preditor 4: $g(\mu) = \beta_0 + \beta_{1j} \textrm{def} + \beta_2
-\textrm{def}^2$ \\
-Preditor 5: $g(\mu) = \beta_0 + \beta_{1j} \textrm{def} + \beta_{2j}
-\textrm{def}^2$
-
-\noindent
+interesses sobre os fatores experimentais. Sendo \texttt{def} a
+covariável que representa o nível de desfolha artificial (0, 25, 50, 75
+e 100\%), os preditores considerados são,
+\begin{itemize}
+  \setlength\itemsep{-0.6cm}
+\item[] Preditor 1: $g(\mu) = \beta_0$ \\
+\item[] Preditor 2: $g(\mu) = \beta_0 + \beta_1 \textrm{def}$ \\
+\item[] Preditor 3: $g(\mu) = \beta_0 + \beta_{1} \textrm{def} + \beta_2
+  \textrm{def}^2$ \\
+\item[] Preditor 4:
+  $g(\mu) = \beta_0 + \beta_{1j} \textrm{def} + \beta_2
+  \textrm{def}^2$ \\
+\item[] Preditor 5:
+  $g(\mu) = \beta_0 + \beta_{1j} \textrm{def} + \beta_{2j}
+  \textrm{def}^2$,
+\end{itemize}
 onde $j$ varia nos níveis de estágio fenológico da planta (1:
 vegetativo, 2: botão floral, 3: florescimento, 4: maça, 5: capulho) e
 $g(\mu)$ a função de ligação considerada no modelo. A proposta desses
@@ -88,9 +88,9 @@ de segunda ordem (interação entre o efeito de primeira e segunda ordem
 de desfolha e estágio).
 
 Na sequência da análise, foram ajustados os modelos Poisson e
-COM-Poisson como alternativas paramétricas à análise de dados e, como
-alternativa semi-paramétrica, a estimação via quasi-verossimilhança
-Poisson. Na \autoref{tab:ajuste-cottonBolls} os resultados dos três
+COM-Poisson como alternativas paramétricas à análise de dados e, o
+modelo quase-Poisson, como alternativa especificada apenas pela média e
+variância. Na \autoref{tab:ajuste-cottonBolls}, os resultados dos três
 modelos ajustados aos cinco preditores são apresentados. O modelo
 COM-Poisson apresentou melhor ajuste dentre todos os preditores
 considerados quando comparado ao Poisson, indicado pelas maiores
@@ -172,23 +172,23 @@ print(xtable(tab.ajuste[11:15, ], digits = digits),
 \begin{tablenotes}
   \footnotesize
 \item np, número de parâmetros; diff $\ell$, diferença entre
-  log-verossimilhanças; F, estatística F baseada nas quasi-deviances;
+  log-verossimilhanças; F, estatística F baseada nas quase-deviances;
   diff np, diferença entre o np. \\[0.1cm]
 \item Fonte: Elaborado pelo autor.
 \end{tablenotes}
 \end{table}
 
 As estimativas dos parâmetros extras $\phi$ e $\sigma^2$ dos modelos
-COM-Poisson e Quasi-Poisson respectivamente, também são apresentadas na
+COM-Poisson e quase-Poisson, respectivamente, também são apresentadas na
 \autoref{tab:ajuste-cottonBolls} e indicam subdispersão ($\phi>0$ e
 $\sigma^2<1$). Note que, mesmo não considerando covariáveis (preditor 1)
 a hipótese de equidispersão foi rejeitada pelos modelos COM-Poisson e
-Quasi-Poisson. Isso se reflete nos níveis descritivos dos testes de
+quase-Poisson. Isso se reflete nos níveis descritivos dos testes de
 razão de verossimilhanças realizados, em que o modelo Poisson, em
 discordância com os demais, não indicou significância do efeito
 quadrático do nível de desfolha por estágio fenológico (preditor 5),
 pois superestima a variabilidade do processo. Esses resultados estão de
-acordos com os apresentados por \citeonline{Zeviani2014}, onde um modelo
+acordos com os apresentados por \citeonline{Zeviani2014}, onde o modelo
 \textit{Gamma-Count} foi ajustado. Destaca-se a similaridade entre as
 medidas de ajuste dos modelos COM-Poisson e \textit{Gamma-Count}. Os
 valores das log-verossimilhanças maximizadas nos dois modelos difere
@@ -201,7 +201,7 @@ somente nas casas decimais, para todos os preditores.
 \label{tab:coef-cottonBolls}
 \begin{tabular}{lcccccc}
   \toprule
-  & \multicolumn{2}{c}{Poisson} & \multicolumn{2}{c}{Quasi-Poisson} &  \multicolumn{2}{c}{COM-Poisson} \\
+  & \multicolumn{2}{c}{Poisson} & \multicolumn{2}{c}{Quase-Poisson} &  \multicolumn{2}{c}{COM-Poisson} \\
   \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}
   Parâmetro  & Estimativa & Est/EP & Estimativa & Est/EP & Estimativa & Est/EP \\
   \midrule
@@ -239,7 +239,7 @@ fonte.xy("Fonte: Elaborado pelo autor.")
 
 @
 
-Na \autoref{fig:prof-cottonBolls} a avaliação do parâmetro $\phi$ do
+Na \autoref{fig:prof-cottonBolls}, a avaliação do parâmetro $\phi$ do
 modelo COM-Poisson com efeito de desfolha artificial de primeira e
 segunda ordem para cada estágio fenológico, via verossimilhança
 perfilhada, é apresentada. O valor zero, que representa a não
@@ -258,7 +258,10 @@ a hipótese nula com um nível de significância muito próximo a zero.
 Vcov <- vcov(m5C)
 Corr <- cov2cor(Vcov)
 
-## Usando expression não funciona! Estudar a função posteriormente
+# Usando expression não funciona! Estudar a função posteriormente
+pnames <- c(":hat(phi)", ":hat(beta)[0]",
+            paste0(":hat(beta)[1", 1:5, "]"),
+            paste0(":hat(beta)[2", 1:5, "]"))
 dimnames(Corr) <- list(pnames, pnames)
 
 mycorrplot(Corr)
@@ -268,31 +271,32 @@ fonte("Fonte: Elaborado pelo autor.")
 
 As estimativas dos efeitos lineares e quadráticos de desfolha
 artificial, conforme notação do preditor 5, são apresentadas na
-\autoref{tab:coef-cottonBolls} para os modelos Poisson, Quasi-Poisson e
-COM-Poisson. Para os modelos Poisson e Quasi-Poisson as estimativas são
+\autoref{tab:coef-cottonBolls} para os modelos Poisson, quase-Poisson e
+COM-Poisson. Para os modelos Poisson e quase-Poisson as estimativas são
 idênticas, por construção (veja \autoref{cap02:poisson}), o que difere
 são as magnitudes dessas estimativas em comparação com seu erro padrão,
-que no caso Quasi-Poisson é corrigido pelo parâmetro
-$\sigma^2$. Considerando o modelo COM-Poisson as estimativas são
+que no caso quase-Poisson é corrigido pelo parâmetro
+$\sigma^2$. Considerando o modelo COM-Poisson, as estimativas são
 notavelmente diferentes, pois o preditor linear é construído em
 $\lambda$, da \autoref{eqn:pmf-compoisson}, e esse parâmetro não
-descreve, diretamente, a média da distribuição. Sendo assim as
+descreve, diretamente, a média da distribuição. Sendo assim, as
 estimativas do COM-Poisson não podem ser comparadas com as demais
-estimativas. Contudo a magnitude desses efeitos, com relação ao seu erro
-padrão, sim. E nesse caso, os modelos Quasi-Poisson e COM-Poisson levam
+estimativas. Contudo, a magnitude desses efeitos, com relação ao seu erro
+padrão, sim. E nesse caso, os modelos quase-Poisson e COM-Poisson levam
 as mesmas conclusões.
 
 Devido ao modelo COM-Poisson não ser construído diretamente para a
 média, as estimativas dos parâmetros não refletem efeitos
-multiplicativos, como ocorre nos casos Poisson e Quasi-Poisson. Com
-isso, a interpretação dos efeitos nesse modelo é somente com relação ao
-sinal da estimativa, quando positivo indica um aumento na média da
-variável de interesse, e quando negativo uma diminuição.
+multiplicativos na média, como ocorre nos casos Poisson e
+quase-Poisson. Com isso, a interpretação dos efeitos nesse modelo é
+somente com relação ao sinal da estimativa, quando positivo indica um
+aumento na média da variável de interesse, e quando negativo uma
+diminuição.
 
-As covariâncias entre as estimativas dos parâmetros do modelo
-COM-Poisson são apresentadas, na escala da correlação, na
-\autoref{fig:corr-cottonBolls}. Destaca-se nessa figura a forte
-correlação do parâmetro de precisão $\phi$ com os $\beta$'s da
+As covariâncias entre as estimadores do modelo COM-Poisson, obtidas a
+partir da matriz de informação de Fisher, são apresentadas, na escala da
+correlação, na \autoref{fig:corr-cottonBolls}. Destaca-se nessa figura a
+forte correlação do parâmetro de precisão $\phi$ com os $\beta$'s da
 regressão. Embora seja uma representação empírica, observada a esse
 particular conjunto de dados, nota-se a não ortogonalidade na matriz de
 informação observada, o que implica que inferências sobre os $\beta$'s
@@ -324,10 +328,10 @@ aux <- data.frame(modelo = "COM-Poisson", aux)
 predC <- cbind(pred, aux)
 
 ##-------------------------------------------
-## Considerando a Quasi-Poisson
+## Considerando a Quase-Poisson
 aux <- predict(m5Q, newdata = pred, se.fit = TRUE)
 aux <- with(aux, exp(fit + outer(se.fit, qn, FUN = "*")))
-aux <- data.frame(modelo = "Quasi-Poisson", aux)
+aux <- data.frame(modelo = "Quase-Poisson", aux)
 predQ <- cbind(pred, aux)
 
 da <- rbind(predP, predC, predQ)
@@ -339,7 +343,7 @@ cols <- trellis.par.get("superpose.line")$col[1:3]
 key <- list(
     column = 3,
     lines = list(lty = c(3, 1, 2), lwd = 1, col = cols),
-    text = list(c("Poisson", "COM-Poisson", "Quasi-Poisson")))
+    text = list(c("Poisson", "COM-Poisson", "Quase-Poisson")))
 
 xyplot(ncap ~ des | est,
        data = cottonBolls,
@@ -386,17 +390,17 @@ computação dos valores preditos, são práticas tomadas também na análise
 dos demais conjuntos de dados.
 
 As médias com intervalos de confiança calculadas com os modelos
-COM-Poisson e Quasi-Poisson são idênticas, conforme pode ser visto na
-\autoref{fig:pred-cottonBolls}. Isso se deve ao fato da relação média e
-variância ser aproximada de forma satisfatória por $\frac{1}{\nu}E(Y)$
-nos casos de subdispersão, no modelo COM-Poisson (vide
+COM-Poisson e quase-Poisson são idênticas, conforme pode ser visto na
+\autoref{fig:pred-cottonBolls}. Isso se deve ao fato da relação
+média--variância ser aproximadamente linear no modelo COM-Poisson (vide
 \autoref{fig:mv-compoisson}). Contudo, destaca-se que o modelo
 COM-Poisson é totalmente paramétrico permitindo representar uma
 distribuição, calculando probabilidades, o que não é possível com a
-formulação Quasi-Poisson. Como visto o modelo Poisson é inadequado a
-esse conjunto de dados e inferências a partir deste são incorretas.
+formulação por quase-verossimilhança. Como visto o modelo Poisson é
+inadequado a esse conjunto de dados e inferências a partir deste são
+incorretas.
 
-\section{Análise de dados de capulhos de algodão sob efeito de Mosca-Branca}
+\section{Análise de dados de capulhos de algodão sob efeito de mosca-branca}
 \label{sec:analise-cottonBolls2}
 
 <<ajuste-cottonBolls2, include=FALSE, cache=TRUE>>=
@@ -468,14 +472,18 @@ prof.nnos <- profile(m3C.nnos, which = "phi")
 Nesse conjunto de dados também há indícios de subdispersão para as
 três variáveis de interesse mensuradas no estudo, conforme apresentado
 na \autoref{sec:cottonBolls2}. Para cada contagem procedeu-se com o
-ajuste dos modelos Poisson, Quasi-Poisson e COM-Poisson com os
+ajuste dos modelos Poisson, quase-Poisson e COM-Poisson com os
 preditores:
-
-\noindent
-Preditor 1: $g(\mu) = \beta_0$ \\
-Preditor 2: $g(\mu) = \beta_0 + \beta_1 \textrm{dexp}$ \\
-Preditor 3: $g(\mu) = \beta_0 + \beta_1 \textrm{dexp} + \beta_2
-\textrm{dexp}^2$
+\begin{itemize}
+  \setlength\itemsep{-0.6cm}
+\item[] Preditor 1: $g(\mu) = \beta_0$ \\
+\item[] Preditor 2: $g(\mu) = \beta_0 + \beta_1 \textrm{dexp}$ \\
+\item[] Preditor 3:
+  $g(\mu) = \beta_0 + \beta_1 \textrm{dexp} + \beta_2 \textrm{dexp}^2$;
+\end{itemize}
+sendo \texttt{dexp} a variável dias de exposição à alta infestação de
+mosca-branca. Assim, os preditores 1, 2, 3 representam efeito nulo,
+linear e quadrático dos dias de exposição, respectivamente.
 
 <<loglik-cottonBolls2, include=FALSE>>=
 
@@ -524,11 +532,6 @@ digits <- c(1, 1, 0, 2, 2, 4, 2, 2, 4, 2, 4)
 
 @
 
-\noindent
-sendo \texttt{dexp} a variável dias de exposição à alta infestação de
-mosca-branca. Assim os preditores 1, 2, 3 representam efeito nulo,
-linear e quadrático dos dias de exposição, respectivamente.
-
 \begin{table}[ht]
 \centering
 \small
@@ -537,12 +540,12 @@ linear e quadrático dos dias de exposição, respectivamente.
 \label{tab:ajuste-cottonBolls2}
 \begin{tabular}{lccccccccc}
   \toprule
-  & & \multicolumn{3}{c}{Poisson} & \multicolumn{3}{c}{COM-Poisson} & \multicolumn{2}{c}{Quasi-Poisson} \\
+  & & \multicolumn{3}{c}{Poisson} & \multicolumn{3}{c}{COM-Poisson} & \multicolumn{2}{c}{Quase-Poisson} \\
   \cmidrule{3-5} \cmidrule{6-8} \cmidrule{9-10}
   & np & $\ell$ & AIC & P($>\rchi^2$) & $\ell$ & AIC & P($>\rchi^2$) & deviance & P($>F$) \\
   \midrule
   \multicolumn{10}{l}{{\bfseries \footnotesize Número de capulhos produzidos}} \\[0.0cm]
-  \cline{1-5} \\[-0.2cm]
+  \cline{1-4} \\[-0.2cm]
 <<tab-conttonBolls21, results="asis">>=
 
 print(xtable(tab.ajuste[1:3, ], digits = digits),
@@ -553,7 +556,7 @@ print(xtable(tab.ajuste[1:3, ], digits = digits),
 @
   \specialrule{0em}{0.5em}{0em} %% Apenas para espaçamento
   \multicolumn{10}{l}{{\bfseries \footnotesize Número de estruturas reprodutivas}} \\[0.0cm]
-  \cline{1-5} \\[-0.2cm]
+  \cline{1-4} \\[-0.2cm]
 <<tab-conttonBolls22, results="asis">>=
 
 print(xtable(tab.ajuste[4:6, ], digits = digits),
@@ -564,7 +567,7 @@ print(xtable(tab.ajuste[4:6, ], digits = digits),
 @
   \specialrule{0em}{0.5em}{0em} %% Apenas para espaçamento
   \multicolumn{10}{l}{{\bfseries \footnotesize Número de nós da planta}} \\[0.0cm]
-  \cline{1-5} \\[-0.2cm]
+  \cline{1-4} \\[-0.2cm]
 <<tab-conttonBolls23, results="asis">>=
 
 print(xtable(tab.ajuste[7:9, ], digits = digits),
@@ -582,16 +585,16 @@ print(xtable(tab.ajuste[7:9, ], digits = digits),
 \end{tablenotes}
 \end{table}
 
-Na \autoref{tab:ajuste-cottonBolls2} são exibidas as medidas de ajuste
-dos modelos para as três variáveis resposta. Em todos os casos o modelo
+Na \autoref{tab:ajuste-cottonBolls2}, são exibidas as medidas de ajuste
+dos modelos para as três variáveis resposta. Em todos os casos, o modelo
 COM-Poisson apresentou maiores log-verossimilhanças indicando um melhor
 ajuste, quando comparado ao Poisson, também indicado pelos valores de
 AIC que ponderam a log-verossimilhança pelo número de parâmetros
 considerados no modelo. Para questões inferenciais, novamente, há um
 desacordo entre os modelos paramétricos. Pelo modelo Poisson não há
 evidências para manutenção de nenhum efeito da variável número de dias
-sob infestação, em todos os casos, ao passo que no modelo COM-Poisson
-tem-se evidências do efeito quadrático quando considerado o modelo para
+sob infestação, em todos os casos, ao passo que, no modelo COM-Poisson
+têm-se evidências do efeito quadrático quando considerado o modelo para
 o número de nós da planta (nível descritivo de \Sexpr{anC.nnos[3,6]}) e
 o número de capulhos produzidos (nível descritivo de
 \Sexpr{anC.ncapu[3,6]}, na borda da região de significância, mas com uma
@@ -604,7 +607,7 @@ ao modelo nulo. Considera-se nas demais inferências os preditores com
 efeito linear, para o número de estruturas reprodutivas e quadrático,
 para o número de capulhos produzidos e número de nós da planta.
 
-Na estimação dos parâmetros via quasi-Verossimilhança Poisson obteve-se
+Na estimação dos parâmetros via quase-verossimilhança Poisson, obteve-se
 níveis descritivos mais conservadores para a rejeição da hipótese nula
 que no modelo COM-Poisson. Contudo, para escolha de preditores os
 resultados se mostram equivalentes.
@@ -676,16 +679,18 @@ de capulhos, número de estruturas reprodutivas e número de nós da planta
 foram de \Sexpr{phis[, 1]} respectivamente, indicando subdispersão em
 todos os casos.
 
-Na \autoref{fig:corr-cottonBolls2} são representadas as matrizes de
-covariâncias (via correlações) entre as estimativas dos modelos para
-número de capulhos (à esquerda), número de estruturas reprodutivas (ao
-centro) e número de nós da plantas (à direita). A forte correlação entre
-o parâmetro de precisão $\phi$ e $\beta_0$ (principalmente) também foi
-observada no ajuste do modelo para esses conjuntos de dados.
+Na \autoref{fig:corr-cottonBolls2}, são representadas as matrizes de
+covariâncias (via correlações) entre os estimadores dos parâmetros
+considerados nos modelos para número de capulhos (à esquerda), número de
+estruturas reprodutivas (ao centro) e número de nós da plantas (à
+direita). A forte correlação entre o estimadores $\hat{\phi}$ e
+$\hat{\beta}_0$ (principalmente) também foi observada no ajuste do
+modelo para esses conjuntos de dados.
 
 <<corr-cottonBolls2, fig.height=1.7, fig.width=5, out.width="1\\linewidth", fig.cap="Imagem da matriz de correlação entre os parâmetros do modelo COM-Poisson. (esquerda) Modelo para o número de capulhos por parcela, (centro) para o número de estruturas reprodutivas e (direita) para o número de nós por parcela.">>=
 
-pnames <- c("phi", "beta0", "beta1", "beta2")
+pnames <- sprintf(":hat(%s)[%s]", c("phi", rep("beta", 3)),
+                  c("", 0:2))
 
 Vcov <- vcov(m3C.ncapu)
 Corr.ncapu <- cov2cor(Vcov)
@@ -695,18 +700,23 @@ Vcov <- vcov(m3C.nnos)
 Corr.nnos <- cov2cor(Vcov)
 dimnames(Corr.nnos) <- list(pnames, pnames)
 
-pnames <- c("phi", "beta0", "beta1")
+pnames <- sprintf(":hat(%s)[%s]", c("phi", "beta", "beta"),
+                  c("", 0:1))
 Vcov <- vcov(m2C.nerep)
 Corr.nerep <- cov2cor(Vcov)
 dimnames(Corr.nerep) <- list(pnames, pnames)
 
 par(mfrow = c(1, 3))
-mycorrplot(Corr.ncapu, mar = c(2.5, 0, 0, 0))
-mtext(text = "Capulhos produzidos", side = 1, cex = 0.7, adj = 0.65)
-mycorrplot(Corr.nerep, mar = c(2.5, 0, 0, 0))
-mtext(text = "Estruturas reprodutivas", side = 1, cex = 0.7, adj = 0.75)
-mycorrplot(Corr.nnos, mar = c(2.5, 0, 0, 0))
-mtext(text = "Número de nós", side = 1, cex = 0.7, adj = 0.6)
+
+mycorrplot(Corr.ncapu, mar = c(0.2, 1, -0.5, -0.5) + .5, cl.pos = "n")
+mtext(text = "Capulhos produzidos",
+      side = 1, line = 2.5, cex = 0.7, adj = 0.6, outer = FALSE)
+mycorrplot(Corr.nerep, mar = c(-0.5, 1, -0.5, -0.4) + .5, cl.pos = "n")
+mtext(text = "Estruturas reprodutivas",
+      side = 1, line = 2.5, cex = 0.7, adj = 0.7, outer = FALSE)
+mycorrplot(Corr.nnos, mar = c(0.2, 1, -0.5, -0.5) + .5, cl.pos = "n")
+mtext(text = "Número de nós",
+      side = 1, line = 2.5, cex = 0.7, adj = 0.6, outer = FALSE)
 
 fonte("Fonte: Elaborado pelo autor.", cex = 0.7)
 
@@ -767,24 +777,24 @@ predC.nnos <- cbind(var = "nnos", pred, aux)
 predC <- rbind(predC.ncapu, predC.nerep, predC.nnos)
 
 ##======================================================================
-## Considerando a Quasi-Poisson
+## Considerando a Quase-Poisson
 ##-------------------------------------------
 ## Para ncapu
 aux <- predict(m3Q.ncapu, newdata = pred, se.fit = TRUE)
 aux <- with(aux, exp(fit + outer(se.fit, qn, FUN = "*")))
-aux <- data.frame(modelo = "Quasi-Poisson", aux)
+aux <- data.frame(modelo = "Quase-Poisson", aux)
 predQ.ncapu <- cbind(var = "ncapu", pred, aux)
 ##-------------------------------------------
 ## Para nerep
 aux <- predict(m2Q.nerep, newdata = pred, se.fit = TRUE)
 aux <- with(aux, exp(fit + outer(se.fit, qn, FUN = "*")))
-aux <- data.frame(modelo = "Quasi-Poisson", aux)
+aux <- data.frame(modelo = "Quase-Poisson", aux)
 predQ.nerep <- cbind(var = "nerep", pred, aux)
 ##-------------------------------------------
 ## Para nnos
 aux <- predict(m3Q.nnos, newdata = pred, se.fit = TRUE)
 aux <- with(aux, exp(fit + outer(se.fit, qn, FUN = "*")))
-aux <- data.frame(modelo = "Quasi-Poisson", aux)
+aux <- data.frame(modelo = "Quase-Poisson", aux)
 predQ.nnos <- cbind(var = "nnos", pred, aux)
 ##
 predQ <- rbind(predQ.ncapu, predQ.nerep, predQ.nnos)
@@ -802,7 +812,7 @@ cols <- trellis.par.get("superpose.line")$col[1:3]
 key <- list(
     column = 3,
     lines = list(lty = c(3, 1, 2), lwd = 1, col = cols),
-    text = list(c("Poisson", "COM-Poisson", "Quasi-Poisson")))
+    text = list(c("Poisson", "COM-Poisson", "Quase-Poisson")))
 
 da$va <- relevel(da$va, "ncapu")
 xyplot(count ~ dexp | va, data = da,
@@ -848,19 +858,19 @@ fonte.xy("Fonte: Elaborado pelo autor.")
 
 @
 
-Finalmente a representação gráfica na \autoref{fig:pred-cottonBolls2}
-mostra os valores preditos pelos modelos Poisson, COM-Poisson e
-Quasi-Poisson com intervalos de confiança de 95\% para média. Assim como
+Finalmente, a representação gráfica na \autoref{fig:pred-cottonBolls2},
+apresenta os valores preditos pelos modelos Poisson, COM-Poisson e
+quase-Poisson com intervalos de confiança de 95\% para média. Assim como
 na análise realizada na \autoref{sec:analise-cottonBolls}, os valores
 preditos com bandas de confiança obtidos dos modelos COM-Poisson e
-Quasi-Poisson, são idênticos, levando às mesmas interpretações.
+quase-Poisson, são idênticos, levando às mesmas interpretações.
 
 Com esse segundo exemplo de subdispersão, em que três contagens foram
 realizados em um único experimento. A flexibilidade do modelo
-COM-Poisson no que tange à característica de subdispersão ganha
-destaque, uma vez que seus resultados (predições pontuais e intervalares
+COM-Poisson, no que tange à característica de subdispersão, ganha
+destaque uma vez que seus resultados (predições pontuais e intervalares
 e testes de hipóteses para comparação de modelos) se equivalem a uma
-abordagem semi-paramétrica.
+abordagem bastante flexível baseado na especificação de momentos.
 
 \section{Análise de produção de soja sob efeito de umidade e adubação
   potássica}
@@ -907,7 +917,7 @@ m2B.nv <- glm.nb(f2.nv, data = soyaBeans)
 m1B.ng <- glm.nb(f1.ng, data = soyaBeans)
 m2B.ng <- glm.nb(f2.ng, data = soyaBeans)
 
-## Ajustando os modelos Quasi-Poisson
+## Ajustando os modelos Quase-Poisson
 m1Q.nv <- glm(f1.nv, data = soyaBeans, family = quasipoisson)
 m2Q.nv <- glm(f2.nv, data = soyaBeans, family = quasipoisson)
 
@@ -922,29 +932,29 @@ prof.ng <- profile(m2C.ng, which = "phi")
 @
 
 Nesse experimento, mais de uma variável de interesse em forma de
-contagem é mensurada. Pela descrição dos dados, realizada na
+contagens é mensurada. Pela descrição dos dados, realizada na
 \autoref{sec:soyaBeans}, características relacionadas a dispersão da
 contagem são distintas em ambas as variáveis (equidispersão e
 superdispersão). Dos modelos apresentados no
 \autoref{cap:modelos-para-dados-de-contagem}, o Poisson, COM-Poisson,
-Binomial-Negativo são as alternativas paramétricas a serem consideradas
-e o Quasi-Poisson é tomado como a alternativa semi-paramétrica. As
+binomial-negativo são as distribuições a serem consideradas. As
 variáveis de interesse, números de grãos de soja e de vagens viáveis,
 foram contabilizados por unidade experimental (vaso com duas plantas) e
 estão sob o efeito, controlado dos níveis de adubação potássica (0, 30,
 60, 120 e 180 mg dm$^{-3}$) e dos níveis de umidade do solo
 (37.5, 50 e 62.5\%), que foram considerados na análise como fatores
-com 5 e 3 níveis respectivamente. Ainda têm-se, pela condução do
+com 5 e 3 níveis respectivamente. Ainda tem-se, pela condução do
 experimento, o efeito relacionado a blocagem realizada, foram cinco
 blocos utilizados para controle de variação local. Os preditores
 considerados são
-
-\noindent
-Preditor 1: $\eta_1 = g(\mu_{ijk}) = \beta_0 + \tau_i + \gamma_j + \delta_k $ \\
-Preditor 2: $\eta_2 = g(\mu_{ijk}) = \beta_0 + \tau_i + \gamma_j + \delta_k +
-\alpha_{jk}$
-
-\noindent
+\begin{itemize}
+  \setlength\itemsep{-0.6cm}
+\item[] Preditor 1:
+  $\eta_1 = g(\mu_{ijk}) = \beta_0 + \tau_i + \gamma_j + \delta_k $ \\
+\item[] Preditor 2:
+  $\eta_2 = g(\mu_{ijk}) = \beta_0 + \tau_i + \gamma_j + \delta_k +
+  \alpha_{jk}$
+\end{itemize}
 em que $\tau_i$ é o efeito do i-ésimo bloco ($i=$1: bloco II, 2: bloco
 III, 3: bloco IV e 4: V), $\gamma_j$ o efeito do j-ésimo nível de
 umidade aplicado ($j=$1: 50\% e 2: 62,5\%), $\delta_k$ o efeito do
@@ -954,12 +964,12 @@ nível de umidade do solo e o k-ésimo nível de adubação potássica. No
 modelo mais completo, com interação, são 19 parâmetros de locação a
 serem estimados.
 
-Na abordagem via modelos COM-Poisson nesse exemplo, o tempo para ajuste
+Para ajuste dos modelos COM-Poisson nesse exemplo, o tempo computacional
 foi ligeiramente maior com relação aos exemplos anteriores. Isso se deve
 ao fato das contagens serem elevadas (variando entre
 \Sexpr{paste(range(soyaBeans[ , "ngra"]), collapse=" e ")} para o número
 de grãos e \Sexpr{paste(range(soyaBeans[ , "nvag"]), collapse=" e ")}
-para o número de vagens) e superdispersas ($\phi<0$). Nesse cenário os
+para o número de vagens) e superdispersas ($\phi<0$). Nesse cenário, os
 incrementos da constante normalizadora $Z(\lambda_i, \nu = \exp(\phi))$,
 \autoref{eqn:constante-z}, convergem para 0 mais lentamente.
 
@@ -1015,20 +1025,20 @@ lambda.ng <- lam.ng[as.numeric(obs.ng)]
 
 @
 
-Na \autoref{fig:convergez-soyaBeans} são exibidos os termos dessa
+Na \autoref{fig:convergez-soyaBeans}, são exibidos os termos dessa
 constante para cada observação nos modelos mais complexos (com
 interação), para o número de vagens e para o número de grãos. O critério
 de convergência adotado foi $\lambda^j/(j!)^\nu < 1 \times 10^{-3}$. No
 modelo para número de vagens o maior valor para a constante foi de
 \Sexpr{soma.nv}, soma de \Sexpr{nterm.nv} termos, calculados para a
 observação \Sexpr{obs.nv}, cujo valor estimado de $\lambda$,
-$\hat{\lambda} = $\Sexpr{lambda.nv}, foi o maior. Nesse o modelo o
+$\hat{\lambda} = \Sexpr{lambda.nv}$, foi o maior. Nesse o modelo o
 parâmetro $\phi$ foi estimado em \Sexpr{m2C.nv@coef[1]}. Já no modelo
-para o número de grãos foram necessários \Sexpr{nterm.ng} termos que,
+para o número de grãos, foram necessários \Sexpr{nterm.ng} termos que,
 somados, resultaram em \Sexpr{soma.ng}, maior constante calculada. Isso
 também se deu para observação \Sexpr{obs.ng}, que, para este modelo com
-$\hat{\phi} = $\Sexpr{m2C.ng@coef[1]}, estimou-se o parâmetro $\lambda$
-estimado em \Sexpr{lambda.ng}.
+$\hat{\phi} = \Sexpr{m2C.ng@coef[1]}$, estimou-se o parâmetro $\lambda$
+em \Sexpr{lambda.ng}.
 
 <<loglik-soyaBeans, include=FALSE>>=
 
@@ -1082,22 +1092,21 @@ pvals <- paste(round(cmptest(m1C.nv, m2C.nv)[, 2], 3), collapse = "e")
 @
 
 Medidas de qualidade de ajuste calculadas sob os modelos Poisson,
-COM-Poisson, Binomial Negativo e Quasi-Poisson são apresentadas na
+COM-Poisson, binomial negativo e quase-Poisson são apresentadas na
 \autoref{tab:ajuste-soyaBeans}. Considerando a variável resposta número
 de vagens viáveis, não há indícios de afastamento da equidispersão
 indicados i) pelos parâmetros extras dos modelos alternativos ao
 Poisson, em que as estimativas $\hat{\phi}$ e $\hat{\sigma^2}$ estão
 próximas dos valores 0 e 1, que compreendem o caso particular Poisson
-nos modelos COM-Poisson e Quasi-Poisson respectivamente e $\hat{\theta}$
-é um valor bastante elevado (lembre-se que a Binomial Negativa se reduz
+nos modelos COM-Poisson e quase-Poisson respectivamente e $\hat{\theta}$
+é um valor bastante elevado (lembre-se que a binomial negativa se reduz
 à Poisson quando $\theta \to \infty$); e ii) pelas log-verossimilhanças
 dos modelos paramétricos que resultaram em valores muito próximos; iii)
 pelos valores de AIC que foram menores nos modelos Poisson, mostrando
-que não há ganho expressivo quando estimados os parâmetros de
-dispersão/precisão nos modelos alternativos. Os \textit{p-valores}
-associados ao TRV entre os modelos COM-Poisson e Poisson com preditores
-1 e 2 foram \Sexpr{pvals}, evidenciando a não fuga de equidispersão dos
-dados.
+que não há ganho expressivo quando estimados os parâmetros de dispersão
+nos modelos alternativos. Os valores de $p$ associados ao TRV entre os
+modelos COM-Poisson e Poisson com preditores 1 e 2 foram \Sexpr{pvals},
+evidenciando que são contagens equidispersas.
 
 <<prof-soyaBeans, fig.height=2.7, fig.width=5.5, out.width="0.8\\linewidth", fig.cap="Perfis de log-verossimilhança para o parâmetro de precisão da COM-Poisson nos modelos para número de vagens viáveis por parcela (esquerda) e número grãos de soja por parcela (direira).">>=
 
@@ -1154,7 +1163,7 @@ xyplot(abs(z) ~ focal | param, data = da.soya,
 @
 
 
-Na figura \autoref{fig:prof-soyaBeans} (à esquerda) são
+Na figura \autoref{fig:prof-soyaBeans} (à esquerda), são
 apresentados os intervalos de confiança baseados no perfil de
 verossimilhança para $\phi$, no modelo COM-Poisson com efeito de
 interação. Como esses intervalos contém o valor 0, da hipótese nula, o
@@ -1229,14 +1238,14 @@ print.xtable(xtable(tab.ajuste[7:8, ], digits = digits),
 \begin{tablenotes}
   \footnotesize
 \item np, número de parâmetros; PO, Poisson; CP, COM-Poisson; BN,
-  Binomial Negativo; e QP, Quasi-Poisson.
+  binomial negativo; e QP, quase-Poisson.
 \item Fonte: Elaborado pelo autor.
 \end{tablenotes}
 \end{table}
 
-Na tabela \autoref{tab:ajuste-soyaBeans} (resultados à direita) são
+Na tabela \autoref{tab:ajuste-soyaBeans} (resultados à direita), são
 apresentados as medidas de ajuste para os modelos considerados para o
-número de grãos por parcela. Neste caso há evidências de superdispersão,
+número de grãos por parcela. Neste caso, há evidências de superdispersão,
 pois as estimativas dos parâmetros $\phi$ e $\sigma^2$ foram menor que
 zero e maior que 1, respectivamente. Os valores de AIC foram menores e
 as avaliações da log-verossimilhança maiores, nos modelos paramétricos
@@ -1246,24 +1255,26 @@ $\phi$ é apresentada com indicação dos intervalos de confiança e estes
 não contém o valor zero.
 
 A visualização das covariâncias entre as estimativas dos parâmetros no
-modelo COM-Poisson para o número de vagens por parcela é feita na
+modelo COM-Poisson para o número de vagens por parcela é apresentada na
 \autoref{fig:corr-soyaBeansa} e, para o número de grãos por parcela na
-\autoref{fig:corr-soyaBeansb}. Em ambos os casos a correlação entre os
-parâmetros de locação ($\beta$'s) e dispersão ($\phi$) ganha destaque,
-pois há uma forte correlação, principalmente entre $\phi$ e $\beta_0$.
+\autoref{fig:corr-soyaBeansb}. Em ambos os casos, a correlação entre os
+estimadores para os parâmetros de regressão ($\beta$'s) e dispersão
+($\phi$) ganha destaque, pois há uma forte correlação, principalmente
+entre $\hat{\phi}$ e $\hat{\beta}_0$.
 
 <<corr-soyaBeansa, fig.height=7, fig.width=7, fig.cap="Imagem da matriz de correlação entre os parâmetros do modelo COM-Poisson ajustados ao número de vagens por parcela.">>=
 
-pnames <- c("phi", "beta0",
-            paste0("tau", 1:4),
-            paste0("gama", 1:2),
-            paste0("delta", 1:4),
-            paste0("alpha", 1:8))
+pnames <- sprintf(":hat(%s",
+                  c("phi)", "beta[0])",
+                    paste0("tau[", 1:4, "])"),
+                    paste0("gamma[", 1:2, "])"),
+                    paste0("delta[", 1:4, "])"),
+                    paste0("alpha[", 1:8, "])")))
 
 Vcov <- vcov(m2C.nv)
 Corr.nv <- cov2cor(Vcov)
 dimnames(Corr.nv) <- list(pnames, pnames)
-mycorrplot(Corr.nv)
+mycorrplot(Corr.nv, number.cex = 0.8)
 
 fonte("Fonte: Elaborado pelo autor.")
 
@@ -1271,24 +1282,25 @@ fonte("Fonte: Elaborado pelo autor.")
 
 <<corr-soyaBeansb, fig.height=7, fig.width=7, fig.cap="Imagem da matriz de correlação entre os parâmetros do modelo COM-Poisson ajustados ao número de grãos por parcela.">>=
 
-pnames <- c("phi", "beta0",
-            paste0("tau", 1:4),
-            paste0("gama", 1:2),
-            paste0("delta", 1:4),
-            paste0("alpha", 1:8))
+pnames <- sprintf(":hat(%s",
+                  c("phi)", "beta[0])",
+                    paste0("tau)[", 1:4, "]"),
+                    paste0("gamma)[", 1:2, "]"),
+                    paste0("delta)[", 1:4, "]"),
+                    paste0("alpha)[", 1:8, "]")))
 
 Vcov <- vcov(m2C.ng)
 Corr.ng <- cov2cor(Vcov)
 dimnames(Corr.ng) <- list(pnames, pnames)
-mycorrplot(Corr.ng)
+mycorrplot(Corr.ng, number.cex = 0.8)
 
 fonte("Fonte: Elaborado pelo autor.")
 
 @
 
-Na \autoref{fig:pred-soyaBeans} são apresentadas as médias calculadas
+Na \autoref{fig:pred-soyaBeans}, são apresentadas as médias calculadas
 com intervalos de confiança 95\% sob os modelos Poisson, COM-Poisson,
-Binomial-Negativo e Quasi-Poisson, considerando efeito de interação
+binomial-negativo e quase-Poisson, considerando efeito de interação
 entre os níveis de umidade do solo e adubação potássica. Tomou-se o
 efeito médio de bloco, uma vez que esse efeito aditivo não é de
 interesse prático.
@@ -1370,20 +1382,20 @@ predB.ng <- cbind(var = "ngra", pred, aux)
 predB <- rbind(predB.nv, predB.ng)
 
 ##======================================================================
-## Considerando a Quasi-Poisson
+## Considerando a Quase-Poisson
 ##-------------------------------------------
 ## Para nv
 aux <- exp(confint(glht(m2Q.nv, linfct = X),
                    calpha = univariate_calpha())$confint)
 colnames(aux) <- c("fit", "lwr", "upr")
-aux <- data.frame(modelo = "Quasi-Poisson", aux)
+aux <- data.frame(modelo = "Quase-Poisson", aux)
 predQ.nv <- cbind(var = "nvag", pred, aux)
 ##-------------------------------------------
 ## Para ng
 aux <- exp(confint(glht(m2Q.ng, linfct = X),
                    calpha = univariate_calpha())$confint)
 colnames(aux) <- c("fit", "lwr", "upr")
-aux <- data.frame(modelo = "Quasi-Poisson", aux)
+aux <- data.frame(modelo = "Quase-Poisson", aux)
 predQ.ng <- cbind(var = "ngra", pred, aux)
 ##
 predQ <- rbind(predQ.nv, predQ.ng)
@@ -1408,7 +1420,7 @@ key <- list(type = "o", divide = 1,
             lines = list(pch = 1:nlevels(pred.all$model) + 4,
                          cex = 0.8),
             text = list(c("Poisson", "COM-Poisson",
-                          "Binomial Negativa", "Quasi-Poisson"))
+                          "Binomial Negativa", "Quase-Poisson"))
             )
 
 useOuterStrips(
@@ -1446,19 +1458,18 @@ fonte.xy("Fonte: Elaborado pelo autor.")
 
 Para a contagem do número de vagens, observa-se intervalos com
 comprimento muito parecidos, ligeiramente menores para o caso
-COM-Poisson e Binomial Negativo. Para a contagem do número de grãos por
+COM-Poisson e binomial negativo. Para a contagem do número de grãos por
 parcela, um caso superdisperso, percebe-se que o modelo Poisson nos leva
 a uma falsa precisão, uma vez que os intervalos são menores não pelo
 modelo se ajustar melhor aos dados, mas sim por subestimar a
-variabilidade do processo. Para as formulações alternativas, obteve-se
-intervalos de confiança menores nos modelos paramétricos quando
-comparados com os intervalos obtidos da abordagem semi-paramétrico
-Quasi-Poisson. Isso é razoável, pois nos modelos Quasi-Poisson somente a
-especificação de dois momentos é feita, enquanto que nos paramétricos
-especifica-se a distribuição completa, ganhando informação (ver
-\autoref{eqn:quasi-informacao}). De forma geral os intervalos sob os
-modelos COM-Poisson e Binomial Negativa são fiéis a variabilidade
-inerente ao processo.
+variabilidade. Para as formulações alternativas, obteve-se intervalos de
+confiança menores nos modelos paramétricos quando comparados com os
+intervalos obtidos da abordagem quase-Poisson. Isso é razoável, pois nos
+modelos quase-Poisson somente a especificação de dois momentos é feita,
+enquanto que nos paramétricos especifica-se a distribuição completa,
+ganhando informação (ver \autoref{eqn:quasi-informacao}). De forma
+geral, os intervalos sob os modelos COM-Poisson e binomial negativo são
+fiéis a variabilidade inerente ao processo.
 
 \section{Análise de ninfas de mosca-branca em lavoura de soja}
 \label{sec:analise-whiteFly}
@@ -1486,7 +1497,7 @@ library(MASS)
 m1B.ntot <- glm.nb(f1, data = whiteFly)
 m2B.ntot <- glm.nb(f2, data = whiteFly)
 
-## Ajustando os modelos Quasi-Poisson
+## Ajustando os modelos Quase-Poisson
 m1Q.ntot <- glm(f1, data = whiteFly, family = quasipoisson)
 m2Q.ntot <- glm(f2, data = whiteFly, family = quasipoisson)
 
@@ -1498,8 +1509,8 @@ prof.ntot <- profile(m1C.ntot, which = "phi")
 
 Nesse experimento também há fortes indícios de superdispersão, conforme
 visto na \autoref{sec:whiteFly}. Assim os modelos Poisson,
-COM-Poisson, Binomial Negativo e Quasi-Poisson foram aplicados. A
-variável em estudo é a contagem da quantidade de ninfas de Mosca-branca
+COM-Poisson, binomial negativo e quase-Poisson foram aplicados. A
+variável em estudo é a contagem da quantidade de ninfas de mosca-branca
 nos folíolos de plantas de soja ao longo dos dias em diferentes
 cultivares. Como o experimento foi conduzido sob delineamento de blocos
 casualizados, os efeitos de bloco são considerados no modelo. As
@@ -1507,13 +1518,14 @@ covariáveis foram tratadas como fator, assim como na aplicação anterior,
 com seis níveis para o número de dias decorridos a partir da primeira
 avaliação e quatro níveis para o fator cultivar de soja. Os preditores
 em comparação são:
-
-\noindent
-Preditor 1: $\eta_1 = g(\mu_{ijk}) = \beta_0 + \tau_i + \gamma_j + \delta_k $ \\
-Preditor 2: $\eta_2 = g(\mu_{ijk}) = \beta_0 + \tau_i + \gamma_j + \delta_k +
-\alpha_{jk}$
-
-\noindent
+\begin{itemize}
+  \setlength\itemsep{-0.6cm}
+\item[] Preditor 1:
+  $\eta_1 = g(\mu_{ijk}) = \beta_0 + \tau_i + \gamma_j + \delta_k $ \\
+\item[] Preditor 2:
+  $\eta_2 = g(\mu_{ijk}) = \beta_0 + \tau_i + \gamma_j + \delta_k +
+  \alpha_{jk}$
+\end{itemize}
 em que $\tau_i$ é o efeito do i-ésimo bloco ($i=$1: bloco II, 2: bloco
 III, 3: bloco IV e 4: V), $\gamma_j$ o efeito da j-ésima cultivar
 ($j=$1: BRS 243 RR, 2: BRS 245 RR e 3: BRS 246 RR), $\delta_k$ o efeito
@@ -1583,7 +1595,7 @@ esquerda da \autoref{fig:convergez-prof-whiteFly}. Para a observação
 foram necessários, conforme exibido no eixo $x$ do gráfico.
 
 Em problemas com contagens altas e comportamento muito superdisperso a
-obtenção da constante Z pode se tornar proibitiva computacionalmente,
+obtenção da constante $Z$ pode se tornar proibitiva computacionalmente,
 devido ao problema de \textit{overflow} (valores que ultrapassam o
 limite de capacidade de cálculo da máquina) e, consequentemente, o
 modelo COM-Poisson não se ajusta.
@@ -1618,16 +1630,15 @@ tab.ajuste <- data.frame(
 @
 
 Nesse exemplo, os modelos COM-Poisson convergiram e seus resultados são
-exibidos na \autoref{tab:ajuste-whiteFly} em conjunto com os
-resultados do ajuste dos modelos Poisson, Binomial Negativo e
-Quasi-Poisson. Todas as estimativas dos parâmetros extras nos modelos
-concorrentes ao Poisson $\hat{\phi}$, $\hat{\theta}$ e $\hat{\sigma^2}$
-indicam expressivamente superdispersão. Em benefício dos
-modelos alternativos ao Poisson tem-se todas as medidas apresentadas
-indicando uma substancial melhora de ajuste quando flexibilizado o
-modelo. Destaque para a magnitude dessas evidências, em que, por
-exemplo, o AIC obtido dos modelos alternativos é em torno de 0,47
-vezes o AIC obtido do Poisson.
+exibidos na \autoref{tab:ajuste-whiteFly} em conjunto com os resultados
+do ajuste dos modelos Poisson, binomial negativo e quase-Poisson. Todas
+as estimativas dos parâmetros extras nos modelos alternativos ao Poisson
+$\hat{\phi}$, $\hat{\theta}$ e $\hat{\sigma^2}$ indicam expressivamente
+superdispersão. Em benefício dos modelos alternativos, tem-se todas as
+medidas apresentadas indicando uma substancial melhora de
+ajuste. Destaque para a magnitude dessas evidências, em que, por
+exemplo, o AIC obtido dos modelos alternativos é em torno de 0,47 vezes
+o AIC obtido do Poisson.
 
 \begin{table}[ht]
 \centering
@@ -1661,7 +1672,7 @@ print.xtable(xtable(tab.ajuste[3:4, ], digits = digits),
 
 @
 \specialrule{0em}{0.5em}{0em} %% Apenas para espaçamento
- Binomial Neg. & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) & $\hat{\theta}$ \\
+ Binomial neg. & np & $\ell$ & AIC & 2(diff $\ell$) & diff np & P($>\rchi^2$) & $\hat{\theta}$ \\
   \midrule
 <<tab-whiteFly3, results="asis">>=
 
@@ -1689,18 +1700,18 @@ print.xtable(xtable(tab.ajuste[7:8, ], digits = digits),
 \begin{tablenotes}
   \footnotesize
 \item np, número de parâmetros; diff $\ell$, diferença entre
-  log-verossimilhanças; F, estatística F baseada nas quasi-deviances;
+  log-verossimilhanças; F, estatística F baseada nas quase-deviances;
   diff np, diferença entre o np.
 \item Fonte: Elaborado pelo autor.
 \end{tablenotes}
 \end{table}
 
-Para tomada de decisão quanto a significância dos efeitos, observa-se
-que o modelo Poisson é claramente inadequado. Para avaliação dos
-preditores, na \autoref{tab:ajuste-whiteFly}, o modelo Poisson indica
-(com uma significância inferior a $1 \times 10^{-10}$) que há efeito de
-interação entre os dias decorridos da primeira avaliação e as cultivares
-ao passo que, nos modelos alternativos, esse efeito é marcadamente não
+Para tomada de decisão e significância dos efeitos, observa-se que o
+modelo Poisson é claramente inadequado. Para avaliação dos preditores,
+na \autoref{tab:ajuste-whiteFly}, o modelo Poisson indica (com uma
+significância inferior a $1 \times 10^{-10}$) que há efeito de interação
+entre os dias decorridos da primeira avaliação e as cultivares ao passo
+que, nos modelos alternativos, esse efeito é marcadamente não
 significativo. Essa discordância se deve, conforme já discutido, ao fato
 de o modelo Poisson subestimar a variabilidade por sua restrição de
 equidispersão. Assim, com variâncias menores, qualquer efeito acrescido
@@ -1718,10 +1729,11 @@ aproximação quadrática da verossimilhança.
 
 <<corr-whiteFly, fig.width=7, fig.height=7, fig.cap="Imagem da matriz de correlação entre os parâmetros do modelo COM-Poisson.">>=
 
-pnames <- c("phi", "beta0",
-            paste0("tau", 1:3),
-            paste0("gama", 1:3),
-            paste0("delta", 1:5))
+pnames <- sprintf(":hat(%s",
+                  c("phi)", "beta)[0]",
+                    paste0("tau)[", 1:3, "]"),
+                    paste0("gamma)[", 1:3, "]"),
+                    paste0("delta)[", 1:5, "]")))
 
 Vcov <- vcov(m1C.ntot)
 Corr <- cov2cor(Vcov)
@@ -1732,11 +1744,11 @@ fonte("Fonte: Elaborado pelo autor.")
 
 @
 
-As covariâncias entre os efeitos estimados pelo modelo COM-Poisson
-também são apresentadas, conforme descrição do preditor 1, na
-\autoref{fig:corr-whiteFly}, sob a escala de correlação. Similarmente as
-análises anteriores observa-se a alta correlação entre $\hat{\phi}$ e os
-demais parâmetros de regressão. A soma dos valores absolutos das
+As covariâncias entre os estimadores dos parâmetros no modelo
+COM-Poisson também são apresentadas, conforme descrição do preditor 1,
+na \autoref{fig:corr-whiteFly}, sob a escala de correlação. Similarmente
+as análises anteriores, observa-se a alta correlação entre $\hat{\phi}$
+e os demais parâmetros de regressão. A soma dos valores absolutos das
 correlações observadas entre $\hat{\phi}$ e as demais estimativas é de
 \Sexpr{sum(abs(Corr[1, ]))} e a média \Sexpr{mean(abs(Corr[1, ]))}.
 
@@ -1784,11 +1796,11 @@ aux <- data.frame(modelo = "Binomial Negativa", aux)
 predB <- cbind(pred, aux)
 
 ##-------------------------------------------
-## Considerando a Quasi-Poisson
+## Considerando a Quase-Poisson
 aux <- exp(confint(glht(m1Q.ntot, linfct = X),
                    calpha = univariate_calpha())$confint)
 colnames(aux) <- c("fit", "lwr", "upr")
-aux <- data.frame(modelo = "Quasi-Poisson", aux)
+aux <- data.frame(modelo = "Quase-Poisson", aux)
 predQ <- cbind(pred, aux)
 
 ##-------------------------------------------
@@ -1803,7 +1815,7 @@ key <- list(type = "o", divide = 1,
             lines = list(pch = 1:nlevels(pred.all$model) + 4,
                          cex = 0.8),
             text = list(c("Poisson", "COM-Poisson",
-                          "Binomial Negativa", "Quasi-Poisson"))
+                          "Binomial Negativa", "Quase-Poisson"))
             )
 
 ## ## A escala do gráfico fica prejudicada, pois os limites do eixo y são
@@ -1838,20 +1850,21 @@ fonte.xy("Fonte: Elaborado pelo autor.")
 
 As médias, com intervalos de confiança, calculadas para cada combinação
 dos níveis de dias após a primeira avaliação e cultivar de soja,
-considerando os modelos Poisson, COM-Poisson, Binomial-Negativo e
-Quasi-Poisson, são apresentadas na \autoref{fig:pred-whiteFly}. Para o
+considerando os modelos Poisson, COM-Poisson, binomial-negativo e
+quase-Poisson, são apresentadas na \autoref{fig:pred-whiteFly}. Para o
 efeito de bloco foi considerado o efeito médio, para uma correta
 comparação. Pode-se observar que o intervalo de confiança descrito pelo
 modelo Poisson é quase imperceptível quando comparados aos demais,
 mostrando novamente que seu uso é inadequado a esses dados. Já para as
 outras alternativas não tivemos um comportamento razoavelmente similar
-em todas as cultivares. Os intervalos pelos modelos Quasi-Poisson e
+em todas as cultivares. Os intervalos pelos modelos quase-Poisson e
 COM-Poisson foram muito similares em todos os casos e os intervalos pelo
-modelo Binomial Negativo mais amplos. Um fato interessante é que não
+modelo binomial negativo mais amplos, decorrente do comportamento da
+relação média--variância desses modelos. Um fato interessante é que não
 necessariamente as estimativas pontuais da média desses modelos
 alternativos serão iguais. Isso ocorre, por construção, somente para nos
-modelos Poisson e Quasi-Poisson. Esse exemplo ilustra na prática a
-constatação desse fato. Para o modelo Binomial Negativo tivemos médias
+modelos Poisson e quase-Poisson. Esse exemplo ilustra na prática a
+constatação desse fato. Para o modelo binomial negativo tivemos médias
 visivelmente superiores que os demais para a cultivar BRS 239. Para o
 modelo COM-Poisson as estimativas pontuais são aproximadamente iguais as
 do modelo Poisson.
@@ -1885,7 +1898,7 @@ m2HC <- hurdlecmp(f2, data = fish)
 
 @
 
-Nesse exemplo ilustra-se a análise de um estudo observacional em que
+Nesse exemplo, ilustra-se a análise de um estudo observacional em que
 aparentemente há uma quantidade excessiva de contagens nulas (veja a
 \autoref{sec:fish}). O estudo tem por objetivo a modelagem do número de
 peixes capturados por grupos de visitantes em um Parque Estadual. As
@@ -1896,44 +1909,41 @@ um campista no grupo (\texttt{ca}, 0: se não presente e 1: se presente).
 Como já antecipado pela visualização e apresentação dos dados, modelos
 estruturados de forma convencional, que pressupõem apenas um processo
 estocástico na geração de dados, não se ajustaram adequadamente. A
-seguir a alternativa de inclusão de um efeito de barreira para acomodar
+seguir, a alternativa de inclusão de um efeito de barreira para acomodar
 a quantidade excessiva de valores zero é apresentada. Os modelos Poisson,
-Binomial Negativo e COM-Poisson sob esta estruturação são ajustados e
+binomial negativo e COM-Poisson, sob esta estruturação, são ajustados e
 comparados.
 
 O número de peixes capturados é modelado em duas partes, as contagens
 nulas e as não nulas, conforme descrito na seção
-\autoref{cap02:zeros}. Abaixo define-se os preditores considerados para
+\autoref{cap02:zeros}. Abaixo, define-se os preditores considerados para
 as duas partes
-
-\noindent
-Preditor 1: \quad $
-\begin{aligned}
-  g(\mu)     &= \beta_0 + \beta_1 \textrm{ca} +
-  \beta_2 \textrm{np} \\
-  \textrm{logit}(\pi) &= \gamma_0 + \gamma_1 \textrm{ca} +
-  \gamma_2 \textrm{np} + \gamma_3 \textrm{nc}
-\end{aligned}$ \\
-
-\noindent
-Preditor 2: \quad $
-\begin{aligned}
-  g(\mu)     &= \beta_0 + \beta_1 \textrm{ca} +
-  \beta_2 \textrm{np} + \beta_3 \textrm{nc} +
-  \beta_4 (\textrm{np} \cdot \textrm{nc}) \\
-  \textrm{logit}(\pi) &= \gamma_0 + \gamma_1 \textrm{ca} +
-  \gamma_2 \textrm{np} + \gamma_3 \textrm{nc} +
-  \gamma_4 (\textrm{np} \cdot \textrm{nc})
-\end{aligned}$ \\
-
-\noindent
+\begin{itemize}
+  \setlength\itemsep{-0.6cm}
+\item[] Preditor 1: \quad $
+  \begin{aligned}
+    g(\mu)     &= \beta_0 + \beta_1 \textrm{ca} +
+    \beta_2 \textrm{np} \\
+    \textrm{logit}(\pi) &= \gamma_0 + \gamma_1 \textrm{ca} +
+    \gamma_2 \textrm{np} + \gamma_3 \textrm{nc};
+  \end{aligned}$ \\
+\item[] Preditor 2: \quad $
+  \begin{aligned}
+    g(\mu)     &= \beta_0 + \beta_1 \textrm{ca} +
+    \beta_2 \textrm{np} + \beta_3 \textrm{nc} +
+    \beta_4 (\textrm{np} \cdot \textrm{nc}) \\
+    \textrm{logit}(\pi) &= \gamma_0 + \gamma_1 \textrm{ca} +
+    \gamma_2 \textrm{np} + \gamma_3 \textrm{nc} +
+    \gamma_4 (\textrm{np} \cdot \textrm{nc}),
+  \end{aligned}$
+\end{itemize}
 sendo $g(\mu)$ e $\textrm{logit}(\pi)$ as funções de ligação que
 relacionam os preditores lineares com as médias dos modelos para
 contagens não nulas e contagens zero, respectivamente. Os preditores
-lineares foram propostos de forma aninhada. No primeiro considera-se os
+lineares foram propostos de forma aninhada. No primeiro, considera-se os
 efeitos aditivos de todas as covariáveis mensuradas para a parte das
 contagens nulas e efeitos aditivos do número de pessoas e de crianças
-para a parte das contagens não nulas. No segundo tem-se os efeitos
+para a parte das contagens não nulas. No segundo, têm-se efeitos
 aditivos de todas as covariáveis acrescido do efeito de interação entre
 o número de pessoas e de crianças para ambas as partes do modelo.
 
@@ -2004,21 +2014,21 @@ print.xtable(xtable(tab[5:6, ], digits = digits),
 \begin{tablenotes}
   \footnotesize
 \item np, número de parâmetros; diff $\ell$, diferença entre
-  log-verossimilhanças; F, estatística F baseada nas quasi-deviances;
+  log-verossimilhanças; F, estatística F baseada nas quase-deviances;
   diff np, diferença entre o np. \\[0.1cm]
 \item Fonte: Elaborado pelo autor.
 \end{tablenotes}
 \end{table}
 
 Na \autoref{tab:ajuste-fish} as medidas de ajuste dos modelos Poisson,
-Binomial Negativo e COM-Poisson são apresentadas para comparação dos
+binomial negativo e COM-Poisson são apresentadas para comparação dos
 resultados. Observa-se pelas log-verossimilhanças maximizadas que o
 modelo Poisson não se ajustou adequadamente quando comparado aos
 demais. Isso se deve ao fato discutido na \autoref{cap02:zeros}, que
 mesmo modelando os zeros pode-se ter diferentes níveis de dispersão para
-as contagens não nulas. Nesse exemplo as contagens não nulas são
+as contagens não nulas. Nesse exemplo, as contagens não nulas são
 superdispersas, visto pelas estimativas dos parâmetros extras do modelo
-Binomial Negativo e COM-Poisson. Indicado pelos níveis descritivos dos
+binomial negativo e COM-Poisson. Indicado pelos níveis descritivos dos
 TRV's aplicados nos modelos encaixados, há evidências de que o modelo com
 efeitos de interação é distinto do modelo com efeitos aditivos definido
 no preditor 1.
@@ -2029,9 +2039,10 @@ estimativas dos parâmetros $\gamma_i$, $i = 0, 1, 2, 3, 4$ são
 idênticas, independentemente do modelo adotado. Esse resultado é
 esperado, pois na construção dos modelos com componente de barreira, a
 modelagem da parte que contempla os valores zero é realizada via
-distribuição Bernoulli com parâmetro $\pi = \textrm{logit}(Z\gamma)$. As
-diferenças entre os modelos ocorre na distribuição considerada para a
-parte das contagens não nulas.
+distribuição Bernoulli com parâmetro
+$\pi_i = \textrm{logit}(\bm{z}_i^\top\bm{\gamma})$. As diferenças entre
+os modelos ocorre na distribuição considerada para a parte das contagens
+não nulas.
 
 \begin{table}[ht]
 \centering
@@ -2090,31 +2101,30 @@ print.xtable(xtable(tab),
 
 Nos efeitos estimados para a parte da modelagem dos valores não nulos
 têm-se algumas diferenças consideráveis. Destaca-se que as estimativas
-dos parâmetros dos modelos Poisson e Binomial Negativo são comparáveis
-entre si, pois modelam a média da distribuição, mas não comparáveis com
-as estimativas do modelo COM-Poisson, pois este modela um parâmetro que
-não representa, diretamente, a média. Contudo, independente da
-distribuição o sinal dos efeitos deve ser o mesmo. Isso não ocorre nas
-estimativas dos parâmetros $\beta_3$, positiva no modelo Poisson e
-negativa nos demais e $\beta_4$, positiva no modelo COM-Poisson e
-negativa nos demais. Porém, esses efeitos não tem impacto significativo
-para definição dos parâmetros das distribuições, conforme pode ser visto
-na \autoref{fig:pred-fish}, que exibe as médias calculadas com base nas
-três formulações. A seguir uma discussão sobre os erros padrão dessas
-estimativas é feita.
+dos parâmetros dos modelos Poisson e binomial negativo são comparáveis
+entre si, pois modelam a média da distribuição truncada, mas não
+comparáveis com as estimativas do modelo COM-Poisson, pois este modela
+um parâmetro que não representa, diretamente, a média. Contudo,
+independente da distribuição o sinal dos efeitos deve ser o mesmo. Isso
+não ocorre nas estimativas dos parâmetros $\beta_3$, positiva no modelo
+Poisson e negativa nos demais e $\beta_4$, positiva no modelo
+COM-Poisson e negativa nos demais. Porém, esses efeitos não tem impacto
+significativo, conforme pode ser visto na \autoref{fig:pred-fish}, que
+exibe as médias calculadas com base nas três formulações. A seguir uma
+discussão sobre os erros padrão dessas estimativas é feita.
 
-Considerando a magnitude dos efeitos estimados nos modelos Hurdle,
+Considerando a magnitude dos efeitos estimados nos modelos de barreira,
 quando escalonados pelo seu erro padrão, obtido pelo negativo do inverso
-da matriz hessiana, há diferenças substanciais entre o Poisson, Binomial
-Negativo e COM-Poisson. O modelo COM-Poisson indica erros padrões das
-estimativas muito menores que os apresentados no modelo Binomial
-Negativo. Sob investigações do problema, encontrou-se que este resultado
+da matriz hessiana, há diferenças substanciais entre o Poisson, binomial
+negativo e COM-Poisson. O modelo COM-Poisson indica erros padrões das
+estimativas muito menores que os apresentados no modelo binomial
+negativo. Sob investigações do problema, encontrou-se que este resultado
 se deve por inconsistências no procedimento numérico para determinação
-da matriz hessiana por diferenças finitas no modelo
-COM-Poisson. Portanto, os erros padrão sob o modelo COM-Poisson
-apresentados estão incorretos. Essa impossibilidade para realização de
-testes do tipo Wald no modelo Hurdle COM-Poisson foi particular da
-análise desse conjunto de dados, uma possível causa seja a notável
+da matriz hessiana por diferenças finitas no modelo COM-Poisson com
+componente de barreira. Portanto, os erros padrão sob o modelo
+COM-Poisson apresentados estão incorretos. Essa impossibilidade para
+realização de testes do tipo Wald no modelo COM-Poisson foi particular
+da análise desse conjunto de dados, uma possível causa seja a notável
 superdispersão das contagens não nulas, $\hat{\theta}=$\Sexpr{coHB[1,1]}
 e $\hat{\phi}=$\Sexpr{coHC[1,1]}.
 
@@ -2207,14 +2217,14 @@ fonte.xy("Fonte: Elaborado pelo autor.")
 Embora tenha-se constatado problemas nos algoritmos numéricos para
 determinar a curvatura da log-verossimilhança, as estimativas pontuais
 são coerentes com os demais modelos, conforme visto na
-\autoref{fig:pred-fish} onde são apresentadas as médias calculadas com
+\autoref{fig:pred-fish}, onde são apresentadas as médias calculadas com
 base nos três modelos estudados. Observa-se em todos os modelos a mesma
 tendência.
 
-Com esse exemplo ilustra-se a extensão do modelo COM-Poisson para
+Com esse exemplo, ilustra-se a extensão do modelo COM-Poisson para
 acomodar excesso de zeros e ressalta-se que as contagens não nulas
-analisadas são superdispersas. Para esses casos a distribuição Binomial
-Negativa se apresenta como principal alternativa. Porém, em casos que as
+analisadas são superdispersas. Para esses casos, a distribuição binomial
+negativa se apresenta como principal alternativa. Porém, em casos que as
 contagens não nulas se mostram subdispersas não há opções prontamente
 disponíveis para análise e o modelo COM-Poisson com componente de
 barreira, conforme apresentado, se torna uma abordagem atrativa.
@@ -2245,28 +2255,28 @@ load("mixedcmp_models.rda")
 
 @
 
-Nessa última aplicação apresentada no trabalho a extensão dos modelos de
-contagem para inclusão de efeitos aleatórios é ilustrada. Os modelos em
+Nessa última aplicação apresentada no trabalho, ilustra-se a extensão
+dos modelos de contagem para inclusão de efeitos aleatórios. Os modelos
 considerados para análise são o Poisson e o COM-Poisson com efeitos
 aleatórios. O conjunto de dados se refere ao número de nematoides,
 mensurados em soluções (\texttt{sol}) compostas da massa fresca de
-raizes diluídas em água, para diferentes cultivares, conforme
-apresentado na \autoref{sec:nematodes}. Considera-se para os modelos
-em competição, os seguintes preditores:
-
-\noindent
-Preditor 1: $g(\mu) = \beta_0 + b_j$ \\
-Preditor 2: $g(\mu) = \beta_0 + \beta_1 \log(\textrm{sol})_i + b_j$
-
-\noindent
+raízes diluídas em água para diferentes cultivares
+(\autoref{sec:nematodes}). Considera-se, para ambos os modelos, os
+seguintes preditores:
+\begin{itemize}
+  \setlength\itemsep{-0.6cm}
+\item[] Preditor 1: $g(\mu) = \beta_0 + b_j$ \\
+\item[] Preditor 2:
+  $g(\mu) = \beta_0 + \beta_1 \log(\textrm{sol})_i + b_j$
+\end{itemize}
 em que $i = 1, 2, \cdots, \Sexpr{nrow(nematodes)}$ (número de
 observações) e $j$ varia nos níveis da cultivar de feijão ($j =$ A, B,
 C, $\cdots$, S) representando o efeito aleatório, realização de uma
-variável aleatória Normal de média 0 e variância $\sigma^2$. Assim, nos
-modelos propostos têm-se a variabilidade entre as cultivares explicada
-por uma distribuição Normal e a variabilidade dentro das cultivares
-explicada pela relação média variância descrita pelo modelo considerado,
-Poisson ou COM-Poisson.
+variável aleatória normal de média 0 e variância $\sigma^2$. Assim, nos
+modelos propostos, tem-se a variabilidade entre as cultivares explicada
+por uma distribuição normal e a variabilidade dentro das cultivares
+explicada pela relação média--variância descrita pelo modelo
+considerado, Poisson ou COM-Poisson.
 
 <<logLik-nematodes, include=FALSE>>=
 
@@ -2290,19 +2300,19 @@ digits <- c(1, 1, 0, 2, 2, 2, 0, 4, 3, 4)
 @
 
 O ajuste dos modelos com a inclusão de efeitos aleatórios requer a
-solução de uma integral que, em geral, é resolvida numericamente. Isso
-torna o procedimento de ajuste computacionalmente intensivo e bastante
+solução de uma integral, resolvida numericamente. Isso torna o
+procedimento de ajuste computacionalmente intensivo e bastante
 suscetível a problemas numéricos. Em algumas iterações durante o
 algoritmo de estimação dos parâmetros dos modelos COM-Poisson de efeitos
 mistos, os valores considerados para os parâmetros resultaram em somas
-$Z(\lambda_i, \phi)$ que não puderam ser representados pela
-máquina. Porém, o algoritmo dispõe de procedimentos que evitam sua
+$Z(\lambda_i, \phi)$ que não puderam ser representadas na memória do
+computador. Porém, o algoritmo dispõe de procedimentos que evitam sua
 interrupção, propondo novos valores mesmo quando a função objetivo não
-puder ser calculada, alcançando o máximo da log-verossimilhança. Para o
-modelo Poisson de efeito aleatório utilizou-se das programações em R
-providas pelo pacote \texttt{lme4} \cite{Bates2015}, que trabalham com
+pôde ser calculada, alcançando o máximo da log-verossimilhança. Para o
+modelo Poisson de efeitos aleatórios, utilizou-se das programações em R
+providas pelo pacote \texttt{lme4} \cite{Bates2015}, que utilizam
 matrizes esparsas para os efeitos aleatórios e otimização em linguagem
-de baixo nível, minimizando os problemas numéricos.
+de baixo nível (\texttt{C++}), minimizando os problemas numéricos.
 
 Os resultados do ajuste para avaliação e comparação dos modelos são
 apresentados na \autoref{tab:ajuste-nematodes}. Os valores
@@ -2368,20 +2378,19 @@ fonte.xy("Fonte: Elaborado pelo autor.")
 Permanecendo com o segundo preditor, com o efeito do logaritmo da
 solução, as estimativas dos parâmetros do modelo são apresentadas na
 \autoref{tab:coef-nematodes}, em conjunto os erros padrão das
-estimativas, calculado sob aproximação quadrática da verossimilhança, ou
-seja via inversão da matriz hessiana. Novamente, os resultados dos
-modelos são similares. Lembre-se que, dessa tabela, o único resultado
-comparável diretamente é a razão entre estimativa e erro padrão do
-parâmetro $\beta_1$. O parâmetro $\sigma$ é a variância da distribuição
-dos efeitos aleatórios, que no modelo Poisson são somados aos efeitos
-fixos para composição de $\mu$ e na COM-Poisson para composição de
-$\lambda$. Outro resultado interessante é a estimativa do parâmetro
-$\phi$ da COM-Poisson que, positiva, indica uma subdispersão moderada
-nesse conjunto de dados. Uma vantagem do modelo misto COM-Poisson é que
-pode-se distinguir a variabilidade da contagem da variabilidade induzida
-pelo efeito do grupo no experimento. Nesse exemplo tem-se uma
-variabilidade do efeito aleatório maior, $\sigma$ estimado no caso
-COM-Poisson maior que no caso Poisson, porém essa variabilidade extra
+estimativas, obtidos da matriz de informação de Fisher. Novamente, os
+resultados dos modelos são similares. Lembre-se que, dessa tabela, o
+único resultado comparável diretamente é a razão entre estimativa e erro
+padrão do parâmetro $\beta_1$. O parâmetro $\sigma$ é o desvio padrão da
+distribuição dos efeitos aleatórios, que no modelo Poisson são somados
+aos efeitos fixos para composição de $\mu$ e na COM-Poisson para
+composição de $\lambda$. Outro resultado interessante é a estimativa do
+parâmetro $\phi$ da COM-Poisson que, positiva, indica uma subdispersão
+moderada nesse conjunto de dados. Uma vantagem do modelo misto
+COM-Poisson é que se pode distinguir a variabilidade da contagem da
+variabilidade induzida pelo efeito de grupo no experimento. Nesse
+exemplo, tem-se a variabilidade do efeito aleatório, $\sigma$ maior no
+modelo COM-Poisson que no Poisson, porém essa variabilidade extra
 capturada pelo efeito aleatório é compensada pela subdispersão capturada
 pelo parâmetro $\phi$.
 
@@ -2425,20 +2434,21 @@ print.xtable(xtable(tab),
 \end{tabular}
 \end{table}
 
-Como resultados complementares à \autoref{tab:coef-nematodes}, tem-se
-os perfis de verossimilhança com intervalos de confianças de níveis 99,
-95 e 90\% apresentados na \autoref{fig:prof-nematodes}. Observa-se um
-comportamento razoavelmente simétrico para todos os parâmetros, apenas
-com uma assimetria levemente destacada para o parâmetro $\beta_0$. Isso
-traz mais segurança na interpretação dos resultados baseados na
-aproximação quadrática da verossimilhança, que são de fácil obtenção
-pois só envolvem inversão de matrizes. No perfil de verossimilhança para
-o parâmetro $\phi$, há mais uma evidência da equivalência entre os
-modelos Poisson e COM-Poisson, pois os intervalos contém o valor 0.
+Como resultados complementares à \autoref{tab:coef-nematodes}, tem-se os
+perfis de verossimilhança com intervalos de confianças de níveis 99, 95
+e 90\% apresentados na \autoref{fig:prof-nematodes}. Observa-se um
+comportamento razoavelmente simétrico para todos os estimadores, apenas
+com uma assimetria levemente destacada para $\hat{\beta}_0$. Isso traz
+mais segurança na interpretação dos resultados baseados na aproximação
+quadrática da verossimilhança, que são de fácil obtenção pois só
+envolvem inversão de matrizes. No perfil de verossimilhança para
+$\hat{\phi}$, há mais uma evidência da equivalência entre os modelos
+Poisson e COM-Poisson, pois os intervalos contém o valor 0.
 
 <<corr-nematodes, fig.width=3.5, fig.height=3.5, fig.cap="Imagem da matriz de correlação entre os parâmetros do modelo COM-Poisson.">>=
 
-pnames <- c("phi", "lsigma0", paste0("beta", 0:1))
+pnames <- c(":hat(phi)", ":log(hat(sigma))",
+            paste0(":hat(beta)[", 0:1, "]"))
 
 Vcov <- vcov(m2CM)
 Corr <- cov2cor(Vcov)
@@ -2491,18 +2501,18 @@ Conforme já observado anteriormente, no modelo COM-Poisson misto os
 parâmetros $\phi$, da distribuição considerada para a variável de
 contagem condicional aos efeitos aleatórios e as covariáveis e $\sigma$,
 da distribuição considerada para os efeitos aleatórios são conjuntamente
-responsáveis pela explicação da variabilidade do processo em estudo. Na
-\autoref{fig:corr-nematodes} são apresentados as covariâncias entre os
-parâmetros do modelo, na escala de correlação, a fim de verificar,
-principalmente, a correlação entre $\sigma$ e $\phi$. Observa-se que,
-conforme esperado, estes parâmetros apresentam uma forte correlação e
-ainda que esta é positiva, pois as contagens são superdispersas, ainda
-que não de forma acentuada. Nota-se também que a característica de não
-ortogonalidade entre os parâmetros de locação e $\phi$ se mantém com a
-inclusão de efeitos aleatórios.
+responsáveis pela explicação da variabilidade das contagens. Na
+\autoref{fig:corr-nematodes}, são apresentados as covariâncias entre os
+estimadores do modelo, na escala de correlação, a fim de verificar,
+principalmente, a correlação entre $\hat{\sigma}$ e
+$\hat{\phi}$. Observa-se que, conforme esperado, estes estimadores
+apresentam uma forte correlação e ainda que esta é positiva, pois as
+contagens são superdispersas, ainda que não de forma acentuada. Nota-se
+também, que a característica de não ortogonalidade entre os parâmetros de
+locação e $\phi$ se mantém com a inclusão de efeitos aleatórios.
 
-Na \autoref{fig:pred-nematodes} são apresentados as predições do efeito
-aleatório em cada modelo (à direita) e as contagem preditas para cada
+Na \autoref{fig:pred-nematodes}, são apresentados as predições do efeito
+aleatório em cada modelo (à direita) e as contagens preditas para cada
 cultivar e para o comportamento médio (à esquerda). A distribuição
 empírica dos efeitos aleatórios, gráfico à direita, está de acordo com
 os parâmetros estimados para $\sigma$, vistos na
@@ -2568,8 +2578,8 @@ fonte.xy("Fonte: Elaborado pelo autor.")
 
 @
 
-Nessa aplicação ilustra-se a extensão do modelo COM-Poisson para
-inclusão de efeitos aleatórios. Nesse caso a análise se deu a um
+Nessa aplicação, ilustra-se a extensão do modelo COM-Poisson para
+inclusão de efeitos aleatórios. Nesse caso, a análise se deu a um
 experimento em que as contagens, condicionadas aos efeitos aleatórios,
 se apresentaram de forma equidispersa, indicada pelo modelo COM-Poisson,
 e os resultados entre os modelos COM-Poisson e Poisson foram
@@ -2580,41 +2590,40 @@ equivalentes.
 
 Nos quatro primeiros conjuntos de dados, em que modelou-se as contagens
 via modelos de regressão de efeitos fixos, observou-se resultados dos
-modelos COM-Poisson equivalentes a abordagem semi-paramétrica via
-quasi-verossimilhança, quanto a significância dos efeitos e predição com
-bandas de confiança. Porém, ressalta-se que na abordagem por
-quasi-verossimilhança, com a especificação de apenas dois momentos, i)
-não se pode representar a distribuição de probabilidades da variável em
-estudo, ii) a informação a respeito da média é igual ou inferior a uma
-abordagem totalmente paramétrica e iii) extensões como a modelagem de
-excesso de zeros e modelagem do parâmetro de dispersão não são
-imediatas. Nos casos de superdispersão explorou-se também os resultados
-dos modelos baseados na distribuição Binomial Negativa e nessa abordagem
-tem-se o inconveniente de somente a característica de superdispersão ser
-contemplada. Nos estudos de caso, os modelos Binomial Negativo
-proporcionaram resultados, com relação a significância dos efeitos,
-equivalentes ao COM-Poisson e Quasi-Poisson. Porém, em um dos estudos
-com acentuada superdispersão, os valores preditos pontuais e
-intervalares obtidos do modelo Binomial Negativo, diferiram dos modelos
-COM-Poisson e Quasi-Poisson, isso devido a forma da relação média e
-variância dessa distribuição, \autoref{fig:mv-binomneg}.
+modelos COM-Poisson equivalentes à abordagem baseada na especificação de
+média e variãncia, quase-verossimilhança. Porém, ressalta-se que na
+abordagem por quase-verossimilhança, com a especificação de apenas dois
+momentos, i) não se pode representar a distribuição de probabilidades da
+variável em estudo, ii) a informação a respeito da média é igual ou
+inferior a uma abordagem totalmente paramétrica e iii) extensões como a
+modelagem de excesso de zeros e modelagem do parâmetro de dispersão não
+são imediatas. Nos casos de superdispersão, explorou-se também os
+resultados dos modelos baseados na distribuição binomial negativa e
+nessa abordagem, tem-se o inconveniente de somente a característica de
+superdispersão ser contemplada. Nos estudos de caso, os modelos binomial
+negativo proporcionaram resultados, com relação a significância dos
+efeitos, equivalentes ao COM-Poisson e quase-Poisson. Porém, em um dos
+estudos com acentuada superdispersão, os valores preditos pontuais e
+intervalares obtidos do modelo binomial negativo, diferiram dos modelos
+COM-Poisson e quase-Poisson, isso devido a forma da relação
+média--variância dessa distribuição, \autoref{fig:mv-binomneg}.
 
-Nas extensões propostas para o modelo COM-Poisson obteve-se resultados
+Nas extensões propostas para o modelo COM-Poisson, obteve-se resultados
 satisfatórios. No caso da inclusão de um componente de barreira para
 modelagem de excesso de zeros, os resultados dos testes de razão de
 verossimilhanças para testar a significância dos efeitos foram
-equivalentes ao modelo Hurdle Binomial Negativo assim como as
-estimativas pontuais dos valores preditos. Ainda nessa aplicação, não
-foi possível a obtenção dos erros padrão das estimativas dos efeitos,
-baseados na matriz hessiana, devido a problemas numéricos na
-determinação dessa matriz. Para o caso estendido do modelo COM-Poisson
-em que acomoda-se efeitos aleatórios, os procedimentos
+equivalentes ao modelo binomial negativo com componente de barreira,
+assim como as estimativas pontuais dos valores preditos. Ainda nessa
+aplicação, não foi possível a obtenção dos erros padrão das estimativas
+dos efeitos, baseados na matriz hessiana, devido a problemas numéricos
+na determinação dessa matriz. Para o caso estendido do modelo
+COM-Poisson em que acomoda-se efeitos aleatórios, os procedimentos
 computacionalmente intensivos que são empregados no algoritmo de
 estimação ganham destaque. A aplicação se deu a um experimento que
 apresentou contagens com um grau não significativo de
 subdispersão. Nessa aplicação os modelos empregados foram o Poisson e o
-COM-Poisson de efeitos mistos e todos os resultados em questões,
-inferenciais, foram equivalentes em, mas com poder de teste maior para o
+COM-Poisson, ambos de efeitos mistos e todos os resultados, em questões
+inferenciais, foram equivalentes, mas com poder de teste maior para o
 modelo COM-Poisson.
 
 Nas aplicações, em geral, pode-se notar características que permearam a
@@ -2622,16 +2631,20 @@ todos os modelos baseados na distribuição COM-Poisson. A primeira delas,
 e talvez a mais difícil de se contornar, é a determinação da constante
 de normalização, pois essa depende do parâmetro que está associado a um
 preditor linear, assim deve-se calcular $n$ constantes a cada iteração
-do algoritmo de estimação. Em casos de contagens altas e superdispersão
+no algoritmo de estimação. Em casos de contagens altas e superdispersão
 o cálculo dessa constante é extremamente demorado. Outra característica
 que se manisfestou em todas as aplicações foi a não ortogonalidade entre
 os parâmetros de regressão e o parâmetro adicional $\phi$, observada
-pelas correlações calculadas a partir da matriz hessiana, o que torna as
-inferências dependentes. Em pesquisas não relatadas nesse trabalho
-verificou-se que a reparametrização do parâmetro $\lambda$, adotando a
-aproximação para média, contorna essa característica com o preço de se
-ter uma distribuição aproximada. Nas aplicações explorou-se também os
-perfis de verossimilhança para o parâmetro $\phi$ da COM-Poisson e o
-comportamento aproximadamente simétrico, em todos casos, induz que
-aproximações quadráticas da verossimilhança podem ter desempenhos
-satisfatórios.
+pelas correlações entre os estimadores obtidas a partir da matriz
+hessiana, o que torna as inferências dependentes. As correlações entre o
+estimador para o parâmetro de dispersão, $\hat{\phi}$ e o estimador para
+$\beta_0$, foram praticamente 1 em todos os exemplos. Isso se dá devido
+a parametrização de efeitos, em que $\beta_0$ governa a locação do
+parâmetro $\lamba$ e os demais parâmetros são diferenças. Em pesquisas
+não relatadas nesse trabalho, verificou-se que a reparametrização do
+parâmetro $\lambda$, adotando a aproximação para média, contorna essa
+característica com o preço de se ter uma distribuição aproximada. Nas
+aplicações, explorou-se também os perfis de verossimilhança para o
+parâmetro $\phi$ da COM-Poisson e o comportamento aproximadamente
+simétrico, em todos casos, induz que aproximações quadráticas da
+verossimilhança podem ter desempenhos satisfatórios.

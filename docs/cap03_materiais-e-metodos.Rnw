@@ -4,10 +4,10 @@
 
 Esse capítulo é destinado à apresentação dos conjuntos de dados
 analisados no trabalho, descrição dos recursos computacionais e métodos
-utilizados na análise. Na \autoref{cap03:materiais-dados} seis conjuntos
-de dados com diferentes características são apresentados. Os recursos
-computacionais utilizados são descritos na
-\autoref{cap03:materiais-recursos}. Na última seção desse capítulo,
+utilizados na análise. Na \autoref{cap03:materiais-dados}, seis
+conjuntos de dados com diferentes características são apresentados. Os
+recursos computacionais utilizados são descritos na
+\autoref{cap03:materiais-recursos}. Na última seção,
 \autoref{cap03:metodos}, são apresentados os métodos para ajuste,
 avaliação e comparação dos modelos propostos.
 
@@ -17,7 +17,7 @@ avaliação e comparação dos modelos propostos.
 \subsection{Conjuntos de dados}
 \label{cap03:materiais-dados}
 
-A seguir são apresentados os seis conjuntos de dados utilizados para
+A seguir são apresentados seis conjuntos de dados utilizados para
 avaliar o desempenho dos modelos COM-Poisson. Os dados em estudo são,
 quase em sua totalidade, resultantes de experimentos agronômicos com
 delineamentos balanceados, o que é uma característica vantajosa para
@@ -48,25 +48,24 @@ Experimento com plantas de algodão \emph{Gossypium hirsutum} submetidas
 desfolha foi aplicada, (vegetativo, botão floral, florescimento, maça e
 capulho). Esse experimento foi conduzido sob delineamento interamente
 casualizado com cinco repetições, em casa de vegetação. A unidade
-experimental foi um vaso com duas plantas, onde avaliou-se o número de
+experimental foi um vaso com duas plantas, onde se avaliou o número de
 capulhos produzidos ao final da ciclo cultura \cite{Silva2012}. O
 experimento contou com \Sexpr{nrow(cottonBolls)} observações das quais
-têm-se as informações das variáveis número de capulhos de algodão
-produzidos (\texttt{ncap}), nível de desfolha de remoção foliar
-(\texttt{des}) e estágio fenológico das plantas na unidade experimental
-(\texttt{est}).
+têm-se o número de capulhos de algodão produzidos (\texttt{ncap}), nível
+de desfolha de remoção foliar (\texttt{des}) e estágio fenológico das
+plantas na unidade experimental (\texttt{est}).
 
-Esse conjunto de dados já fora analisado e publicado sob a motivação da
+Esse conjunto de dados já fora analisado sob a motivação da
 característica de subdispersão, utilizando o modelo \textit{Gamma-Count}
 \cite{Zeviani2014}. Na \autoref{fig:descr-cottonBolls}, são apresentados
 os dados do experimento. À esquerda apresenta-se a disposição das cinco
 observações em cada tratamento (combinação de nível de desfolha e
 estágio fenológico do algodão) e à direita um gráfico descritivo
-cruzando médias e variâncias amostrais calculadas em cada tratamento,
+cruzando médias e variâncias amostrais calculadas para cada tratamento,
 onde a linha pontilhada representa a característica de equidispersão,
-média igual a variância, e a contínua a reta de um ajuste de regressão
-linear simples. Em todos os tratamentos obteve-se a média menor que a
-variância apontando evidência de subdispersão.
+média igual a variância, e a contínua a reta de mínimos quadrados. Em
+todos os tratamentos se obteve a média menor que a variância apontando
+evidência para subdispersão.
 
 <<descr-cottonBolls, fig.height=4.2, fig.width=7, fig.cap="Número de capulhos produzidos para cada nível de desfolha e estágio fenológico (esquerda) e médias e variâncias das cinco repetições em cada combinação de nível de desfolha e estágio fenológico (direita).">>=
 
@@ -123,14 +122,14 @@ niveis.dexp <- paste0(paste(unique(cottonBolls2$dexp),
 
 Experimento conduzido na Universidade Federal da Grande Dourados (UFGD)
 em 2007, cujo objetivo foi avaliar os impactos da exposição de plantas à
-alta infestação de Mosca-branca \emph{Bemisia tabaci} em componentes de
+alta infestação de mosca-branca \emph{Bemisia tabaci} em componentes de
 produção do algodão \cite{Martelli2008}. No experimento, plantas de
 algodão foram expostas a alta infestação da praga por diferentes
 períodos, 0, 1, 2, 3, 4, e 5 dias. Avaliou-se o número de capulhos
 produzidos (\texttt{ncapu}), o número de estruturas reprodutivas
 (\texttt{nerep}) e o número de nós (\texttt{nnos}), como variáveis de
 interesse que representam a produtividade do cultivo de algodão. A
-condução do estudo deu-se via delineamento inteiramente casualizado com
+condução do estudo foi em delineamento inteiramente casualizado com
 cinco vasos contendo duas plantas, para cada período de exposição.
 
 <<descr-cottonBolls2, fig.height=3.5, fig.width=7.2, fig.cap="Disposição das variáveis de contagem nº de estruturas reprodutivas, nº de capulhos produzidos e nº de nós da planta observadas sob diferentes dias de exposição à infestação de Mosca-branca.">>=
@@ -166,7 +165,7 @@ fonte.xy("Fonte: Elaborado pelo autor.")
 
 @
 
-Na \autoref{fig:descr-cottonBolls2} a disposição de cada uma das
+Na \autoref{fig:descr-cottonBolls2}, a disposição de cada uma das
 variáveis aleatórias de contagem, \texttt{ncapu}, \texttt{nerep} e
 \texttt{nnos}, para os diferentes períodos em que as plantas estiveram
 sob alta infestação de Mosca-branca é apresentada. Para todas as
@@ -175,7 +174,7 @@ muitas contagens sobrepostas e dispostas em um intervalo pequeno de
 valores. A indicação de subdispersão também se observa na
 \autoref{tab:mv-cottonBolls2}, em que as médias e variâncias amostrais,
 calculadas com as dez observações nos seis períodos de exposição à
-infestação de Mosca-branca, são exibidas. Em todos os casos observa-se
+infestação de mosca-branca, são exibidas. Em todos os casos, observa-se
 as variâncias amostrais substancialmente menores que respectivas médias,
 ainda a manifestação de subdispersão é mais expressiva na variável
 número de nós da planta. Portanto, nesse experimento modelos
@@ -241,7 +240,7 @@ niveis.umid <- paste0(
 
 @
 
-Nesse experimento estudou-se os componentes de produção da soja com
+Nesse experimento, estudou-se os componentes de produção da soja com
 relação à diferentes níveis de adubação potássica aplicada ao solo (0,
 30, 60, 120 e 180 mg dm$^{-3}$) e diferentes níveis de umidade do solo
 (37.5, 50, 62.5\%, que representam pouca água, água em quantidade ideal
@@ -251,7 +250,7 @@ casa de vegetação no delineamento de blocos casualizados completos e a
 unidade experimental foi um vaso com duas plantas de soja. Foram medidas
 várias variáveis respostas (que representam a produtividade), sendo que
 o número de vagens viáveis por vaso e o número de grãos por vaso foram
-as variáveis de contagem.
+as variáveis em forma de contagens.
 
 <<descr-soyaBeans, fig.height=4, fig.width=7, fig.cap="Disposição das variáveis número de grãos e número de vagens nos diferentes níveis de adubação potássica e umidade do solo.">>=
 
@@ -279,16 +278,16 @@ fonte.xy("Fonte: Elaborado pelo autor.")
 
 @
 
-Na \autoref{fig:descr-soyaBeans} é apresentada a dispersão das contagens
-nas combinações das covariáveis umidade do solo e adubação potássica. As
-duas variáveis de contagem avaliadas no experimento apresentam níveis de
-dispersão distintos. Essa característica fica explícita na
-\autoref{fig:mv-soyaBeans}, em que são exibidas as dispersões entre
-médias e variâncias amostrais para cada uma das variáveis, com a linha
-pontilhada representando a igualdade entre média e variância
-(equidispersão) e a contínua um ajuste de regressão linear simples. Para
-o número de grãos por parcela, com contagens mais elevadas, as
-variâncias amostrais são, quase em sua totalidade, superiores às médias,
+Na \autoref{fig:descr-soyaBeans}, é apresentadi um gráfico de dispersão
+das contagens contra os tratamentos, combinações das covariáveis umidade
+do solo e adubação potássica. As duas variáveis de contagem avaliadas no
+experimento apresentam níveis de dispersão distintos. Essa
+característica fica explícita na \autoref{fig:mv-soyaBeans}, em que são
+exibidas as médias e variâncias amostrais para cada uma das variáveis,
+com a linha pontilhada representando a igualdade entre média e variância
+(equidispersão) e a contínua uma reta de minímos quadrados. Para o
+número de grãos por parcela, com contagens mais elevadas, as variâncias
+amostrais são, quase em sua totalidade, superiores às médias,
 caracterizando uma evidência de superdispersão. Já para o número de
 vagens por parcela, as médias e variâncias são próximas, o que indica
 que a suposição de equidispersão é razoável.
@@ -356,7 +355,7 @@ fonte.xy("Fonte: Elaborado pelo autor.")
 
 @
 
-\subsubsection{Ocorrência de ninfas de Mosca-branca em lavoura de soja}
+\subsubsection{Ocorrência de ninfas de mosca-branca em lavoura de soja}
 \label{sec:whiteFly}
 
 <<data-whiteFly, include=FALSE, cache=FALSE>>=
@@ -373,7 +372,7 @@ niveis.data <- paste0(format(unique(whiteFly$data), "%d/%m/%y"),
 @
 
 Nesse experimento também envolvendo a cultura de soja e a praga
-Mosca-branca, foram avaliadas plantas de quatro diferentes cultivares de
+mosca-branca, foram avaliadas plantas de quatro diferentes cultivares de
 soja (BRS 245 RR, BRS 243 RR, BRS 246 RR e BRS 239), contabilizando o
 número de ninfas de mosca-branca nos folíolos dos terços superior, médio
 e inferior das plantas em seis datas (11/12/09, 19/12/09, 24/12/09,
@@ -386,8 +385,8 @@ avaliação, representadas pelos dias decorridos após a primeira
 avaliação, em 11/12/09, são apresentadas à esquerda na
 \autoref{fig:descr-ninfas}. As contagens são muito elevadas e dispersas,
 principalmente nas quatro primeiras avaliações. À direita da
-\autoref{fig:descr-ninfas} uma descrição do nível de dispersão da
-variável de contagem é apresentada. Esse é um conjunto de dados
+\autoref{fig:descr-ninfas}, apresenta-se uma descrição do nível de
+dispersão da variável de contagem. Esse é um conjunto de dados
 extremamente superdisperso. Os pontos, que representam as médias e
 variâncias em cada combinação de cultivares de soja e dias após a
 primeira avaliação, estão todos acima da reta identidade (de
@@ -433,7 +432,7 @@ fonte.xy("Fonte: Elaborado pelo autor")
 
 @
 
-\subsubsection{Peixes Capturados por Visitantes em um Parque Estadual}
+\subsubsection{Peixes capturados por visitantes em um parque estadual}
 \label{sec:fish}
 
 <<data-fish, include=FALSE, echo=FALSE>>=
@@ -445,7 +444,7 @@ data(fish, package = "cmpreg")
 Diferentemente dos demais, esse é um estudo observacional feito por
 biólogos com interesse em modelar o número de peixes capturados por
 grupos de pescadores visitantes em um Parque Estadual \cite{UCLA}. Nesse
-estudo tem-se como informações referentes ao grupo de visitantes, o
+estudo, têm-se como informações referentes ao grupo de visitantes, o
 número de pessoas e de crianças e se há ou não a presença de
 campista. Um fato interessante nesse estudo é que nem todos os grupos de
 visitantes praticaram pescaria, portanto, para esses grupos o número de
@@ -469,7 +468,9 @@ xy1 <- xyplot(log(npeixes+0.5) ~ npessoas | campista,
               ), par.settings = ps.sub)
 
 suppressWarnings(
-    xy2 <- histogram(~npeixes, data = fish, nint = 50,
+    xy2 <- histogram(~npeixes,
+                     data = fish,
+                     nint = 50,
                      xlab = "Número de peixes capturados",
                      ylab = "Percentual",
                      axis = axis.grid,
@@ -480,20 +481,20 @@ suppressWarnings(
 )
 
 suppressWarnings({
-    print(xy1, split = c(1, 1, 2, 1), more = TRUE)
-    print(xy2, split = c(2, 1, 2, 1), more = FALSE)
+    print(xy1, position = c(0, 0, 0.6, 1), more = TRUE)
+    print(xy2, position = c(0.56, 0, 1, 0.95), more = FALSE)
 })
 
 fonte.xy("Fonte: Elaborado pelo autor.")
 
 @
 
-Nos gráficos apresentados na \autoref{fig:descr-fish} é evidente o
-excesso de contagens zero. No gráfico à esquerda tem-se a disposição das
+Nos gráficos apresentados na \autoref{fig:descr-fish}, é evidente o
+excesso de contagens zero. No gráfico à esquerda, tem-se a disposição das
 contagens, transformadas por $\log(y_i + 0,5)$. É característica
 marcante no gráfico a grande quantidade de pontos dispostos no primeiro
 valor do eixo $y$, \Sexpr{log(0.5)} = $\log(0.5)$. À direita da
-\autoref{fig:descr-fish} um histograma da variável resposta é
+\autoref{fig:descr-fish}, um histograma da variável resposta é
 apresentado e, embora seja uma representação da distribuição marginal do
 número de peixes capturados (não considera as covariáveis de cada
 contagem), percebe-se novamente a grande quantidade de valores nulos, ao
@@ -501,7 +502,7 @@ todo \Sexpr{with(fish, sum(npeixes == 0)/length(npeixes))*100}\% dos
 dados são contagens nulas. Portanto, nesse problema, modelos
 alternativos que acomodem excesso de zeros se fazem necessários.
 
-\subsubsection{Número de nematoides em raizes de feijoeiro}
+\subsubsection{Número de nematoides em raízes de feijoeiro}
 \label{sec:nematodes}
 
 <<data-nematodes, include=FALSE, cache=FALSE>>=
@@ -544,7 +545,7 @@ Esse último conjunto de dados explorado no trabalho é resultado de um
 experimento em casa de vegetação cujo intersse foi a reprodução de
 nematoides em linhagens de feijoeiro. No experimento, o solo de vasos
 com duas plantas de feijão foi inicialmente contaminado com nematoides e
-as raizes das plantas por vaso foram, ao final do experimento, lavadas,
+as raízes das plantas por vaso foram, ao final do experimento, lavadas,
 trituradas, peneiradas e diluídas e, a partir de alíquotas dessa
 solução, contou-se o número de nematoides. Como denominador da contagem
 tem-se a razão entre a massa fresca de raizes (em gramas) por parcela e
@@ -553,8 +554,7 @@ o volume de água (em milímetros) utilizado para diluir essa quantidade
   Machado, pesquisadora do Instituto Agronômico do Paraná (IAPAR), e
   pelo técnico agrícola do IAPAR, Santino Aleandro da Silva}.
 
-
-Na \autoref{fig:descr-nematodes} a dispersão das contagens de
+Na \autoref{fig:descr-nematodes}, a dispersão das contagens de
 nematoides em alíquotas da solução de uma grama de massa fresca de raiz
 por um milímetro de água para cada linhagem é exibida. As contagens para
 cada uma das linhagens se distribuem em torno do perfil médio (linha
@@ -569,31 +569,27 @@ por meio de uma distribuição de probabilidades.
 \subsection{Recursos computacionais}
 \label{cap03:materiais-recursos}
 
-O \textit{software} R, versão \Sexpr{with(R.version, paste0(major, ".",
-  minor))}, foi utilizado tanto para a preparação e apresentação dos
-dados quanto para ajuste dos modelos e apresentação de
-resultados. Pacotes auxiliares utilizados no trabalho são: \texttt{MASS}
-(\Sexpr{packageVersion("MASS")}) para ajuste e inferências dos modelos
-Binomial Negativo, \texttt{bbmle} (\Sexpr{packageVersion("bbmle")}) para
-estimação via máxima verossimilhança das funções implementadas para o
-modelo COM-Poisson , \texttt{pscl} (\Sexpr{packageVersion("pscl")}) para
-ajuste dos modelos Poisson e Binomial Negativo com componente de
-barreira para modelagem de excesso de zeros e \texttt{lme4} (versão
-\Sexpr{packageVersion("lme4")}) para ajuste dos modelos Poisson com
-efeitos aleatórios normais. Para apresentação gráfica dos resultados os
-pacotes \texttt{lattice} (\Sexpr{packageVersion("lattice")}),
-\texttt{latticeExtra} (\Sexpr{packageVersion("latticeExtra")}) e
-\texttt{corrplot} (\Sexpr{packageVersion("corrplot")}) são
-exaustivamente utilizados. Finalmente, para elaboração do relatório,
-mesclando códigos em R e escrita na linguagem de marcação \LaTeX{},
-utilizou-se o pacote \texttt{knitr} (\Sexpr{packageVersion("knitr")}).
+O \textit{software} R, versão 3.3.1, foi utilizado tanto para a
+preparação e apresentação dos dados quanto para ajuste dos modelos e
+apresentação dos resultados. Pacotes auxiliares utilizados no trabalho
+são: \texttt{MASS} (7.3.45) para ajuste e inferências dos modelos
+binomial negativos, \texttt{bbmle} (1.0.18) para estimação via máxima
+verossimilhança das funções implementadas para o modelo COM-Poisson,
+\texttt{pscl} (1.4.9) para ajuste dos modelos Poisson e binomial
+negativo com componente de barreira para modelagem de excesso de zeros e
+\texttt{lme4} (1.1.12) para ajuste dos modelos Poisson com efeitos
+aleatórios normais. Para apresentação gráfica dos resultados os pacotes
+\texttt{lattice} (0.20.33), \texttt{latticeExtra} (0.6.28) e
+\texttt{corrplot} (0.73) são exaustivamente utilizados. Finalmente, para
+elaboração do relatório, mesclando códigos em R e escrita na linguagem
+de marcação \LaTeX{}, utilizou-se o pacote \texttt{knitr} (1.12.3).
 
-Destaca-se nesse trabalho que todas as funções implementadas para ajuste
-e inferência dos modelos de regressão COM-Poisson estão disponíveis, em
-formato de um pacote R, \texttt{cmpreg}, no endereço
-\url{https://github.com/JrEduardo/cmpreg}. No apêndice
-\ref{capA:codigostcc} o emprego do pacote na análise de um conjunto de
-dados exibido no trabalho é ilustrado com códigos R.
+Nesse trabalho, destaca-se que todas as funções implementadas para
+ajuste e inferência dos modelos de regressão COM-Poisson estão
+disponíveis, em formato de um pacote R, \texttt{cmpreg}, no endereço
+\url{https://github.com/jreduardo/cmpreg}. No apêndice
+\ref{capA:codigostcc}, o emprego do pacote na análise de um conjunto de
+dados exibido no trabalho é ilustrado com códigos.
 
 \section{Métodos}
 \label{cap03:metodos}
@@ -604,40 +600,38 @@ log-verossimilhança, definida na \autoref{eqn:loglik-compoisson}, via
 algoritmo numérico de otimização \textit{BFGS} \cite{Nocedal1995}. O
 parâmetro extra da COM-Poisson ($\nu$) tem suporte nos reais positivos,
 restringindo o espaço paramétrico de busca do otimizador, o que é
-numericamente indesejável. Para deixar o domínio de busca nos reais
-reparametrizou-se o modelo com $\phi = \log(\nu)$. Como $0 < \nu <
+numericamente indesejável. Para deixar o domínio de busca nos reais,
+reparametrizou-se o modelo por $\phi = \log(\nu)$. Como $0 < \nu <
 \infty$, então $-\infty < \phi < \infty$. Sob a reparametrização a função
 a ser maximizada é dada por
 \begin{equation}
   \label{loglik-compoissonr}
-  \ell(\phi,\, \beta \mid \underline{y}) = \sum_{i=1}^n y_i
+  \ell(\phi,\, \beta \mid \bm{y}) = \sum_{i=1}^n y_i
   \log(\lambda_i) - e^\phi \sum_{i=1}^n \log(y!) - \sum_{i=1}^n
   \log(Z(\lambda_i, \phi))
 \end{equation}
-em que $\lambda_i = e^{\underline{x}_i^t\beta}$, com $\underline{x}_i$ o
-vetor $(x_{i1}, x_{i2}, \ldots x_{ip})$ de covariáveis da i-ésima
-observação, e $(\beta, \phi) \in \R^{p+1}$.
-
-O ajuste do modelo é realizado sob $\phi$.
+em que $\lambda_i = \exp(\bm{x}_i^\top\bm{\beta})$, com $\bm{x}_i$ o
+vetor $(x_{i1}, x_{i2}, \ldots x_{ip})^\top$ de covariáveis da i-ésima
+observação, e $(\bm{\beta}, \phi) \in \R^{p+1}$. O ajuste do modelo é
+realizado sob $\phi$.
 
 As inferências com relação à dispersão, decorrentes do modelo
-reparametrizado, são sobre o parâmetro $\phi$. Todavia pode-se retornar
-para parametrização original utilizando a função inversa em valores
-pontuais ou método delta para funções de $\phi$. Nesse trabalho as
-inferências são realizadas sob o parâmetro $\phi$. Para esse parâmetro
+reparametrizado, são sobre o parâmetro $\phi$. Pode-se retornar para
+parametrização original utilizando a função inversa em valores pontuais
+ou método delta para funções de $\phi$. Todavia, $\phi$ mantém a
+interpretação como parâmetro de dispersão, assim como $\nu$. Para $\phi$
 as interpretações são como se segue
 $$
-\phi < 0 \Rightarrow \textrm{Superdispersão}; \quad
-\phi = 0 \Rightarrow \textrm{Equidispersão}; \textrm{ e} \quad
-\phi > 0 \Rightarrow \textrm{Subdispersão}
+\phi < 0 \Rightarrow \textrm{superdispersão}; \quad
+\phi = 0 \Rightarrow \textrm{equidispersão}; \textrm{ e} \quad
+\phi > 0 \Rightarrow \textrm{subdispersão}.
 $$
-ou seja, $\phi$ possui a interpretação de um parâmetro de precisão.
 
 A partir dessa reparametrização a condução de testes de hipóteses é
 facilitada. Uma vez que $\phi = 0$ representa o caso particular em que
 a COM-Poisson se reduz a Poisson, a estatística
 \begin{equation*}
-  TRV = 2 \left ( \ell_{CMP} - \ell_{P} \right ) \sim \rchi^2_{1}
+  \text{TRV} = 2 \left ( \ell_{CMP} - \ell_{P} \right ) \sim \rchi^2_{1}
 \end{equation*}
 sendo $\ell_{CMP}$ e $\ell_{P}$ as log-verossimilhanças maximizadas dos
 modelos COM-Poisson e Poisson com mesmo preditor linear respectivamente,
@@ -646,60 +640,58 @@ equivalência dos modelos COM-Poisson e Poisson.
 
 A partir da \autoref{eqn:pmf-hurdle}, para incluir um
 componente de barreira no modelo COM-Poisson, acomodando excesso de
-zeros, adota-se, para $\Pr(Z = z \mid \Theta_c)$, a distribuição
+zeros, adota-se, para $\Pr(Z = z \mid \theta_c)$, a distribuição
 COM-Poisson (\autoref{eqn:pmf-compoisson}), resultando em
 \begin{equation}
   \label{eqn:pmf-hurdlecmp}
   \Pr(Y = y \mid \pi, \phi, \lambda) =
     \begin{dcases*}
-      \pi &, \text{se } y = 0\,;\\
-      (1 - \pi) \frac{\lambda^y}{(y!)^{e^\phi}Z(\lambda,
-          \phi)}\left (1 - \frac{1}{Z(\lambda, \phi)} \right )^{-1} &,
-      \text{se } y = 1, 2, \dots
+      \pi, & \text{se } y = 0\,;\\
+      \frac{(1 - \pi) \lambda^y}{(y!)^{e^\phi}Z(\lambda,
+          \phi)}\left (1 - \frac{1}{Z(\lambda, \phi)} \right )^{-1}, &
+      \text{se } y = 1, 2, \dots.
     \end{dcases*}
 \end{equation}
 Para modelos de regressão com componente de barreira, são incorporados
 preditores lineares em $\pi$,
-$\underline{\pi}=\frac{\exp(Z\gamma)}{1+\exp(Z\gamma)}$ e $\lambda$,
-$\underline{\lambda}=\exp(X\beta)$ e a verossimilhança desse modelo toma
-a forma
+$\bm{\pi}=\frac{\exp(\bm{Z\gamma})}{1+\exp(\bm{Z\gamma})}$ e $\lambda$,
+$\bm{\lambda}=\exp(\bm{X\beta})$ e a verossimilhança desse modelo é
+dada por
 \begin{equation}
   \label{eqn:loglik-hurdlecmp}
-  \Ell(\phi, \beta, \gamma \mid \underline{y}) =
-  \prod_{i \in \Omega_0} \left [  \pi_i \right ]
-  \prod_{i \in \Omega_+} \left [
-    (1-\pi_i) \left (
-    \frac{\lambda_i^{y_i}}{(y_i!)^{e^\phi}
+  \Ell(\phi, \beta, \gamma \mid \bm{y}) =
+  \prod_{i=1}^n \left [  \pi_i \right ]^{\mathds{1}_{\{y_i=0\}}}
+  \left [ \left (
+    \frac{(1-\pi_i)\lambda_i^{y_i}}{(y_i!)^{e^\phi}
       Z(\lambda_i, \phi)}
   \right ) \left ( 1-\frac{1}{Z(\lambda_i, \phi)} \right )
-  \right ]
+  \right ]^{\mathds{1}_{\{y_i>0\}}},
 \end{equation}
-sendo $\Omega_0 = \{i \mid y_i = 0\}$ o conjunto de observações que
-apresentam contagens 0 e $\Omega_+ = \{i \mid y_i > 0\}$ o conjunto de
-observações que apresentam contagens não nulas. Os argumentos
-$\hat{\phi}$, $\hat{\beta}$ e $\hat{\gamma}$, que maximizam o logaritmo
-neperiano da \autoref{eqn:loglik-hurdlecmp} serão as estimativas de
-máxima verossimilhança do modelo COM-Poisson com componente de barreira.
+em que $\mathds{1}_{\{y_i=0\}}$ e $\mathds{1}_{\{y_i>0\}}$ representam
+as indicadores de contagens nulas e não nulas, respectivamente. As
+quantidades $\hat{\phi}$, $\hat{\bm{\beta}}$ e $\hat{\bm{\gamma}}$, que
+maximizam o logaritmo neperiano da \autoref{eqn:loglik-hurdlecmp} serão
+as estimativas de máxima verossimilhança do modelo COM-Poisson com
+componente de barreira.
 
 Uma outra extensão proposta para o modelo COM-Poisson é a inclusão de
 efeitos aleatórios a fim de modelar a estrutura experimental ou
-observacional de um conjunto de dados. Neste trabalho restringe-se à
-inclusão de efeitos aleatórios Normais, ou seja, $b_j \sim
+observacional de um conjunto de dados. Neste trabalho, restringe-se à
+inclusão de efeitos aleatórios Normais, ou seja, $\bm{b}_j \sim
 \textrm{Normal}(0, \Sigma)$, que são incorporados sob a forma
-$\underline{\lambda} = X\beta + Z b$ conforme especificação em
+$\bm{\lambda} = \bm{X\beta + Z b}$ conforme especificação em
 \ref{eqn:reg-misto}. Assim, considerando a distribuição COM-Poisson para
 a variável resposta condicionada às covariáveis e aos efeitos aleatórios,
 a verossimilhança pode ser escrita como
 \begin{equation}
   \label{eqn:loglik-mixedcmp}
-  \Ell(\phi, \Sigma, \beta \mid \underline{y}) =
+  \Ell(\phi, \Sigma, \bm{\beta} \mid \bm{y}) =
   \prod_{i=1}^m \int_{\R^q} \left (
-    \prod_{j=1}^{n_i} \frac{\underline{\lambda}^y}{(y!)^{e^\phi}
-      Z(\underline{\lambda}, \phi)}
-  \right ) \cdot
+    \prod_{j=1}^{n_i} \frac{\lambda_{ij}^{y_{ij}}}{(y_{ij}!)^{e^\phi}
+      Z(\lambda_{ij}, \phi)} \right ) \cdot
   (2\pi)^{q/2} |\Sigma| \exp \left (
-    -\frac{1}{2}b^t \Sigma^{-1} b
-  \right ) db_i
+    -\frac{1}{2}\bm{b}_i^\top \Sigma^{-1} \bm{b}_i
+  \right ) d\bm{b}_i^\top
 \end{equation}
 sendo $m$ o número de grupos que compartilham do mesmo efeito aleatório,
 $q$ o número de efeitos aleatórios (intercepto aleatório, inclinação e
@@ -715,33 +707,30 @@ iteração do algoritmo de maximização, $m$ aproximações de Laplace para
 integrais de dimensão $q$ são realizadas. Ainda, quando considerada a
 distribuição COM-Poisson para a variável resposta condicionalmente
 independente, tem-se também o cálculo de $n_m$ constantes normalizadoras
-$Z(\lambda, \phi)$ (\autoref{eqn:constante-z}) para cada um dos $m$ grupos
-em cada iteração do algoritmo de otimização. Com toda essa estrutura
-hierárquica, procedimentos computacionais realizados a cada estágio são
-potencialmente instáveis numericamente.
+$Z(\lambda_{ij}, \phi)$ (\autoref{eqn:constante-z}) para cada um dos $m$
+grupos em cada iteração do algoritmo de otimização. Com toda essa
+estrutura hierárquica, procedimentos computacionais realizados a cada
+estágio são potencialmente instáveis numericamente.
 
 Para comparação entre os modelos COM-Poisson e demais modelos
 listados no \autoref{cap:modelos-para-dados-de-contagem} utiliza-se
 essencialmente o valor maximizado da log-verossimilhança e o critério
 de informação de Akaike (AIC) definido como
-
 \begin{equation}
   \label{eqn:criterios-informacao}
-  \textrm{AIC} = 2(k - \ell(\Theta_k, \underline{y}))
+  \textrm{AIC} = 2(k - \ell(\theta_k, \bm{y}))
 \end{equation}
-
-\noindent
-sendo $k$ o número de parâmetros e $\ell(\Theta_k, \underline{y})$ a
+em que $k$ é o número de parâmetros e $\ell(\theta_k, \bm{y})$ a
 log-verossimilhança maximizada do modelo definido pelo conjunto
-$\Theta_k$ de parâmetros. Nas análises compara-se também os níveis
+$\theta_k$ de parâmetros. Nas análises, compara-se também os níveis
 descritivos dos testes de razão de verossimilhanças entre modelos
-encaixados. Nos modelos de regressão de efeitos fixos os valores
+encaixados. Nos modelos de regressão de efeitos fixos, os valores
 preditos pelos modelos COM-Poisson e demais alternativas pertinentes são
-exibidos graficamente com bandas de confiança.
+exibidos graficamente com bandas de confiança obtidas pelo método delta.
 
 Para maximização numérica das log-verossimilhanças dos modelos de
-regressão COM-Poisson e suas extensões utiliza-se o método de otimização
-quasi-Newton, denominado \textit{BFGS}. O vetor gradiente (derivadas de
-primeira ordem) e matriz hessiana (derivadas de segunda ordem) são
-obtidos numericamente via aproximação de diferenças finitas
+regressão COM-Poisson e suas extensões, utiliza-se o método de
+otimização quase-Newton, denominado \textit{BFGS}. O vetor gradiente
+(derivadas de primeira ordem) e matriz hessiana (derivadas de segunda
+ordem) são obtidos numericamente via aproximação por diferenças finitas
 \cite{Nocedal1995}.

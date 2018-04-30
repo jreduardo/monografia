@@ -5,41 +5,42 @@
 Os objetivos nesse trabalho foram a exploração, extensão e aplicação da
 distribuição COM-Poisson na análise de dados de contagem, cujo foram
 atendidos com a apresentação de seis aplicações dos modelos COM-Poisson
-a conjuntos de dados reais que exibem equidispersão, subdispersão,
-superdispersão, contagens altas, excesso de zeros e efeito aleatório,
-mostrando a flexibilidade do modelo COM-Poisson.
+para análise de conjuntos de dados reais que exibem equidispersão,
+subdispersão, superdispersão, contagens altas, excesso de zeros e efeito
+aleatório, destacando a flexibilidade do modelo COM-Poisson.
 
-Das análises realizadas destaca-se a característica restritiva do modelo
+Das análises realizadas, destaca-se a característica restritiva do modelo
 Poisson, que na maioria dos casos não se ajustou adequadamente devido à
 suposição de equidispersão. Para os modelos de regressão de efeitos
 fixos, os resultados obtidos com as abordagens via modelo COM-Poisson,
-Quasi-Poisson e Binomial Negativo (para os casos de superdispersão)
+quase-Poisson e binomial negativo (para os casos de superdispersão)
 foram bastante similares quanto à significância dos efeitos e predição
 com bandas de confiança. Resultados satisfatórios também foram obtidos
 nos modelos COM-Poisson com modelagem de excesso de zeros e
 inclusão de efeitos aleatórios. Nessas extensões, há dificuldade
 computacional para ajuste dos modelos, principalmente devido ao cálculo
-das constantes de normalização, que mesmo nos modelos de efeitos fixos
+das constantes de normalização que, mesmo nos modelos de efeitos fixos
 se mostram como dificuldades a serem superadas.
 
-Em todas as aplicações observou-se a não ortonalidade empírica, via
-matriz hessiana, o que se mostra como característica da
-distribuição. Outra característica observada na análise de dados é a
-simetria nos perfis de verossimilhança para o parâmetro $\phi$,
-indicando que aproximações quadráticas da verossimilhança podem ter bons
-desempenhos.
+Em todas as aplicações, observou-se a não ortonalidade empírica entre
+$\phi$ e $\lambda$, via matriz de informação observada de Fisher, o que
+se mostra como característica da distribuição. Outra característica
+observada na análise de dados é a simetria nos perfis de verossimilhança
+para o parâmetro $\phi$, indicando que aproximações quadráticas da
+verossimilhança podem ter bons desempenhos.
 
 De forma geral, sugere-se a aplicação dos modelos COM-Poisson na análise
 de dados de contagem, pois devido à sua flexibilidade, seus resultados
-se equivalem a abordagem semi-paramétrica via quasi-verossimilhança,
-porém com todos os benefícios da inferência totalmente paramétrica.
+se equivalem a abordagem por quase-verossimilhança, em que se faz apenas
+a especificação dos momentos média e variância, porém com todos os
+benefícios da inferência totalmente paramétrica.
 
 Dado o escopo do trabalho foram vários os tópicos levantados para
 pesquisas futuras. Estudo de reparametrizações que tornem os parâmetros
 $\lambda$ e $\nu$ ortogonais no modelo COM-Poisson podem ser de grande
 valia, pois tornarão as inferências entre eles independentes, além de
 possivelmente permitir a fatoração da verossimilhança com estimação
-concentrada. Para acelerar o algoritmo de estimação aproximações da
+concentrada. Para acelerar o algoritmo de estimação, aproximações da
 constante normalização podem resultar em ajustes satisfatórios. Estudos
 de simulação para verificar a robustez do modelo à má especificação da
 distribuição da variável resposta. Implementação da modelagem de excesso

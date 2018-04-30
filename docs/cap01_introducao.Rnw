@@ -4,24 +4,24 @@
 
 Em diversas áreas do conhecimento é comum o interesse em i) compreender
 o relacionamento entre variáveis de interesse e características de uma
-amostra e ii) realizar predições por meio de modelos estatísticos
-ajustados por dados de uma amostra. A teoria de modelos de regressão
-sustenta muitas das pesquisas na área de Estatística aplicada.
+amostra e ii) realizar predições para dadas características. A teoria
+dos modelos de regressão sustenta muitas das pesquisas na área de
+estatística aplicada nesse contexto.
 
 Os modelos de regressão, na sua forma univariada e usual, consistem no
 estabelecimento de uma equação matemática que relaciona a média de uma
 variável aleatória de interesse (variável resposta) com as demais
-variáveis observadas (covariáveis). Nessa metodologia considera-se uma
+variáveis observadas (covariáveis). Nessa metodologia, assume-se uma
 distribuição de probabilidades para a variável resposta condicionada às
-covariáveis cuja média está associada a um preditor que acomoda os
+covariáveis, cuja média está associada a um preditor que acomoda os
 efeitos dessas covariáveis.
 
 Pode-se destacar o modelo linear normal como o de uso predominante
-dentre os disponíveis para análises estatísticas aplicadas. Esse modelo
+dentre os mais comuns em análises estatísticas aplicadas. Esse modelo
 estabelece que a variável resposta, condicional às covariáveis, tem
-distribuição Normal, de média descrita por um preditor linear das
-covariáveis. Todavia, não são raras as situações em que a variável
-resposta é uma contagem, assumindo valores inteiros não
+distribuição normal, de média descrita por um preditor linear das
+covariáveis e variância comum. Todavia, não são raras as situações em
+que a variável resposta é uma contagem, assumindo valores inteiros não
 negativos. Variáveis aleatórias de contagem, de forma geral, representam
 o número de ocorrências de um evento em um domínio específico que pode
 ser contínuo, como um intervalo de tempo ou espaço, ou discreto, como
@@ -32,67 +32,67 @@ estimativas que contêm erros padrões inconsistentes e pode produzir
 predições negativas para o número de eventos \cite{King1989}. Uma
 alternativa adotada durante muitos anos, e ainda aplicada, é encontrar
 alguma forma de transformação da variável resposta a fim de atender aos
-pressupostos do modelo de regressão normal. Contudo essa abordagem
-dispõe de resultados insatisfatórios, pois i) dificulta a interpretação
-dos resultados, ii) não contempla a natureza da variável (ainda serão um
-conjunto discreto de valores, só que em outra escala) iii) não contempla
-a relação média e variância, característica de dados de contagem e iv) o
-uso da transformação logarítmica é problemática quando há contagens
-nulas.
+pressupostos do modelo de regressão normal \cite{Paula2013}. Contudo,
+essa abordagem dispõe de resultados insatisfatórios, pois i) dificulta a
+interpretação dos resultados, ii) não contempla a natureza da variável
+(ainda serão um conjunto discreto de valores, só que em outra escala)
+iii) não contempla a relação média--variância, característica de dados
+de contagem e iv) o uso da transformação logarítmica é problemática
+quando há contagens nulas.
 
 Diante dos problemas relatados na aplicação de modelos normais para
 análise de dados de contagem, diferentes abordagens foram
 propostas. Destaca-se o trabalho apresentado por \citeonline{Nelder1972}
 que introduz a teoria dos modelos lineares generalizados (MLG's). Essa
-nova classe de modelos flexibilizou a distribuição condicional
+nova classe de modelos flexibiliza a distribuição condicional,
 permitindo que outras distribuições pertencentes à família exponencial
-fossem consideradas para a distribuição da variável resposta. Tal
-família contempla as distribuições Poisson, Binomial, Gama entre outras
-bem conhecidas na literatura, além da própria distribuição Normal.
+sejam consideradas para a distribuição da variável resposta. Tal família
+contempla as distribuições Poisson, binomial, gama entre outras bem
+conhecidas na literatura, além da própria distribuição normal
+\cite{McCullagh1989}.
 
-Com os MLG's a modelagem de dados passou a ser mais fiel à natureza da
+Com os MLG's, a modelagem de dados passou a ser mais fiel à natureza da
 variável resposta, principalmente no que diz respeito ao seu
 suporte. Nesse contexto, a análise de variáveis aleatórias de contagem,
 que têm suporte nos conjunto dos números naturais, foi enriquecida
 expressivamente.
 
-Para análise estatística dessas variáveis, o modelo probabilístico de
-Poisson, já consolidado na literatura, é amplamente utilizado. Esse
-modelo possui apenas um parâmetro, denotado por $\lambda$, que
-representa a média e também a variância, o que implica em uma relação
-identidade ($\lambda = E(Y) = V(Y)$). Essa propriedade, chamada de
-equidispersão, é uma particularidade do modelo Poisson que pode não ser
-adequada a diversas situações. Quando aplicado sob negligência dessa
+Para análise dessas variáveis, o modelo Poisson, já consolidado na
+literatura, é amplamente utilizado. Esse modelo possui apenas um
+parâmetro, denotado por $\lambda$, que representa a média e também a
+variância, o que implica em uma relação identidade
+($\lambda = \text{E}(Y_i) = \text{V}(Y_i)$). Essa propriedade, chamada
+de equidispersão, é uma particularidade do modelo Poisson que pode não
+ser adequada a diversas situações. Quando aplicado sob negligência dessa
 suposição, o modelo Poisson apresenta erros padrões inconsistentes para
 as estimativas dos parâmetros e, por consequência, para toda função
 desses parâmetros \cite{Winkelmann1995, Winkelmann1994}.
 
 O caso de superdispersão, quando a variância é maior que a média, é o
-mais comum e existe uma variedade de métodos para análise de dados
-superdispersos. A superdispersão pode ocorrer pela ausência de
+mais comum e existe uma grande variedade de métodos para análise de
+dados superdispersos. A superdispersão pode ocorrer pela ausência de
 covariáveis importantes, excesso de zeros, diferentes amplitudes de
 domínio (\textit{offset}) não consideradas, heterogeneidade de unidades
 amostrais, entre outros \cite{RibeiroJr2012}. Para tais casos, uma
 abordagem é a adoção de modelos com efeitos aleatórios, que capturam a
-variabilidade extra, com a adoção de um ou mais termos de efeito
-aleatório. Um caso particular do modelo Poisson de efeitos aleatórios,
-muito adotado no campo aplicado da Estatística, ocorre quando a
-distribuição Gama é assumida para os efeitos aleatórios. Nessa situação
-há expressão fechada para a função de probabilidade marginal, que assume
-a forma Binomial Negativa.
+variabilidade extra com a adoção de um ou mais termos aleatórios. Um
+caso particular do modelo Poisson de efeitos aleatórios, muito adotado
+no campo aplicado da estatística, ocorre quando a distribuição gama é
+assumida para os efeitos aleatórios. Nessa situação há expressão fechada
+para a função de probabilidade marginal, que assume a forma binomial
+negativa.
 
-Outra manifestação de fuga da suposição de equidispersão é a
-subdispersão, situação menos comum na prática e menos relatada na
-literatura. Os processos que reduzem a variabilidade das contagens,
-abaixo do estabelecido pela Poisson, não são tão conhecidos quanto os
-que produzem variabilidade extra. Pela mesma razão, são poucas as
-abordagens descritas na literatura capazes de tratar subdispersão, uma
-vez que efeitos aleatórios só capturam a variabilidade extra. Cita-se os
-modelos de quasi-verossimilhança como a abordagem mais
-utilizada. Todavia não é possível descrever uma distribuição de
-probabilidades para a variável resposta nessa abordagem, pois a
-modelagem é baseada apenas nos dois primeiros momentos da distribuição
-condicional \cite{Paula2013}.
+Outra falha na suposição de equidispersão é a subdispersão, situação
+menos comum na prática e menos relatada na literatura. Os processos que
+reduzem a variabilidade das contagens, abaixo do estabelecido pela
+Poisson, não são tão conhecidos quanto os que produzem variabilidade
+extra. Pela mesma razão, são poucas as abordagens descritas na
+literatura capazes de tratar subdispersão, uma vez que efeitos
+aleatórios só capturam a variabilidade extra. Citam-se os modelos de
+quase-verossimilhança como a abordagem mais utilizada. Entretanto, não é
+possível descrever uma distribuição de probabilidades para a variável
+resposta nessa abordagem, pois a modelagem é baseada apenas nos momentos
+média e variância da distribuição condicional \cite{Paula2013}.
 
 <<processo-pontual, fig.cap="Ilustração de diferentes tipos de processos pontuais. Da direita para esquerda têm-se processos sob padrões aleatório, aglomerado e uniforme.", fig.height=3, fig.width=7>>=
 
@@ -135,24 +135,24 @@ xyplot(y ~ x | caso, data = da,
 @
 
 A \autoref{fig:processo-pontual} ilustra, em duas dimensões, a
-ocorrência de equi, super e subdispersão respectivamente. Nessa figura
+ocorrência de equi, super e subdispersão respectivamente. Nessa figura,
 cada ponto representa a ocorrência de um evento e cada parcela,
 delimitada pelas linhas pontilhadas, representa a unidade (ou domínio)
 na qual conta-se o número de eventos (como variável aleatória). O painel
-da esquerda representa a situação de dados de contagem equidispersos.
-Nesse cenário as ocorrências dos eventos se dispõem aleatoriamente. No
-painel central o padrão já se altera, tem-se a representação do caso de
-superdispersão. Nesse cenário formam-se aglomerados que deixam parcelas
-com contagens muito elevadas e parcelas com contagens baixas. Uma
-possível causa desse padrão se dá pelo processo de contágio
+da esquerda, representa a situação de dados de contagem equidispersos.
+Nesse cenário, as ocorrências dos eventos se dispõem aleatoriamente. No
+painel central, o padrão já se altera e tem-se a representação do caso
+de superdispersão. Nesse cenário, formam-se aglomerados que deixam
+parcelas com contagens muito elevadas e parcelas com contagens
+baixas. Uma possível causa desse padrão se dá pelo processo de contágio
 (e.g. contagem de casos de uma doença contagiosa, contagem de frutos
-apodrecidos). No terceiro e último painel ilustra-se o caso de
+apodrecidos). No terceiro e último painel, ilustra-se o caso de
 subdispersão, em que as ocorrências se dispõem uniformemente no
-espaço. Agora as contagens de ocorrências nas parcelas variam bem
-pouco. Ao contrário do caso superdisperso uma causa provável seria o
-oposto de contágio, a repulsa, ou seja, uma ocorrência causa a repulsa
-de outras ocorrências em seu redor (e.g. contagem de árvores, contagem
-de animais territoriais ou que disputam por território).
+espaço. Nesse caso, as contagens nas parcelas variam bem pouco. Ao
+contrário do caso superdisperso, uma causa provável seria o oposto de
+contágio, a repulsa, ou seja, uma ocorrência causa a repulsa de outras
+ocorrências em seu redor (e.g. contagem de árvores, contagem de animais
+que disputam por território).
 
 Uma alterativa paramétrica que contempla os casos de equi, super e
 subdispersão é a adoção de uma distribuição mais flexível para a
@@ -160,62 +160,60 @@ variável resposta condicional às covariáveis. \citeonline{Conway1962},
 antes da formalização dos MLG's, propuseram uma distribuição denominada
 COM-Poisson (nome em em homenagem aos seus autores Richard W. Conway,
 William L. Maxwell, \textbf{Co}nway-\textbf{M}axwell-Poisson) que
-generaliza a Poisson com a adição de mais um parâmetro, denotado por
-$\nu$, que torna a razão de probabilidades sucessivas não linear,
-contemplando os casos de sub e superdispersão \cite{Shmueli2005}.
+generaliza a Poisson com a adição de um parâmetro, denotado por $\nu$,
+que torna a razão de probabilidades sucessivas não linear, contemplando
+os casos de sub e superdispersão \cite{Shmueli2005}.
 
-Uma característica bastante relevante é que a COM-Poisson possui como
-casos particulares as distribuições Poisson, Geométrica e
-Binomial. Portanto, empregando a COM-Poisson como distribuição
-condicional em um modelo de regressão, a imposição de equidispersão não
-precisa ser satisfeita. Tal flexibilidade, considerando o amplo uso do
-modelo Poisson, significa que a COM-Poisson pode ser aplicada nessas
-situações e será especialmente importante naquelas em que há fuga da
+A distribuição COM-Poisson possui como casos particulares as
+distribuições Poisson e geométrica e a distribuição binomial como caso
+limite. Portanto, empregando a COM-Poisson como distribuição condicional
+em um modelo de regressão, a imposição de equidispersão não precisa ser
+satisfeita. Tal flexibilidade, considerando o amplo uso do modelo
+Poisson, significa que a COM-Poisson pode ser aplicada nessas situações
+e será especialmente importante naquelas em que há falha na suposição de
 equidispersão.
 
-Assim como no modelo COM-Poisson vários aspectos do COM-Poisson podem
-ser estendidos. Por exemplo, há situações em que o delineamento do
+Assim como no modelo Poisson, vários aspectos do COM-Poisson podem ser
+estendidos. Por exemplo, há situações em que o delineamento do
 experimento sugere uma estrutura de covariância entre observações
-induzidas por um processo hierárquico de casualização ou amostragem. São
+induzida por um processo hierárquico de casualização ou amostragem. São
 casos assim os experimentos em parcelas subdivididas e experimentos com
 medidas repetidas ou longitudinais. Tais estruturas estabelecem modelos
-com efeitos não observáveis e isso pode ser incorporado no modelo de
-regressão COM-Poisson com a inclusão de efeitos aleatórios a nível de
-grupos experimentais. Da mesma forma, excesso de zeros pode ser
-introduzido a essa distribuição como ocorre para o modelo Poisson,
-através de truncamento (modelos Hurdle) ou inflação (modelos de mistura)
-\cite{Sellers2016}. Estas extensões do modelo COM-Poisson ainda não são
-bem consolidadas na literatura e são escassas suas aplicações. Uma
-constatação do fato é que não há implementações destas extensões nos
-principais softwares estatísticos.
+com efeitos não observáveis e isso pode ser incorporado com a inclusão
+de efeitos aleatórios a nível de grupos experimentais. Da mesma forma,
+excesso de zeros pode ser introduzido a essa distribuição como ocorre
+para o modelo Poisson, através de truncamento (modelos \textit{hurdle})
+ou inflação (modelos de mistura) \cite{Sellers2016}. Estas extensões do
+modelo COM-Poisson ainda não são bem consolidadas na literatura e são
+escassas suas aplicações. Uma constatação do fato é que não há
+implementações destas extensões nos principais softwares estatísticos.
 
 Na literatura brasileira, aplicações do modelo COM-Poisson são
-raras. Foram encontradas apenas aplicações na área de Análise de
-Sobrevivência, mais especificamente em modelos com fração de cura
+raras. Foram encontradas apenas aplicações na área de análise de
+sobrevivência, mais especificamente em modelos com fração de cura
 \cite{Ribeiro2012, Borges2012}. Portanto, o presente trabalho visa
-colaborar com a literatura estatística brasileira i) apresentando e
-explorando o modelo de regressão COM-Poisson para dados de contagem; ii)
-estendendo as aplicações desse modelo para situações específicas como
-inclusão de efeitos aleatórios e modelagem de excesso de zeros; iii)
-discutindo os aspectos inferenciais por meio de análise de dados reais;
-e iv) disponibilizando os recursos computacionais, em formato de pacote
-R, para ajuste dos modelos apresentados. Nas aplicações optou-se também
-pela análise via modelos Poisson, Quasi-Poisson e Binomial Negativa para
-comparação de resultados.
+colaborar com a literatura estatística i) apresentando e explorando o
+modelo de regressão COM-Poisson para dados de contagem; ii) estendendo
+as aplicações desse modelo para situações específicas com a inclusão de
+efeitos aleatórios e modelagem de excesso de zeros; iii) discutindo os
+aspectos inferenciais por meio de análise de dados reais; e iv)
+disponibilizando os recursos computacionais, em formato de pacote R,
+para ajuste dos modelos apresentados. Nas aplicações, os modelos
+Poisson, quase-Poisson e binomial negativo também são ajustados, quando
+possível, para comparação de resultados.
 
 O trabalho é organizado em cinco capítulos. O primeiro capítulo visa
-enfatizar as características das variáveis aleatórias de contagem e suas
+enfatizar as características das variáveis aleatórias de contagem e as
 lacunas que podem ser complementadas na análise estatística dessas
 variáveis. O \autoref{cap:modelos-para-dados-de-contagem} é dedicado a
-revisão bibliográfica dos modelos estatísticos empregados à análise de
-dados de contagem. Nesse capítulo os modelos Poisson, Binomial Negativo,
-COM-Poisson, as abordagens para excesso de zeros e a estrutura dos
-modelos de efeitos aleatórios são apresentados. No
-\autoref{cap:material-e-metodos} são apresentados os conjuntos de dados
-a serem analisados e os métodos para ajuste e comparação dos modelos. O
-\autoref{cap:resultados-e-discussao} traz os principais resultados da
-aplicação e comparação dos modelos estatísticos, com ênfase nas
-discussões sob aspectos inferenciais empíricos. Finalmente, no
-\autoref{cap:consideracoes-finais} são apresentadas as considerações
+revisão bibliográfica dos modelos empregados à análise de dados de
+contagem. Nesse capítulo, os modelos Poisson, binomial negativo,
+COM-Poisson, as abordagens para excesso de zeros e os modelos de efeitos
+aleatórios são apresentados. No \autoref{cap:material-e-metodos} são
+apresentados os conjuntos de dados analisados e os métodos para ajuste e
+comparação dos modelos. O \autoref{cap:resultados-e-discussao} traz os
+principais resultados das aplicações e comparação dos modelos, com
+ênfase nas discussões sob aspectos inferenciais empíricos. Finalmente,
+no \autoref{cap:consideracoes-finais} são apresentadas as considerações
 finais obtidas desse trabalho e listadas algumas possíveis linhas de
 pesquisa para estudos futuros.
