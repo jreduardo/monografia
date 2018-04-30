@@ -256,11 +256,66 @@ myprof <- function(prof, conf = c(0.9, 0.95, 0.99),
 ## Gráfico de correlação entre os parâmetros
 
 library(corrplot)
-mycorrplot <- function(Corr, ...) {
-    corrplot.mixed(
-        Corr, lower = "number", upper = "ellipse",
-        diag = "l", tl.pos = "lt", tl.col = "black",
-        tl.cex = 0.8, col = brewer.pal(9, "Greys")[-(1:3)], ...)
+corrplot.mixed2 <- function (corr,
+                             lower = "number",
+                             upper = "circle",
+                             tl.pos = c("d", "lt", "n"),
+                             diag = c("n", "l", "u"),
+                             bg = "white",
+                             addgrid.col = "grey",
+                             lower.col = NULL,
+                             upper.col = NULL,
+                             plotCI = c("n", "square",
+                                        "circle", "rect"),
+                             mar = c(0, 0, 0, 0),
+                             cl.pos = NULL,
+                             ...)
+{
+    tl.pos <- match.arg(tl.pos)
+    diag <- match.arg(diag)
+    n <- nrow(corr)
+    adjust_plotCI <- function(plotCI, method) {
+        if (plotCI != "rect" || method %in% c("circle", "square")) {
+            return(plotCI)
+        }
+        return("n")
+    }
+    plotCI_lower <- adjust_plotCI(plotCI, lower)
+    plotCI_upper <- adjust_plotCI(plotCI, upper)
+    oldpar <- par(mar = mar, bg = "white")
+    on.exit(par(oldpar), add = TRUE)
+    corrplot(corr, type = "upper", method = upper, diag = TRUE,
+        tl.pos = tl.pos, plotCI = plotCI_upper, col = upper.col,
+        mar = mar, cl.pos = cl.pos, ...)
+    corrplot(corr, add = TRUE, type = "lower", method = lower,
+        diag = (diag == "l"), tl.pos = "n", cl.pos = "n", plotCI = plotCI_lower,
+        col = lower.col, mar = mar, ...)
+    if (diag == "n" && tl.pos != "d") {
+        symbols(1:n, n:1, add = TRUE, bg = bg, fg = addgrid.col,
+            inches = FALSE, squares = rep(1, n))
+    }
+    invisible(corr)
+}
+mycorrplot <- function(Corr,
+                       lower = "number",
+                       upper = "ellipse",
+                       diag = "l",
+                       tl.pos = "lt",
+                       tl.col = "black",
+                       tl.cex = 0.8,
+                       lower.col = brewer.pal(9, "Greys")[-(1:3)],
+                       upper.col = brewer.pal(9, "Greys")[-(1:3)],
+                       ...) {
+    corrplot.mixed2(Corr,
+                    lower = lower,
+                    upper = upper,
+                    diag = diag,
+                    tl.pos = tl.pos,
+                    tl.col = tl.col,
+                    tl.cex =tl.cex,
+                    lower.col = lower.col,
+                    upper.col = upper.col,
+                    ...)
 }
 
 ##======================================================================
