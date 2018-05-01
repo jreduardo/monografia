@@ -2,22 +2,23 @@
 % APÊNDICE A - CÓDIGOS TCC
 % ------------------------------------------------------------------------
 
-Todos os resultados apresentados são realizados com o \textit{software}
-R, cujo códigos para ajuste dos modelos COM-Poisson de efeito fixo,
-aleatório e com componente de barreira foram disponibilizados em formato
-de pacote no endereço \url{github.com/jreduardo/cmpreg}. Nesse
+Todos os resultados apresentados são realizados com o software
+\texttt{R}, cujo códigos para ajuste dos modelos COM-Poisson de efeito
+fixo, aleatório e com componente de barreira são disponibilizados em
+formato de pacote no endereço \url{github.com/jreduardo/cmpreg}. Nesse
 apêndice são apresentados os códigos, que utilizam as funções do pacote,
 para produzir os resultados da seção \ref{sec:analise-cottonBolls2}
 (modelos de regressão de efeitos fixos). Todavia, os códigos que
 produzem os demais resultados apresentados no trabalho podem ser
-visualizados no complemento online
+visualizados no repositório online
+\url{github.com/jreduardo/monografia}.
 
 <<code-cottonBolls2, echo=TRUE, eval=FALSE>>=
 
 ##----------------------------------------------------------------------
 ## Instalando o pacote cmpreg, elaborado no trabalho
 library(devtools)
-install_git("git@github.com:JrEduardo/cmpreg.git")
+install_github("jreduardo/cmpreg@v0.0.1")
 
 ##----------------------------------------------------------------------
 ## Análise de dados apresentados na seção ... (v.a. número de nós)

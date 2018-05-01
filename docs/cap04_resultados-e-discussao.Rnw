@@ -2640,7 +2640,7 @@ hessiana, o que torna as inferências dependentes. As correlações entre o
 estimador para o parâmetro de dispersão, $\hat{\phi}$ e o estimador para
 $\beta_0$, foram praticamente 1 em todos os exemplos. Isso se dá devido
 a parametrização de efeitos, em que $\beta_0$ governa a locação do
-parâmetro $\lamba$ e os demais parâmetros são diferenças. Em pesquisas
+parâmetro $\lambda$ e os demais parâmetros são diferenças. Em pesquisas
 não relatadas nesse trabalho, verificou-se que a reparametrização do
 parâmetro $\lambda$, adotando a aproximação para média, contorna essa
 característica com o preço de se ter uma distribuição aproximada. Nas
