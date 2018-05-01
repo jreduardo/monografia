@@ -1,6 +1,6 @@
 %% abtex2-modelo-projeto-pesquisa.tex, v<VERSION> laurocesar
-%% Copyright 2012-2015 by abnTeX2 group at http://www.abntex.net.br/ 
-%% 
+%% Copyright 2012-2015 by abnTeX2 group at http://www.abntex.net.br/
+%%
 %% This work may be distributed and/or modified under the
 %% conditions of the LaTeX Project Public License, either version 1.3
 %% of this license or (at your option) any later version.
@@ -8,23 +8,23 @@
 %% http://www.latex-project.org/lppl.txt
 %% and version 1.3 or later is part of all distributions of LaTeX
 %% version 2005/12/01 or later.
-%% 
+%%
 %% This work has the LPPL maintenance status `maintained'.
-%% 
+%%
 %% The Current Maintainer of this work is the abnTeX2 team, led
-%% by Lauro César Araujo. Further information are available on 
+%% by Lauro César Araujo. Further information are available on
 %% http://www.abntex.net.br/
-%% 
+%%
 %% This work consists of the files abntex2-modelo-projeto-pesquisa.tex
 %% and abntex2-modelo-references.bib
-%% 
+%%
 
 % ------------------------------------------------------------------------
 % ------------------------------------------------------------------------
-% abnTeX2: Modelo de Projeto de pesquisa em conformidade com 
+% abnTeX2: Modelo de Projeto de pesquisa em conformidade com
 % ABNT NBR 15287:2011 Informação e documentação - Projeto de pesquisa -
-% Apresentação 
-% ------------------------------------------------------------------------ 
+% Apresentação
+% ------------------------------------------------------------------------
 % ------------------------------------------------------------------------
 
 \documentclass[
@@ -32,7 +32,7 @@
 12pt,				% tamanho da fonte
 openright,			% capítulos começam em pág ímpar (insere página vazia caso preciso)
 oneside,			% para impressão em recto e verso. Oposto a oneside
-a4paper,			% tamanho do papel. 
+a4paper,			% tamanho do papel.
 % -- opções da classe abntex2 --
 % chapter=TITLE,		% títulos de capítulos convertidos em letras maiúsculas
 % section=TITLE,		% títulos de seções convertidos em letras maiúsculas
@@ -49,7 +49,7 @@ brazil,				% o último idioma é o principal do documento
 % ---
 
 % ---
-% Pacotes fundamentais 
+% Pacotes fundamentais
 % ---
 \usepackage{lmodern}			% Usa a fonte Latin Modern
 \usepackage[T1]{fontenc}		% Selecao de codigos de fonte.
@@ -63,7 +63,7 @@ brazil,				% o último idioma é o principal do documento
 
 % ---
 % Pacotes e definições adcionais, para adequações especificas
-\usepackage{tikz}				
+\usepackage{tikz}
 \usepackage{pdflscape}			% para ambiente landscape
 \usepackage{pgfgantt}			% cronograma estilo gráfico de gantt
 \usetikzlibrary{backgrounds}
@@ -84,9 +84,9 @@ brazil,				% o último idioma é o principal do documento
 \usepackage[brazilian,hyperpageref]{backref}% Paginas com as citações
 \usepackage[alf]{abntex2cite}				% Citações padrão ABNT
 
-% --- 
+% ---
 % CONFIGURAÇÕES DE PACOTES
-% --- 
+% ---
 
 % ---
 % Configurações do pacote backref
@@ -122,10 +122,10 @@ brazil,				% o último idioma é o principal do documento
 }
 \orientador[Orientador:]{Prof. Dr. Walmes Marques Zeviani}
 \tipotrabalho{Projeto de Pesquisa}
-% O preambulo deve conter o tipo do trabalho, o objetivo, 
-% o nome da instituição e a área de concentração 
-\preambulo{Projeto de Pesquisa apresentado à disciplina Laboratório A 
-  do Curso de Graduação em Estatística da Universidade Federal do Paraná, 
+% O preambulo deve conter o tipo do trabalho, o objetivo,
+% o nome da instituição e a área de concentração
+\preambulo{Projeto de Pesquisa apresentado à disciplina Laboratório A
+  do Curso de Graduação em Estatística da Universidade Federal do Paraná,
   como requisito para elaboração do Trabalho de Conclusão de Curso}
 % ---
 
@@ -139,11 +139,11 @@ brazil,				% o último idioma é o principal do documento
 \makeatletter
 \hypersetup{
   % pagebackref=true,
-  pdftitle={\@title}, 
+  pdftitle={\@title},
   pdfauthor={\@author},
   pdfsubject={\imprimirpreambulo},
   pdfcreator={LaTeX with abnTeX2},
-  pdfkeywords={abnt}{latex}{abntex}{abntex2}{projeto de pesquisa}, 
+  pdfkeywords={abnt}{latex}{abntex}{abntex2}{projeto de pesquisa},
   colorlinks=true,	% false: boxed links; true: colored links
   linkcolor=blue,     % color of internal links
   citecolor=blue, % color of links to bibliography
@@ -155,11 +155,11 @@ brazil,				% o último idioma é o principal do documento
   \renewcommand{\bibname}{REFER\^ENCIAS}
 }
 \makeatother
-% --- 
+% ---
 
-% --- 
-% Espaçamentos entre linhas e parágrafos 
-% --- 
+% ---
+% Espaçamentos entre linhas e parágrafos
+% ---
 
 % O tamanho do parágrafo é dado por:
 \setlength{\parindent}{1.3cm}
@@ -183,7 +183,7 @@ brazil,				% o último idioma é o principal do documento
 \selectlanguage{brazil}
 
 % Retira espaço extra obsoleto entre as frases.
-% \frenchspacing 
+% \frenchspacing
 
 % ----------------------------------------------------------
 % ELEMENTOS PRÉ-TEXTUAIS
@@ -193,7 +193,7 @@ brazil,				% o último idioma é o principal do documento
 % ---
 % Capa
 % ---
-\tikz[remember picture,overlay] \node[opacity=0.9,inner sep=0pt] at 
+\tikz[remember picture,overlay] \node[opacity=0.9,inner sep=0pt] at
 (current page.center){
   \includegraphics[width=\paperwidth,
   height=\paperheight]{images/ufpr_bg}};
@@ -263,11 +263,11 @@ atender aos pressupostos \cite{Paula2013}. Porém, com a introdução dos
 modelos lineares generalizados (MLG) por
 \citeauthoronline{Nelder1972} (\citeyear{Nelder1972}) e com o avanço
 computacional, a análise de dados não normais passou a ter
-como alternativa os MLG's. Esta nova classe de modelos flexibilizou a 
+como alternativa os MLG's. Esta nova classe de modelos flexibilizou a
 distribuição condicional associada permitindo outras distribuições
 pertencentes à família exponencial de distribuições. Tal família
 contempla as distribuições Poisson, Binomial, Gama entre outras bem
-conhecidas na literatura, além da própria distribuição Normal. 
+conhecidas na literatura, além da própria distribuição Normal.
 
 Com os MLG's a modelagem de dados passou a ser mais
 fiel a natureza dos dados em observação, principalmente no que diz
@@ -285,7 +285,7 @@ de Poisson, já consolidado na literatura e amplamente
 utilizado. Este modelo possui apenas um parâmetro, denotado por
 $\lambda$, que representa a média e também a variância, o que implica em
 uma relação identidade 1:1 ($\lambda = E[Y] = V[Y]$). Essa propriedade,
-chamada de 
+chamada de
 equidispersão, é uma particularidade do modelo Poisson que pode não ser
 adequada à diversas situações. Quando aplicado sob negligência desta
 suposição, o modelo Poisson apresenta erros padrões inconsistentes para
@@ -313,20 +313,20 @@ comum na literatura. Os processos
 que reduzem a variabilidade das contagens, abaixo do estabalecido pela
 Poisson, não são tão conhecidos quanto os
 que produzem variabilidade extra. Pela mesma razão, são poucas as
-abordagens descritas na literatura que 
+abordagens descritas na literatura que
 capazes de tratar a
 subdispersão, uma vez que efeitos aleatórios só capturam a variabilidade
-extra. Podemos citar os modelos de quasi-verossimilhança como a 
+extra. Podemos citar os modelos de quasi-verossimilhança como a
 abordagem mais utilizada, todavia não é possível recuperar a verdadeira
 distribuição da variável resposta nesta abordagem pois aqui a
-modelagem é baseada apenas nos dois primeiros momentos \cite{Paula2013}. 
+modelagem é baseada apenas nos dois primeiros momentos \cite{Paula2013}.
 
 Anteriormente à formalização dos MLG's, em um contexto de filas,
 \citeauthoronline{Conway1962} (\citeyear{Conway1962}) propuseram uma
-distribuição de probabilidades que 
+distribuição de probabilidades que
 generaliza a distribuição Poisson com a adição de mais uma parâmetro,
 denotado por $\nu$, contemplando assim os casos de sub e
-superdispersão. Posteriormente esta distribuição foi nomeada como 
+superdispersão. Posteriormente esta distribuição foi nomeada como
 COM-Poisson (Conway-Maxwell-Poisson em homenagem à Richard W. Conway,
 William L. Maxwell, seus autores). A função distribuição de
 probabilidade COM-Poisson assume a forma
@@ -345,7 +345,7 @@ verificada na razão de probabilidades consecutivas,
 \end{equation}
 que se caracteriza por
 não ser linear em $y$ para $nu \neq 1$, portanto, governada pelo
-parâmetro extra $\nu$ 
+parâmetro extra $\nu$
 \cite{Shmueli2005}.
 
 Uma característica bastante relevante é que a COM-Poisson
@@ -367,7 +367,7 @@ e \citeonline{Sellers2010}.
 
 Pela similaridade da função de distribuição COM-Poisson em \ref{eq:dcmp}
 com a Poisson, vários aspectos podem ser estendidos. Por exemplo,
-citamos 
+citamos
 a inclusão de efeitos aleatórios para acomodar superdispersão, porém há
 situações em que o delineamento do experimento sugere uma estrutura de
 covariância entre observações induzidas por um processo hierárquico de
@@ -380,7 +380,7 @@ de zeros pode ser introduzido a esta distribuição da mesma maneira
 que ocorre para o modelo Poisson, através de truncamento (modelos
 Hurdle) ou inflação (modelos de mistura). Estas extensões para o
 modelo COM-Poisson ainda não são bem consolidadas na literatura e são
-raras 
+raras
 suas aplicações. Uma constatação do fato é que não há implementações
 destas extensões nos principais softwares estatísticos.
 
@@ -413,17 +413,17 @@ efeitos aleatórios e excesso de zeros.
 \begin{itemize}
 \item Apresentar e discutir aspectos da distribuição COM-Poisson para
   modelos de regressão para dados de contagem;
-  
+
 \item Avaliar as propriedades de soluções numéricas para 1) cálculo da
-  densidade de probabilidade do modelo e 2) para estimação de modelos de 
+  densidade de probabilidade do modelo e 2) para estimação de modelos de
   regressão de efeito fixo;
-  
+
 \item Propor e implementar uma extensão do modelo de regressão
   COM-Poisson para acomodar efeitos aleatórios;
-  
+
 \item Propor e implementar uma extensão do modelo de regressão
   COM-Poisson para acomodar contagens com excesso de zeros.
-  
+
 \item Fazer a aplicação do modelo COM-Poisson e das extensões
   desenvolvidas à dados reais ou simulados. Fazer comparações com os
   modelos disponíveis para as situações estudadas: Poisson,
@@ -443,7 +443,7 @@ efeitos aleatórios e excesso de zeros.
 \label{sec:dados}
 
 Este projeto de pesquisa objetiva o estudo e avaliação do modelo de
-regressão 
+regressão
 COM-Poisson para modelagem de dados de contagem. Portanto, pretende-se
 analisar vários conjuntos de dados, preferencialmente os já analisados
 na literatura via outras técnicas, para efeitos de comparação.
@@ -454,7 +454,7 @@ Inicialmente temos o conjunto \texttt{defoliation}, disponível no
   UFPR \url{http://git.leg.ufpr.br/leg/legTools}}. Este conjunto de
 dados contém 125 observações provenientes de um experimento em casa de
 vegetação em delineamento inteiramente casualizado com 5 repetições,
-cujas plantas de 
+cujas plantas de
 algodão (\textit{Gossypium hirsutum}) foram submetidas à níveis de
 desfolha artificial (5 níveis) combinados com o estágio fenológico da
 planta na aplicação da desfolha (5 níveis). Observou-se como variável
@@ -471,7 +471,7 @@ cenários.
 \label{sec:recursos}
 
 Para análise e elaboração do trabalho será utilizado o
-\textit{software R}, na versão 3.2 \cite{Rcore2015}. 
+\textit{software R}, na versão 3.2 \cite{Rcore2015}.
 Atualmente há três bibliotecas desenvolvidas em R dedicadas
 à distribuição COM-Poisson:
 \begin{itemize}
@@ -487,8 +487,8 @@ Atualmente há três bibliotecas desenvolvidas em R dedicadas
   estimação de modelos de regressão além de funções probabilísticas.
 \end{itemize}
 
-Outros recursos e bibliotecas, principalmente para 
-otimização de funções e elaboração de gráficos, serão 
+Outros recursos e bibliotecas, principalmente para
+otimização de funções e elaboração de gráficos, serão
 utilizadas.
 
 \section{Métodos}
@@ -535,7 +535,7 @@ observações é pequeno.
           hgrid={*1{black!50, dotted}}, % grid cinza horizontal
           title height=0.8, % Size dos dias
           bar/.style={fill=done},
-          bar incomplete/.append style={fill=do}, 
+          bar incomplete/.append style={fill=do},
           bar label node/.append style={align=right},
           bar label font=\scriptsize\color{black!65},
           group label font=\bfseries\scriptsize\color{black},
@@ -554,17 +554,17 @@ observações é pequeno.
           today label font=\bfseries\scriptsize,
           today rule/.style={draw=black, thick, dashed},
           progress label text ={\pgfmathprintnumber[precision=0,
-            verbatim]{#1}\% realizado}, 
-          ]{1}{24} % 
+            verbatim]{#1}\% realizado},
+          ]{1}{24} %
           \gantttitle{Fevereiro\footnote{ss}}{4}
-          \gantttitle{Março}{4} 
-          \gantttitle{Abril}{4} 
-          \gantttitle{Maio}{4} 
-          \gantttitle{Junho}{4} 
+          \gantttitle{Março}{4}
+          \gantttitle{Abril}{4}
+          \gantttitle{Maio}{4}
+          \gantttitle{Junho}{4}
           \gantttitle{Julho}{4} \\
           \gantttitlelist{1,...,24}{1} \\
 
-          \ganttgroup[group label node/.append style={align=right}, 
+          \ganttgroup[group label node/.append style={align=right},
           progress=75]{Projeto \ganttalignnewline de Pesquisa}{1}{3} \\
           \ganttbar[progress=100, progress label text=]{Entrega à
             \ganttalignnewline banca}{1}{2} \\
@@ -586,15 +586,15 @@ observações é pequeno.
 
           \ganttgroup[group label node/.append style={align=right},
           progress=0, progress label text=]{Defesa \ganttalignnewline do
-            Trabalho}{20}{21} \\  
+            Trabalho}{20}{21} \\
           \ganttbar[progress=0, progress label text= ]{Elaboração da
             \ganttalignnewline apresentação}{20}{20} \\
 
           \ganttgroup[group label node/.append style={align=right},
-          progress=0, progress label text=]{Revisão Final}{21}{24} \\ 
+          progress=0, progress label text=]{Revisão Final}{21}{24} \\
           \ganttbar[progress=0, progress label text= ]{Incorporação
             \ganttalignnewline das sugestões}{21}{22} \\
-          \ganttbar[progress=0, progress label text= ]{Redação da 
+          \ganttbar[progress=0, progress label text= ]{Redação da
             \ganttalignnewline versão final}{22}{23} \\
           \ganttlink{elem1}{elem2}
           \ganttlink{elem3}{elem4}
