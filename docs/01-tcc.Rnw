@@ -70,6 +70,7 @@
 \usepackage{amsmath,amssymb,amstext}
 \usepackage{mathtools}                  % Funcionalidades (como \dcases)
 \usepackage{dsfont}    %% Para \mathds{1} Indicadora
+\usepackage{bm}
 
 \DeclareMathOperator{\Ell}{\mathcal{L}}
 \DeclareMathOperator{\R}{\mathbb{R}}
@@ -138,11 +139,11 @@
 % Informações de dados para CAPA e FOLHA DE ROSTO
 % ---
 \titulo{Extensões e Aplicações do Modelo de Regressão
-  Conway-Maxwell-Poisson para Modelagem de Dados de Contagem}
+  COM-Poisson para Análise de Dados de Contagem}
 \vspace{2cm}
 \autor{Eduardo Elias Ribeiro Junior}
 \local{Curitiba}
-\data{\Sexpr{format(Sys.time(), "%Y")}}
+\data{2016}
 \instituicao{Universidade Federal do Paraná
   \par
   Setor de Ciências Exatas
@@ -305,37 +306,30 @@ library(cmpreg)
 % resumo em português
 \setlength{\absparsep}{18pt} % ajusta o espaçamento dos parágrafos do resumo
 \begin{resumo}
-  Variáveis aleatórias de contagem são de natureza discreta e
-  representam o número de ocorrências de um evento em um domínio
-  discreto ou contínuo.  Para análise estatística dessas variáveis, o
-  modelo de Poisson é amplamente utilizado. Porém, não são raras as
-  situações de sub ou superdispersão, que inviabilizam o emprego desse
-  modelo. Uma alternativa paramétrica é o modelo COM-Poisson que, com a
-  adição de um parâmetro, contempla diferentes níveis de dispersão.
-  Outras características frequentes em dados de contagem são excesso de
-  contagens nulas e estrutura de correlação entre observações, muitas
-  vezes induzida pelo processo de casualização ou amostragem. Nesses
-  casos os modelos adotados devem ser adaptados. Neste trabalho são
-  exploradas as características da distribuição COM-Poisson e
-  apresentados os modelos de regressão COM-Poisson de efeitos fixos, com
-  modelagem para excesso de zeros e incluindo efeitos aleatórios. O
-  emprego dos modelos COM-Poisson e suas extensões é ilustrado com
-  aplicações e seus resultados são comparados com as abordagens Poisson,
-  Quasi-Poisson e Binomial Negativa (para casos de superdispersão) via
-  níveis descritivos de testes de razão de verossimilhanças, critério de
-  informação de Akaike e predições pontuais e intervalares. O ajuste dos
-  modelos é feito via maximização da verossimilhança. Os resultados
-  mostram que o modelo Poisson é de fato restritivo, com ajustes
-  inadequados na maioria das aplicações. O modelo COM-Poisson, por sua
-  vez, mostrou-se bastante flexível apresentando resultados similares
-  aos obtidos via abordagem semi-paramétrica Quasi-Poisson. As extensões
-  propostas para o modelo COM-Poisson apresentaram resultados
-  satisfatórios, sendo equivalentes às abordagens já consolidadas na
-  literatura.
+  Na análise de dados na forma de contagens, comumente, a suposição de
+  equidispersão é inapropriada inviabilizando o uso dos modelos de
+  regressão Poisson. Uma alternativa paramétrica nessas situações é o
+  modelo COM-Poisson que, com a adição de um parâmetro, contempla
+  diferentes níveis de dispersão. Outras características frequentes em
+  contagens são excesso de zeros e correlação entre observações, muitas
+  vezes induzida pelo processo de casualização ou amostragem. Neste
+  trabalho, são explorados os modelos de regressão baseados na
+  distribuição COM-Poisson e propostas extensões para modelagem de
+  excesso de zeros e inclusão de efeitos aleatórios. A estimação dos
+  parâmetros é realizada sob o método da máxima verossimilhança e a
+  inferência é baseada na distribuição assintótica dos estimadores. O
+  emprego dos modelos COM-Poisson e suas extensões são ilustrados com
+  seis aplicações. Os resultados destacam a flexibilidade da abordagem
+  proposta em relação aos modelos convencionais Poisson, quase-Poisson e
+  binomial negativo. Algumas características como a não ortogonalidade
+  dos parâmetros e linearidade da relação média-variância também foram
+  observadas. As implementações computacionais para ajuste dos modelos
+  COM-Poisson e suas extensões foram organizadas em formato de pacote
+  para o software R e estão disponíveis no GitHub.
 
   \textbf{Palavras-chave}:
   COM-Poisson; dados de contagem; subdispersão; superdispersão; excesso
-  de zeros; efeitos aleatórios; Binomial Negativa; Quasi-Poisson
+  de zeros; efeitos aleatórios; binomial negativa; quase-Poisson
 \end{resumo}
 
 % ---
